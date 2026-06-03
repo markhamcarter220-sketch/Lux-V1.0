@@ -57,13 +57,17 @@ fn reverse_edge_is_denied_when_undeclared() {
 fn inactive_node_blocks_traversal() {
     let mut booting = BootingGraph::new();
     booting.activate(node(1)).unwrap();
-    // node(2) intentionally not activated
-    booting.permit_edge(node(1), node(2)).unwrap();
+    // node(2) intentionally not activated — permit_edge must be denied at
+    // declaration time (fail-closed: no ghost edges).
+    assert!(
+        booting.permit_edge(node(1), node(2)).is_err(),
+        "permit_edge to inactive dst must be denied at declaration time"
+    );
     let graph = booting.seal();
 
     assert!(
         graph.traverse(node(1), node(2)).is_err(),
-        "inactive destination must block traversal"
+        "inactive destination must block traversal after seal"
     );
 }
 

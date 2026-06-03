@@ -76,9 +76,12 @@ proptest! {
         );
     }
 
-    /// An inactive node must block traversal even if the edge is declared.
+    /// An edge to an unactivated node must be denied at declaration time (fail-closed).
+    ///
+    /// The pre-activation guard in `permit_edge` enforces this earlier than
+    /// `traverse` — ghost edges are refused before they can be stored.
     #[test]
-    fn inactive_node_blocks_declared_edge(
+    fn inactive_node_blocks_edge_declaration(
         src in 1u32..=63u32,
         dst in 1u32..=30u32, // dst in different range to avoid collision
     ) {
@@ -89,14 +92,18 @@ proptest! {
         if ns == nd { return Ok(()); }
 
         let mut booting = BootingGraph::new();
-        // Activate src but NOT dst.
+        // Activate src but NOT dst — permit_edge must be denied at declaration time.
         booting.activate(ns).unwrap();
-        booting.permit_edge(ns, nd).unwrap();
-        let graph = booting.seal();
+        prop_assert!(
+            booting.permit_edge(ns, nd).is_err(),
+            "permit_edge to inactive dst must be denied at declaration time"
+        );
 
+        // After seal, traversal is also denied (edge was never stored).
+        let graph = booting.seal();
         prop_assert!(
             graph.traverse(ns, nd).is_err(),
-            "inactive dst node must block traversal"
+            "inactive dst node must block traversal after seal"
         );
     }
 }

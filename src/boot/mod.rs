@@ -77,9 +77,9 @@ impl BootState {
         let mut ledger  = Ledger::new();
 
         for edge in &manifest.edges {
-            booting.permit_edge(edge.src, edge.dst)?;
             booting.activate(edge.src)?;
             booting.activate(edge.dst)?;
+            booting.permit_edge(edge.src, edge.dst)?;
         }
 
         for q in &manifest.quotas {
