@@ -1,20 +1,26 @@
-//! Bounded, priority-ordered work queue.
+//! Bounded, priority-ordered work queue — allocator-free.
+//!
+//! Capacity is a const generic parameter baked into the type.  The queue
+//! never grows beyond `N` items; `enqueue` returns `SchedulerInvariant` when
+//! the ceiling is reached, which is the fail-closed response to overload.
+//!
+//! `heapless::BinaryHeap` with `Min` kind replaces `std::collections::BinaryHeap`:
+//! lower `priority` values (higher urgency) surface first, with no `Reverse`
+//! wrapper required and no allocator interaction at runtime.
 
-use alloc::{collections::BinaryHeap, vec::Vec};
-use core::cmp::Reverse;
+use heapless::{binary_heap::Min, BinaryHeap, Vec as HVec};
 
-use crate::{
-    error::Error,
-    types::NodeId,
-    Result,
-};
+use crate::{error::Error, types::MAX_QUEUE, Result};
 
 /// A single unit of scheduled work.
 #[derive(Debug, PartialEq, Eq)]
 pub struct WorkItem {
-    /// Lower value = higher priority (min-heap via `Reverse`).
+    /// Lower value = higher urgency.  A Min-heap surfaces the smallest
+    /// `priority` first, so no `Reverse` wrapper is needed.
     pub priority: u8,
-    pub target:   NodeId,
+    /// The node that will execute this work item.
+    pub target:   crate::types::NodeId,
+    /// Opaque caller-defined payload associated with the work item.
     pub payload:  u64,
 }
 
@@ -26,40 +32,43 @@ impl PartialOrd for WorkItem {
 
 impl Ord for WorkItem {
     fn cmp(&self, other: &Self) -> core::cmp::Ordering {
-        Reverse(self.priority).cmp(&Reverse(other.priority))
+        self.priority.cmp(&other.priority)
     }
 }
 
-/// Bounded priority queue.  Capacity is fixed at construction and enforced
-/// on every enqueue — no unbounded growth is permitted.
-#[derive(Debug)]
-pub struct WorkQueue {
-    inner:    BinaryHeap<WorkItem>,
-    capacity: usize,
+/// Bounded priority queue.  `N` is the hard capacity ceiling, fixed at
+/// compile time — no runtime allocation ever occurs.
+pub struct WorkQueue<const N: usize = MAX_QUEUE> {
+    inner: BinaryHeap<WorkItem, Min, N>,
 }
 
-impl WorkQueue {
-    /// Construct a queue with a hard capacity ceiling.
+impl<const N: usize> core::fmt::Debug for WorkQueue<N> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("WorkQueue")
+            .field("len", &self.inner.len())
+            .field("capacity", &N)
+            .finish()
+    }
+}
+
+impl<const N: usize> WorkQueue<N> {
+    /// Construct an empty queue.
     #[must_use]
-    pub fn with_capacity(capacity: usize) -> Self {
-        Self {
-            inner: BinaryHeap::with_capacity(capacity),
-            capacity,
-        }
+    pub fn new() -> Self {
+        Self { inner: BinaryHeap::new() }
     }
 
     /// Attempt to enqueue `item`.
     ///
-    /// Returns `Err(SchedulerInvariant)` if the queue is at capacity.
+    /// Returns `Err(SchedulerInvariant)` if the queue is at capacity — the
+    /// fail-closed response to sustained overload.
     pub fn enqueue(&mut self, item: WorkItem) -> Result<()> {
-        if self.inner.len() >= self.capacity {
-            return Err(Error::SchedulerInvariant { detail: "queue capacity exhausted" });
-        }
-        self.inner.push(item);
-        Ok(())
+        self.inner
+            .push(item)
+            .map_err(|_| Error::SchedulerInvariant { detail: "queue capacity exhausted" })
     }
 
-    /// Dequeue the highest-priority item, or `None` if the queue is empty.
+    /// Dequeue the highest-urgency (lowest `priority`) item, or `None`.
     pub fn dequeue(&mut self) -> Option<WorkItem> {
         self.inner.pop()
     }
@@ -76,12 +85,18 @@ impl WorkQueue {
         self.inner.is_empty()
     }
 
-    /// Drain all items as an ordered `Vec` (highest-priority first).
-    pub fn drain_ordered(&mut self) -> Vec<WorkItem> {
-        let mut out = Vec::with_capacity(self.inner.len());
+    /// Drain all items into a stack-allocated `Vec`, highest-urgency first.
+    pub fn drain_ordered(&mut self) -> HVec<WorkItem, N> {
+        let mut out = HVec::new();
         while let Some(item) = self.inner.pop() {
-            out.push(item);
+            let _ = out.push(item);
         }
         out
+    }
+}
+
+impl<const N: usize> Default for WorkQueue<N> {
+    fn default() -> Self {
+        Self::new()
     }
 }

@@ -26,14 +26,34 @@ bitflags! {
 ///
 /// Tokens are intentionally `!Clone` — possession is transfer.
 /// Delegation produces a *new* token with a subset of rights.
-#[derive(Debug, Zeroize)]
-#[zeroize(drop)]
+///
+/// The `nonce` field is consumed on first use by `Policy::check`; re-presenting
+/// the same token is detected and denied as a replay.
+///
+/// Secret fields (`rights`, `generation`, `nonce`) are zeroed on drop.
+/// `issuer` and `target` are `NonZeroU32` and cannot be zeroed to 0; they
+/// are non-secret routing metadata.
+#[derive(Debug)]
 pub struct Capability {
     pub(crate) issuer:     NodeId,
     pub(crate) target:     NodeId,
     pub(crate) rights:     CapabilitySet,
     pub(crate) generation: Generation,
     pub(crate) nonce:      u64,
+}
+
+impl Zeroize for Capability {
+    fn zeroize(&mut self) {
+        self.nonce = 0u64;
+        self.generation.0 = 0u64;
+        self.rights = CapabilitySet::empty();
+    }
+}
+
+impl Drop for Capability {
+    fn drop(&mut self) {
+        self.zeroize();
+    }
 }
 
 impl Capability {
@@ -46,8 +66,12 @@ impl Capability {
 
     /// Delegate a strict subset of rights to `new_target`.
     ///
-    /// Returns `None` if `subset` would expand rights beyond what this token
-    /// holds — the kernel never allows privilege amplification.
+    /// Returns `None` if:
+    /// - the token does not hold `DELEGATE`, or
+    /// - `subset` is not a bitwise subset of `self.rights`.
+    ///
+    /// The kernel never allows privilege amplification — this is enforced
+    /// algebraically by the `contains` check.
     #[must_use]
     pub fn delegate(
         &self,
@@ -68,5 +92,109 @@ impl Capability {
             generation: self.generation,
             nonce,
         })
+    }
+
+    /// Returns the node that issued this token.
+    #[must_use]
+    pub fn issuer(&self) -> NodeId {
+        self.issuer
+    }
+
+    /// Returns the node to which this token is bound.
+    #[must_use]
+    pub fn target(&self) -> NodeId {
+        self.target
+    }
+
+    /// Test-only constructor — use only in test harnesses.
+    ///
+    /// Not gated behind `#[cfg(test)]` because integration tests compile as
+    /// separate crates and would not see `cfg(test)` items.  The `new_for_`
+    /// prefix and this doc comment are the canonical signal.
+    #[must_use]
+    pub fn new_for_test(
+        issuer: NodeId,
+        target: NodeId,
+        rights: CapabilitySet,
+        generation: Generation,
+        nonce: u64,
+    ) -> Self {
+        Self { issuer, target, rights, generation, nonce }
+    }
+}
+
+// ── Kani proof harnesses ──────────────────────────────────────────────────────
+
+#[cfg(kani)]
+mod proofs {
+    use super::*;
+    use core::num::NonZeroU32;
+
+    /// Formal proof: `delegate` can never produce a token whose rights are a
+    /// strict superset of the delegating token's rights.
+    ///
+    /// Kani explores all possible `rights_raw` and `subset_raw` bit patterns
+    /// (2^32 × 2^32 combinations) and asserts the invariant holds for every
+    /// one.  A counterexample here is a P0 security finding.
+    #[kani::proof]
+    fn delegate_never_amplifies_rights() {
+        let rights_raw: u32  = kani::any();
+        let subset_raw: u32  = kani::any();
+        let gen_val: u64     = kani::any();
+        let nonce: u64       = kani::any();
+        let new_nonce: u64   = kani::any();
+
+        let issuer     = NonZeroU32::new(1).unwrap();
+        let target     = NonZeroU32::new(2).unwrap();
+        let new_target = NonZeroU32::new(3).unwrap();
+
+        let rights          = CapabilitySet::from_bits_truncate(rights_raw);
+        let requested_subset = CapabilitySet::from_bits_truncate(subset_raw);
+
+        let cap = Capability {
+            issuer,
+            target,
+            rights,
+            generation: Generation(gen_val),
+            nonce,
+        };
+
+        if let Some(delegated) = cap.delegate(new_target, requested_subset, new_nonce) {
+            kani::assert(
+                rights.contains(delegated.rights),
+                "INVARIANT VIOLATION: delegation produced rights not held by delegator",
+            );
+        }
+    }
+
+    /// Formal proof: a token without `DELEGATE` right can never produce a
+    /// delegated token under any input.
+    #[kani::proof]
+    fn no_delegate_right_produces_no_delegation() {
+        let rights_raw: u32 = kani::any();
+        let subset_raw: u32 = kani::any();
+        let gen_val: u64    = kani::any();
+        let nonce: u64      = kani::any();
+        let new_nonce: u64  = kani::any();
+
+        // Mask out the DELEGATE bit — this token explicitly lacks it.
+        let rights = CapabilitySet::from_bits_truncate(rights_raw)
+            .difference(CapabilitySet::DELEGATE);
+        let subset = CapabilitySet::from_bits_truncate(subset_raw);
+
+        let issuer     = NonZeroU32::new(1).unwrap();
+        let target     = NonZeroU32::new(2).unwrap();
+        let new_target = NonZeroU32::new(3).unwrap();
+
+        let cap = Capability {
+            issuer,
+            target,
+            rights,
+            generation: Generation(gen_val),
+            nonce,
+        };
+
+        let result = cap.delegate(new_target, subset, new_nonce);
+        kani::assert(result.is_none(), "INVARIANT VIOLATION: token without DELEGATE produced a delegation");
     }
 }

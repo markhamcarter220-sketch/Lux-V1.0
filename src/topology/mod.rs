@@ -1,11 +1,12 @@
-//! Topology subsystem — directed execution graph enforcement.
+//! Topology subsystem — typestate-enforced directed execution graph.
 //!
-//! The topology is a **static**, manifest-derived directed graph.
-//! No edge may be traversed that was not declared at boot.  This confines
-//! lateral movement within the kernel's node space.
+//! The graph transitions through exactly two states:
+//! 1. `BootingGraph` — mutable; edges and nodes are declared here.
+//! 2. `OperationalGraph` — sealed; only `traverse` is available.
+//!
+//! The typestate pattern ensures that `activate` and `permit_edge` are
+//! unreachable after the kernel enters the operational phase.
 
 pub mod graph;
-pub mod node;
 
-pub use graph::TopologyGraph;
-pub use node::Node;
+pub use graph::{BootingGraph, OperationalGraph};

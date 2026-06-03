@@ -1,26 +1,78 @@
 //! Integration tests: topology graph edge enforcement.
+//!
+//! These tests exercise the typestate API directly: a `BootingGraph` is
+//! constructed, seeded, and sealed into an `OperationalGraph`.  They verify
+//! that the adjacency-matrix traversal correctly enforces the declared edges.
 
 use lux_kernel::{
     error::Error,
-    topology::{
-        graph::TopologyGraph,
-        node::{Node, NodeState},
-    },
+    topology::{BootingGraph, OperationalGraph},
 };
 use core::num::NonZeroU32;
 
-// These tests construct a `TopologyGraph` directly against the internal API.
-// They verify the invariant: unlisted edges must always be denied.
+fn node(n: u32) -> NonZeroU32 {
+    NonZeroU32::new(n).unwrap()
+}
 
 #[test]
-fn undeclared_edge_is_denied() {
-    // A graph with no edges in the manifest denies all traversals.
-    // Constructing via internal test harness (not via boot path).
-    let n1 = NonZeroU32::new(1).unwrap();
-    let n2 = NonZeroU32::new(2).unwrap();
+fn undeclared_edge_is_denied_on_sealed_graph() {
+    let booting = BootingGraph::new();
+    let graph: OperationalGraph = booting.seal();
 
-    // Without a seeded manifest permitting (n1 → n2), traversal must fail.
-    // This test validates the deny-by-default baseline.
-    let err = Error::TopologyViolation { src: 1, dst: 2 };
-    assert_eq!(err, Error::TopologyViolation { src: n1.get(), dst: n2.get() });
+    // No edges declared → all traversals must fail.
+    let result = graph.traverse(node(1), node(2));
+    assert_eq!(
+        result,
+        Err(Error::TopologyViolation { src: 1, dst: 2 }),
+        "undeclared edge must be denied"
+    );
+}
+
+#[test]
+fn declared_edge_between_active_nodes_is_permitted() {
+    let mut booting = BootingGraph::new();
+    booting.activate(node(1)).unwrap();
+    booting.activate(node(2)).unwrap();
+    booting.permit_edge(node(1), node(2)).unwrap();
+    let graph = booting.seal();
+
+    assert!(graph.traverse(node(1), node(2)).is_ok(), "declared edge must be permitted");
+}
+
+#[test]
+fn reverse_edge_is_denied_when_undeclared() {
+    let mut booting = BootingGraph::new();
+    booting.activate(node(1)).unwrap();
+    booting.activate(node(2)).unwrap();
+    booting.permit_edge(node(1), node(2)).unwrap(); // only 1→2
+    let graph = booting.seal();
+
+    assert!(
+        graph.traverse(node(2), node(1)).is_err(),
+        "undeclared reverse edge must be denied"
+    );
+}
+
+#[test]
+fn inactive_node_blocks_traversal() {
+    let mut booting = BootingGraph::new();
+    booting.activate(node(1)).unwrap();
+    // node(2) intentionally not activated
+    booting.permit_edge(node(1), node(2)).unwrap();
+    let graph = booting.seal();
+
+    assert!(
+        graph.traverse(node(1), node(2)).is_err(),
+        "inactive destination must block traversal"
+    );
+}
+
+#[test]
+fn activate_is_unreachable_on_operational_graph() {
+    // This test is a compile-time proof: `OperationalGraph` has no
+    // `activate` method.  The following line would not compile:
+    //   graph.activate(node(1));
+    // We assert the structural property here as documentation.
+    let graph = BootingGraph::new().seal();
+    assert!(!graph.is_active(node(1)), "freshly-sealed graph has no active nodes");
 }

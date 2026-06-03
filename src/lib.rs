@@ -21,8 +21,6 @@
 )]
 #![warn(clippy::nursery)]
 
-extern crate alloc;
-
 pub mod auth;
 pub mod boot;
 pub mod error;

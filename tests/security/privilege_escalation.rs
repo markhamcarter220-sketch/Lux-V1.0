@@ -1,8 +1,8 @@
 //! Security tests: privilege escalation paths.
 //!
-//! These tests attempt known escalation patterns and assert that each is
-//! denied.  Any new escalation vector discovered in audit must have a
-//! corresponding regression test added here before the fix lands.
+//! Every test attempts a known escalation pattern and asserts it is denied.
+//! New escalation vectors discovered in audit must have a regression test
+//! added here before the fix lands.
 
 use lux_kernel::{
     auth::{
@@ -22,13 +22,13 @@ fn node(n: u32) -> NonZeroU32 {
 #[test]
 fn stale_token_after_rotation_is_denied() {
     let mut policy = Policy::new(Generation(0));
-    let stale_cap = Capability {
-        issuer:     node(1),
-        target:     node(2),
-        rights:     CapabilitySet::SHUTDOWN,
-        generation: Generation(0),
-        nonce:      0,
-    };
+    let stale_cap = Capability::new_for_test(
+        node(1),
+        node(2),
+        CapabilitySet::SHUTDOWN,
+        Generation(0),
+        20,
+    );
     policy.rotate_generation();
     assert_eq!(
         policy.check(&stale_cap, CapabilitySet::SHUTDOWN),
@@ -42,13 +42,61 @@ fn stale_token_after_rotation_is_denied() {
 // Attempt: delegate without holding the DELEGATE right.
 #[test]
 fn delegation_without_delegate_right_fails() {
-    let cap = Capability {
-        issuer:     node(1),
-        target:     node(2),
-        rights:     CapabilitySet::SCHEDULE,   // no DELEGATE
-        generation: Generation(0),
-        nonce:      0,
-    };
+    let cap = Capability::new_for_test(
+        node(1),
+        node(2),
+        CapabilitySet::SCHEDULE, // no DELEGATE
+        Generation(0),
+        21,
+    );
     let result = cap.delegate(node(3), CapabilitySet::SCHEDULE, 0);
     assert!(result.is_none(), "Delegation without DELEGATE right must fail");
+}
+
+// Attempt: nonce replay — present the same token a second time.
+#[test]
+fn nonce_replay_is_denied() {
+    let gen = Generation(0);
+    let mut policy = Policy::new(gen);
+    let cap = Capability::new_for_test(node(1), node(2), CapabilitySet::SCHEDULE, gen, 42);
+
+    assert!(
+        policy.check(&cap, CapabilitySet::SCHEDULE).is_ok(),
+        "First presentation must succeed"
+    );
+    // Second check with the same nonce must fail — replay detected.
+    assert_eq!(
+        policy.check(&cap, CapabilitySet::SCHEDULE),
+        Err(Error::CapabilityDenied { reason: "nonce replayed" }),
+        "Replay must be denied"
+    );
+}
+
+// Attempt: nonce replay cleared after generation rotation.
+#[test]
+fn nonce_window_clears_on_rotation() {
+    let mut policy = Policy::new(Generation(0));
+    let cap0 = Capability::new_for_test(
+        node(1),
+        node(2),
+        CapabilitySet::SCHEDULE,
+        Generation(0),
+        99,
+    );
+    assert!(policy.check(&cap0, CapabilitySet::SCHEDULE).is_ok());
+
+    // Rotate; old cap0 is now stale (generation mismatch), but nonce 99
+    // should be cleared — a new token with nonce 99 in gen 1 must succeed.
+    policy.rotate_generation();
+    let cap1 = Capability::new_for_test(
+        node(1),
+        node(2),
+        CapabilitySet::SCHEDULE,
+        policy.generation(), // gen 1
+        99,                  // same nonce, new generation — must be accepted
+    );
+    assert!(
+        policy.check(&cap1, CapabilitySet::SCHEDULE).is_ok(),
+        "Nonce 99 must be reusable in the new generation"
+    );
 }

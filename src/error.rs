@@ -16,26 +16,46 @@ pub type Result<T> = core::result::Result<T, Error>;
 pub enum Error {
     /// The caller's capability token is absent, expired, or malformed.
     #[error("capability denied: {reason}")]
-    CapabilityDenied { reason: &'static str },
+    CapabilityDenied {
+        /// Human-readable explanation of why the token was rejected.
+        reason: &'static str,
+    },
 
     /// The operation would exceed the caller's allocated resource quota.
     #[error("quota exceeded: {resource}")]
-    QuotaExceeded { resource: &'static str },
+    QuotaExceeded {
+        /// The resource class that was exhausted (e.g. `"compute"`, `"memory"`).
+        resource: &'static str,
+    },
 
     /// The requested topology edge is not declared in the boot manifest.
     #[error("topology violation: edge ({src}, {dst}) is not permitted")]
-    TopologyViolation { src: u32, dst: u32 },
+    TopologyViolation {
+        /// Source node ID.
+        src: u32,
+        /// Destination node ID.
+        dst: u32,
+    },
 
     /// The boot manifest failed structural or cryptographic validation.
     #[error("manifest invalid: {detail}")]
-    ManifestInvalid { detail: &'static str },
+    ManifestInvalid {
+        /// Specific validation failure reason.
+        detail: &'static str,
+    },
 
     /// A scheduler invariant was broken (e.g. priority inversion detected).
     #[error("scheduler invariant violated: {detail}")]
-    SchedulerInvariant { detail: &'static str },
+    SchedulerInvariant {
+        /// Description of the invariant that was violated.
+        detail: &'static str,
+    },
 
     /// Internal state machine reached an undefined transition.
     /// Maps directly to the fail-closed default: deny and halt sub-system.
     #[error("undefined state: {context}")]
-    UndefinedState { context: &'static str },
+    UndefinedState {
+        /// The context in which the undefined state was encountered.
+        context: &'static str,
+    },
 }

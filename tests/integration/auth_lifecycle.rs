@@ -10,34 +10,22 @@ use lux_kernel::{
 };
 use core::num::NonZeroU32;
 
-fn node(n: u32) -> core::num::NonZeroU32 {
+fn node(n: u32) -> NonZeroU32 {
     NonZeroU32::new(n).expect("test node id must be non-zero")
 }
 
 #[test]
 fn valid_capability_passes_policy_check() {
     let gen = Generation(0);
-    let policy = Policy::new(gen);
-    let cap = Capability {
-        issuer:     node(1),
-        target:     node(2),
-        rights:     CapabilitySet::SCHEDULE,
-        generation: gen,
-        nonce:      0,
-    };
+    let mut policy = Policy::new(gen);
+    let cap = Capability::new_for_test(node(1), node(2), CapabilitySet::SCHEDULE, gen, 1);
     assert!(policy.check(&cap, CapabilitySet::SCHEDULE).is_ok());
 }
 
 #[test]
 fn expired_generation_is_denied() {
-    let policy = Policy::new(Generation(5));
-    let cap = Capability {
-        issuer:     node(1),
-        target:     node(2),
-        rights:     CapabilitySet::SCHEDULE,
-        generation: Generation(3),
-        nonce:      0,
-    };
+    let mut policy = Policy::new(Generation(5));
+    let cap = Capability::new_for_test(node(1), node(2), CapabilitySet::SCHEDULE, Generation(3), 2);
     assert_eq!(
         policy.check(&cap, CapabilitySet::SCHEDULE),
         Err(Error::CapabilityDenied {
@@ -49,13 +37,13 @@ fn expired_generation_is_denied() {
 #[test]
 fn delegation_cannot_amplify_rights() {
     let gen = Generation(0);
-    let cap = Capability {
-        issuer:     node(1),
-        target:     node(2),
-        rights:     CapabilitySet::SCHEDULE | CapabilitySet::DELEGATE,
-        generation: gen,
-        nonce:      0,
-    };
+    let cap = Capability::new_for_test(
+        node(1),
+        node(2),
+        CapabilitySet::SCHEDULE | CapabilitySet::DELEGATE,
+        gen,
+        3,
+    );
     // Attempt to delegate ALLOC_RESOURCE which the token does not hold.
     let delegated = cap.delegate(node(3), CapabilitySet::ALLOC_RESOURCE, 42);
     assert!(delegated.is_none(), "privilege amplification must be blocked");
@@ -64,16 +52,17 @@ fn delegation_cannot_amplify_rights() {
 #[test]
 fn delegation_within_rights_succeeds() {
     let gen = Generation(0);
-    let cap = Capability {
-        issuer:     node(1),
-        target:     node(2),
-        rights:     CapabilitySet::SCHEDULE | CapabilitySet::DELEGATE,
-        generation: gen,
-        nonce:      0,
-    };
+    let cap = Capability::new_for_test(
+        node(1),
+        node(2),
+        CapabilitySet::SCHEDULE | CapabilitySet::DELEGATE,
+        gen,
+        4,
+    );
     let delegated = cap.delegate(node(3), CapabilitySet::SCHEDULE, 99);
     assert!(delegated.is_some());
     let delegated = delegated.unwrap();
-    assert_eq!(delegated.rights, CapabilitySet::SCHEDULE);
-    assert_eq!(delegated.target, node(3));
+
+    let mut policy = Policy::new(gen);
+    assert!(policy.check(&delegated, CapabilitySet::SCHEDULE).is_ok());
 }

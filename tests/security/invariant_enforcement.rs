@@ -1,6 +1,6 @@
 //! Security tests: core invariant enforcement.
 //!
-//! Each test in this file corresponds to exactly one kernel security invariant.
+//! Each test corresponds to exactly one kernel security invariant.
 //! These tests must pass at 100%.  A failure here is a P0 security regression.
 
 use lux_kernel::{
@@ -22,14 +22,14 @@ fn node(n: u32) -> NonZeroU32 {
 // Invariant 1: Fail-Closed — missing capability must deny.
 #[test]
 fn inv1_no_capability_no_access() {
-    let policy = Policy::new(Generation(0));
-    let cap = Capability {
-        issuer:     node(1),
-        target:     node(2),
-        rights:     CapabilitySet::empty(),
-        generation: Generation(0),
-        nonce:      0,
-    };
+    let mut policy = Policy::new(Generation(0));
+    let cap = Capability::new_for_test(
+        node(1),
+        node(2),
+        CapabilitySet::empty(),
+        Generation(0),
+        10,
+    );
     assert_eq!(
         policy.check(&cap, CapabilitySet::SCHEDULE),
         Err(Error::CapabilityDenied {
@@ -42,13 +42,13 @@ fn inv1_no_capability_no_access() {
 // Invariant 2: Capability-Gated — delegation cannot amplify.
 #[test]
 fn inv2_delegation_never_amplifies() {
-    let cap = Capability {
-        issuer:     node(10),
-        target:     node(11),
-        rights:     CapabilitySet::READ_TOPOLOGY | CapabilitySet::DELEGATE,
-        generation: Generation(0),
-        nonce:      1,
-    };
+    let cap = Capability::new_for_test(
+        node(10),
+        node(11),
+        CapabilitySet::READ_TOPOLOGY | CapabilitySet::DELEGATE,
+        Generation(0),
+        11,
+    );
     let all = CapabilitySet::all();
     let result = cap.delegate(node(12), all, 2);
     assert!(result.is_none(), "Invariant 2 violated: delegation amplified rights");
@@ -75,5 +75,9 @@ fn inv3_ledger_unchanged_after_failed_deduction() {
     ledger.seed(node(1), Quota::new(50));
     let enforcer = QuotaEnforcer;
     let _ = enforcer.deduct(&mut ledger, node(1), 999, "memory");
-    assert_eq!(ledger.balance(node(1)), Some(50), "Invariant 3: ledger must be unchanged after failed deduction");
+    assert_eq!(
+        ledger.balance(node(1)),
+        Some(50),
+        "Invariant 3: ledger must be unchanged after failed deduction"
+    );
 }

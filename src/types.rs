@@ -2,6 +2,26 @@
 
 use core::num::NonZeroU32;
 
+// ── Capacity constants ────────────────────────────────────────────────────────
+// All statically-allocated structures are bounded by these values.
+// Increasing any constant widens the worst-case stack frame proportionally.
+
+/// Maximum number of nodes in the topology graph.
+/// Encoded as a 64-bit bitmask row per node, so 64 is the natural ceiling.
+pub const MAX_NODES: usize = 64;
+
+/// Maximum number of directed edges declared in a boot manifest.
+pub const MAX_EDGES: usize = 256;
+
+/// Maximum capacity of a `WorkQueue`.
+pub const MAX_QUEUE: usize = 256;
+
+/// Number of per-generation nonces tracked for replay protection.
+/// When exhausted the kernel denies new capabilities (fail-closed).
+pub const NONCE_WINDOW: usize = 256;
+
+// ── Domain primitives ─────────────────────────────────────────────────────────
+
 /// Unique, non-zero identifier for a kernel node.
 pub type NodeId = NonZeroU32;
 
