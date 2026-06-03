@@ -4,3 +4,9 @@ mod auth_lifecycle;
 mod boot_sequence;
 #[path = "integration/topology_convergence.rs"]
 mod topology_convergence;
+#[path = "integration/manifest_decode.rs"]
+mod manifest_decode;
+#[path = "integration/revocation.rs"]
+mod revocation;
+#[path = "integration/audit_log.rs"]
+mod audit_log;

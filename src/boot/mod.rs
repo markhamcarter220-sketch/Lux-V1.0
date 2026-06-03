@@ -4,7 +4,7 @@
 //! capability seeds, and resource quotas may be established.  It follows an
 //! atomic, all-or-nothing contract:
 //!
-//! 1. Parse and cryptographically verify the manifest.
+//! 1. Decode and cryptographically verify the manifest.
 //! 2. Seed a `BootingGraph` with all declared edges and active nodes.
 //! 3. Seed a `Ledger` with per-node quotas.
 //! 4. **Seal** the graph — `BootingGraph::seal()` consumes the mutable graph
@@ -15,8 +15,12 @@
 //! If any step fails, `Err` is returned and **no partial state is retained**.
 //! The caller receives either a fully initialised `BootState` or nothing.
 
+pub mod credentials;
+pub mod decode;
 pub mod manifest;
 
+pub use credentials::BootCredentials;
+pub use decode::ManifestDecoder;
 pub use manifest::Manifest;
 
 use crate::{
@@ -57,16 +61,17 @@ impl BootState {
         &mut self.policy
     }
 
-    /// Validate `raw` bytes, run the full boot sequence, and seal the kernel.
+    /// Decode and verify `raw_manifest` using `credentials`, run the full
+    /// boot sequence, and return the sealed `BootState`.
     ///
-    /// Steps performed (all-or-nothing):
-    ///  1. Parse + verify manifest
+    /// Steps (all-or-nothing):
+    ///  1. CBOR decode + Ed25519 signature verify
     ///  2. Seed topology graph edges
     ///  3. Seed resource ledger
-    ///  4. Seal the graph (typestate transition: Booting → Operational)
+    ///  4. Seal the graph (typestate: Booting → Operational)
     ///  5. Construct the policy enforcement point
-    pub fn initialise(raw: &[u8]) -> Result<Self> {
-        let manifest = Manifest::parse_and_verify(raw)?;
+    pub fn initialise(raw_manifest: &[u8], credentials: &BootCredentials) -> Result<Self> {
+        let manifest = ManifestDecoder::decode(raw_manifest, credentials)?;
 
         let mut booting = BootingGraph::new();
         let mut ledger  = Ledger::new();

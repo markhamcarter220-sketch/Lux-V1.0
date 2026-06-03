@@ -20,6 +20,13 @@ pub const MAX_QUEUE: usize = 256;
 /// When exhausted the kernel denies new capabilities (fail-closed).
 pub const NONCE_WINDOW: usize = 256;
 
+/// Maximum simultaneously-revoked capability tokens per generation.
+/// Must be a power of two (heapless `FnvIndexSet` requirement).
+pub const MAX_REVOCATIONS: usize = 256;
+
+/// Maximum events retained in the in-memory audit log.
+pub const MAX_AUDIT_EVENTS: usize = 512;
+
 // ── Domain primitives ─────────────────────────────────────────────────────────
 
 /// Unique, non-zero identifier for a kernel node.

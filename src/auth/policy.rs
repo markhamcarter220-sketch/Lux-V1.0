@@ -1,23 +1,27 @@
 //! Policy enforcement point — the kernel's single authorisation gate.
 //!
-//! ## Nonce replay protection
+//! ## Check order (fail-closed at each step)
 //!
-//! `Policy` maintains a per-generation nonce window (`used_nonces`).
-//! Every successful `check` records the capability's nonce; a second
-//! presentation of the same nonce within the same generation is denied.
-//! On `rotate_generation` the window is cleared atomically.
+//! 1. **Generation + rights** — token expired or insufficient rights → deny.
+//! 2. **Revocation** — token explicitly revoked before use → deny.
+//! 3. **Nonce replay** — token already consumed this generation → deny.
+//! 4. **Nonce recording** — record nonce as consumed (window exhaustion → deny).
 //!
-//! When the window is exhausted (`NONCE_WINDOW` unique nonces consumed),
-//! further checks are denied — the fail-closed response that forces the
-//! caller to rotate the generation rather than silently widening the window.
+//! `check` requires `&mut self` because steps 3–4 mutate state.
 //!
-//! `check` requires `&mut self` because recording a nonce is a state mutation.
-//! All subsystems that hold a `Policy` must be declared `mut`.
+//! ## Revocation integration
+//!
+//! `Policy` owns a `RevocationLedger`.  Callers revoke tokens via
+//! `Policy::revoke_capability(nonce)`.  On `rotate_generation`, both the
+//! nonce window and the revocation ledger are cleared atomically.
 
 use heapless::Vec as HVec;
 
 use crate::{
-    auth::capability::{Capability, CapabilitySet},
+    auth::{
+        capability::{Capability, CapabilitySet},
+        revocation::RevocationLedger,
+    },
     error::Error,
     types::{Generation, NONCE_WINDOW},
     Result,
@@ -29,6 +33,8 @@ pub struct Policy {
     current_generation: Generation,
     /// Nonces consumed in the current generation.  Cleared on rotation.
     used_nonces: HVec<u64, NONCE_WINDOW>,
+    /// Explicitly revoked token IDs.  Cleared on rotation.
+    revocation: RevocationLedger,
 }
 
 impl Policy {
@@ -38,28 +44,33 @@ impl Policy {
         Self {
             current_generation: generation,
             used_nonces: HVec::new(),
+            revocation: RevocationLedger::new(),
         }
     }
 
     /// Gate the operation described by `required_right` on `cap`.
     ///
-    /// Returns `Ok(())` iff:
-    /// - the token is valid and current (generation + rights check), **and**
-    /// - the token's nonce has not been presented before in this generation.
-    ///
-    /// Every other path returns `Err(CapabilityDenied)` — fail-closed.
+    /// Returns `Ok(())` iff all four checks pass (generation, rights,
+    /// revocation, replay).  Every other path returns `Err(CapabilityDenied)`.
     pub fn check(&mut self, cap: &Capability, required_right: CapabilitySet) -> Result<()> {
+        // Step 1: generation and rights.
         if !cap.authorises(required_right, self.current_generation) {
             return Err(Error::CapabilityDenied {
                 reason: "token expired, insufficient rights, or wrong generation",
             });
         }
 
+        // Step 2: revocation check (pre-use denial).
+        if self.revocation.is_revoked(cap.nonce) {
+            return Err(Error::CapabilityDenied { reason: "capability revoked" });
+        }
+
+        // Step 3: nonce replay.
         if self.used_nonces.contains(&cap.nonce) {
             return Err(Error::CapabilityDenied { reason: "nonce replayed" });
         }
 
-        // Fail-closed on window exhaustion: deny rather than silently permit.
+        // Step 4: record nonce — fail-closed on window exhaustion.
         self.used_nonces
             .push(cap.nonce)
             .map_err(|_| Error::CapabilityDenied {
@@ -69,14 +80,28 @@ impl Policy {
         Ok(())
     }
 
-    /// Advance the generation counter, immediately invalidating all tokens
-    /// issued under older generations and clearing the nonce replay window.
+    /// Explicitly revoke a capability token by its nonce.
+    ///
+    /// Returns `true` on success, `false` if the revocation set is full.
+    pub fn revoke_capability(&mut self, token_id: u64) -> bool {
+        self.revocation.revoke(token_id)
+    }
+
+    /// Returns `true` if `token_id` is currently revoked.
+    #[must_use]
+    pub fn is_revoked(&self, token_id: u64) -> bool {
+        self.revocation.is_revoked(token_id)
+    }
+
+    /// Advance the generation counter, clearing both the nonce replay window
+    /// and the revocation ledger atomically.
     pub fn rotate_generation(&mut self) {
         self.current_generation = Generation(self.current_generation.0.saturating_add(1));
         self.used_nonces.clear();
+        self.revocation.clear();
     }
 
-    /// Returns the current generation value (read-only).
+    /// Returns the current generation value.
     #[must_use]
     pub fn generation(&self) -> Generation {
         self.current_generation

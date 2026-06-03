@@ -21,6 +21,7 @@
 )]
 #![warn(clippy::nursery)]
 
+pub mod audit;
 pub mod auth;
 pub mod boot;
 pub mod error;
