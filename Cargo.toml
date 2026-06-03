@@ -1,0 +1,49 @@
+[package]
+name        = "lux_kernel"
+version     = "1.0.0"
+edition     = "2021"
+rust-version = "1.78"
+authors     = ["Lux Project Contributors"]
+description = "A fail-closed, capability-authenticated governance microkernel"
+license     = "Apache-2.0"
+repository  = "https://github.com/markhamcarter220-sketch/lux-v1.0"
+keywords    = ["kernel", "governance", "capability", "security", "infrastructure"]
+categories  = ["os", "embedded", "no-std"]
+readme      = "README.md"
+publish     = false
+
+[lib]
+name = "lux_kernel"
+path = "src/lib.rs"
+
+[dependencies]
+thiserror  = "1.0"
+bitflags   = "2.5"
+once_cell  = "1.19"
+zeroize    = { version = "1.8", features = ["zeroize_derive"] }
+serde      = { version = "1.0", features = ["derive"], optional = true }
+
+[dev-dependencies]
+proptest   = "1.4"
+criterion  = { version = "0.5", features = ["html_reports"] }
+
+[features]
+default     = []
+serde       = ["dep:serde"]
+std         = []
+
+[profile.release]
+opt-level   = 3
+lto         = "fat"
+codegen-units = 1
+panic       = "abort"
+strip       = "symbols"
+overflow-checks = true
+
+[profile.dev]
+panic       = "abort"
+overflow-checks = true
+
+[[bench]]
+name    = "scheduler_throughput"
+harness = false

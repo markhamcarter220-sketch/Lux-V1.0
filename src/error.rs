@@ -1,0 +1,41 @@
+//! Kernel-wide error taxonomy.
+//!
+//! All errors are non-recoverable from the caller's perspective — the kernel
+//! never silently degrades.  The sentinel value for "unknown / catch-all" is
+//! intentionally absent: every rejection must carry a precise cause.
+
+use thiserror::Error;
+
+/// Canonical result type for all kernel operations.
+pub type Result<T> = core::result::Result<T, Error>;
+
+/// Every path that returns `Err` **denies** the requested operation.
+/// Adding a variant here requires a corresponding entry in `docs/SECURITY.md`.
+#[derive(Debug, Error, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum Error {
+    /// The caller's capability token is absent, expired, or malformed.
+    #[error("capability denied: {reason}")]
+    CapabilityDenied { reason: &'static str },
+
+    /// The operation would exceed the caller's allocated resource quota.
+    #[error("quota exceeded: {resource}")]
+    QuotaExceeded { resource: &'static str },
+
+    /// The requested topology edge is not declared in the boot manifest.
+    #[error("topology violation: edge ({src}, {dst}) is not permitted")]
+    TopologyViolation { src: u32, dst: u32 },
+
+    /// The boot manifest failed structural or cryptographic validation.
+    #[error("manifest invalid: {detail}")]
+    ManifestInvalid { detail: &'static str },
+
+    /// A scheduler invariant was broken (e.g. priority inversion detected).
+    #[error("scheduler invariant violated: {detail}")]
+    SchedulerInvariant { detail: &'static str },
+
+    /// Internal state machine reached an undefined transition.
+    /// Maps directly to the fail-closed default: deny and halt sub-system.
+    #[error("undefined state: {context}")]
+    UndefinedState { context: &'static str },
+}
