@@ -18,6 +18,10 @@ from typing import List
 
 PROTECTED_ATTRS: frozenset = frozenset({"age", "gender", "race"})
 
+# Substring scan catches aliased keys like "candidate_age", "gender_flag",
+# "applicant_race_code" that aren't in the exact set above.
+_PROTECTED_SUBSTRINGS: tuple = ("age", "gender", "race", "ethnicity", "sex")
+
 APPROVED_FEATURES: frozenset = frozenset({
     "years_experience",
     "education_level",
@@ -56,7 +60,7 @@ class PolicyGate:
         """
         self._checks += 1
 
-        # Invariant A: no protected attribute in the feature vector.
+        # Invariant A: no protected attribute in the feature vector (exact match).
         protected_violations = [k for k in features_used if k in PROTECTED_ATTRS]
         if protected_violations:
             self._denied += 1
@@ -64,6 +68,19 @@ class PolicyGate:
                 allowed=False,
                 reason=f"Protected attribute(s) detected in feature vector: {protected_violations}",
                 violations=protected_violations,
+            )
+
+        # Invariant A2: substring scan catches aliased keys (e.g. "candidate_age").
+        alias_violations = [
+            k for k in features_used
+            if any(sub in k.lower() for sub in _PROTECTED_SUBSTRINGS)
+        ]
+        if alias_violations:
+            self._denied += 1
+            return PolicyResult(
+                allowed=False,
+                reason=f"Key(s) with protected-attribute substrings in feature vector: {alias_violations}",
+                violations=alias_violations,
             )
 
         # Invariant B: every key is in the approved feature set.
