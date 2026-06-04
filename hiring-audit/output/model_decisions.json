@@ -1,0 +1,1828 @@
+{
+  "model": {
+    "type": "DecisionTreeClassifier",
+    "max_depth": 4,
+    "features": [
+      "years_experience",
+      "education_level",
+      "technical_skills",
+      "communication_score",
+      "problem_solving",
+      "fit_score"
+    ],
+    "protected_attrs_excluded": [
+      "age",
+      "gender",
+      "race"
+    ],
+    "note": "Protected attributes (age, gender, race) were NEVER passed to the model at train or predict time."
+  },
+  "summary": {
+    "total": 100,
+    "hired": 63,
+    "rejected": 37,
+    "hire_rate_pct": 63.0
+  },
+  "decisions": [
+    {
+      "candidate_id": 1,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 6,
+        "education_level": 2,
+        "technical_skills": 62.7,
+        "communication_score": 47.54,
+        "problem_solving": 73.65,
+        "fit_score": 68.26
+      },
+      "protected_attrs_audit_only": {
+        "age": 34,
+        "gender": "female",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 2,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 8,
+        "education_level": 2,
+        "technical_skills": 76.82,
+        "communication_score": 71.66,
+        "problem_solving": 55.45,
+        "fit_score": 57.79
+      },
+      "protected_attrs_audit_only": {
+        "age": 33,
+        "gender": "male",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 3,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 14,
+        "education_level": 3,
+        "technical_skills": 59.38,
+        "communication_score": 77.36,
+        "problem_solving": 82.85,
+        "fit_score": 68.63
+      },
+      "protected_attrs_audit_only": {
+        "age": 37,
+        "gender": "male",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 4,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 8,
+        "education_level": 2,
+        "technical_skills": 84.23,
+        "communication_score": 74.49,
+        "problem_solving": 95.2,
+        "fit_score": 94.35
+      },
+      "protected_attrs_audit_only": {
+        "age": 39,
+        "gender": "female",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 5,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 9,
+        "education_level": 4,
+        "technical_skills": 57.41,
+        "communication_score": 77.49,
+        "problem_solving": 90.66,
+        "fit_score": 80.72
+      },
+      "protected_attrs_audit_only": {
+        "age": 42,
+        "gender": "non-binary",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 6,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 0,
+        "education_level": 2,
+        "technical_skills": 32.33,
+        "communication_score": 78.2,
+        "problem_solving": 76.31,
+        "fit_score": 83.19
+      },
+      "protected_attrs_audit_only": {
+        "age": 39,
+        "gender": "male",
+        "race": "white"
+      }
+    },
+    {
+      "candidate_id": 7,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 0,
+        "education_level": 3,
+        "technical_skills": 78.83,
+        "communication_score": 91.33,
+        "problem_solving": 76.6,
+        "fit_score": 83.7
+      },
+      "protected_attrs_audit_only": {
+        "age": 28,
+        "gender": "non-binary",
+        "race": "white"
+      }
+    },
+    {
+      "candidate_id": 8,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 7,
+        "education_level": 3,
+        "technical_skills": 82.15,
+        "communication_score": 48.34,
+        "problem_solving": 68.57,
+        "fit_score": 75.55
+      },
+      "protected_attrs_audit_only": {
+        "age": 49,
+        "gender": "non-binary",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 9,
+      "decision": "HIRE",
+      "hire_probability": 0.6667,
+      "features_used": {
+        "years_experience": 11,
+        "education_level": 4,
+        "technical_skills": 54.61,
+        "communication_score": 90.11,
+        "problem_solving": 38.11,
+        "fit_score": 90.93
+      },
+      "protected_attrs_audit_only": {
+        "age": 32,
+        "gender": "male",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 10,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 8,
+        "education_level": 2,
+        "technical_skills": 64.64,
+        "communication_score": 54.14,
+        "problem_solving": 54.05,
+        "fit_score": 65.35
+      },
+      "protected_attrs_audit_only": {
+        "age": 27,
+        "gender": "male",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 11,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 7,
+        "education_level": 3,
+        "technical_skills": 71.66,
+        "communication_score": 63.38,
+        "problem_solving": 81.76,
+        "fit_score": 89.85
+      },
+      "protected_attrs_audit_only": {
+        "age": 40,
+        "gender": "female",
+        "race": "white"
+      }
+    },
+    {
+      "candidate_id": 12,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 4,
+        "education_level": 2,
+        "technical_skills": 100,
+        "communication_score": 64.62,
+        "problem_solving": 95.08,
+        "fit_score": 73.61
+      },
+      "protected_attrs_audit_only": {
+        "age": 27,
+        "gender": "non-binary",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 13,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 1,
+        "education_level": 1,
+        "technical_skills": 46.85,
+        "communication_score": 76.57,
+        "problem_solving": 100,
+        "fit_score": 63.82
+      },
+      "protected_attrs_audit_only": {
+        "age": 30,
+        "gender": "female",
+        "race": "hispanic"
+      }
+    },
+    {
+      "candidate_id": 14,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 13,
+        "education_level": 4,
+        "technical_skills": 75.41,
+        "communication_score": 60.82,
+        "problem_solving": 53.03,
+        "fit_score": 57.3
+      },
+      "protected_attrs_audit_only": {
+        "age": 34,
+        "gender": "male",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 15,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 14,
+        "education_level": 4,
+        "technical_skills": 48.05,
+        "communication_score": 59.88,
+        "problem_solving": 80.32,
+        "fit_score": 80.59
+      },
+      "protected_attrs_audit_only": {
+        "age": 45,
+        "gender": "non-binary",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 16,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 6,
+        "education_level": 2,
+        "technical_skills": 58.35,
+        "communication_score": 67.5,
+        "problem_solving": 64.45,
+        "fit_score": 46.41
+      },
+      "protected_attrs_audit_only": {
+        "age": 53,
+        "gender": "male",
+        "race": "white"
+      }
+    },
+    {
+      "candidate_id": 17,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 6,
+        "education_level": 3,
+        "technical_skills": 75.22,
+        "communication_score": 67.05,
+        "problem_solving": 45.13,
+        "fit_score": 68.69
+      },
+      "protected_attrs_audit_only": {
+        "age": 47,
+        "gender": "male",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 18,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 4,
+        "education_level": 3,
+        "technical_skills": 43.37,
+        "communication_score": 83.27,
+        "problem_solving": 42.48,
+        "fit_score": 93.44
+      },
+      "protected_attrs_audit_only": {
+        "age": 57,
+        "gender": "non-binary",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 19,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 8,
+        "education_level": 0,
+        "technical_skills": 42.38,
+        "communication_score": 63.36,
+        "problem_solving": 94.64,
+        "fit_score": 72.99
+      },
+      "protected_attrs_audit_only": {
+        "age": 28,
+        "gender": "male",
+        "race": "hispanic"
+      }
+    },
+    {
+      "candidate_id": 20,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 8,
+        "education_level": 1,
+        "technical_skills": 67.02,
+        "communication_score": 92.24,
+        "problem_solving": 70.02,
+        "fit_score": 79.27
+      },
+      "protected_attrs_audit_only": {
+        "age": 38,
+        "gender": "male",
+        "race": "hispanic"
+      }
+    },
+    {
+      "candidate_id": 21,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 4,
+        "education_level": 3,
+        "technical_skills": 69.14,
+        "communication_score": 60.88,
+        "problem_solving": 82.81,
+        "fit_score": 80.51
+      },
+      "protected_attrs_audit_only": {
+        "age": 47,
+        "gender": "female",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 22,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 10,
+        "education_level": 3,
+        "technical_skills": 73.15,
+        "communication_score": 69.32,
+        "problem_solving": 55.33,
+        "fit_score": 79.32
+      },
+      "protected_attrs_audit_only": {
+        "age": 25,
+        "gender": "non-binary",
+        "race": "white"
+      }
+    },
+    {
+      "candidate_id": 23,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 4,
+        "education_level": 2,
+        "technical_skills": 52.17,
+        "communication_score": 75.71,
+        "problem_solving": 68.05,
+        "fit_score": 100
+      },
+      "protected_attrs_audit_only": {
+        "age": 40,
+        "gender": "male",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 24,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 10,
+        "education_level": 1,
+        "technical_skills": 99.23,
+        "communication_score": 69.87,
+        "problem_solving": 100,
+        "fit_score": 65.81
+      },
+      "protected_attrs_audit_only": {
+        "age": 22,
+        "gender": "non-binary",
+        "race": "white"
+      }
+    },
+    {
+      "candidate_id": 25,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 5,
+        "education_level": 2,
+        "technical_skills": 59.91,
+        "communication_score": 73.04,
+        "problem_solving": 32.21,
+        "fit_score": 100
+      },
+      "protected_attrs_audit_only": {
+        "age": 39,
+        "gender": "female",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 26,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 16,
+        "education_level": 2,
+        "technical_skills": 100,
+        "communication_score": 56.95,
+        "problem_solving": 42.58,
+        "fit_score": 64.35
+      },
+      "protected_attrs_audit_only": {
+        "age": 33,
+        "gender": "female",
+        "race": "hispanic"
+      }
+    },
+    {
+      "candidate_id": 27,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 10,
+        "education_level": 3,
+        "technical_skills": 79.48,
+        "communication_score": 74.86,
+        "problem_solving": 86.4,
+        "fit_score": 76.94
+      },
+      "protected_attrs_audit_only": {
+        "age": 40,
+        "gender": "male",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 28,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 4,
+        "education_level": 1,
+        "technical_skills": 74.5,
+        "communication_score": 88.55,
+        "problem_solving": 62.36,
+        "fit_score": 62.86
+      },
+      "protected_attrs_audit_only": {
+        "age": 46,
+        "gender": "male",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 29,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 14,
+        "education_level": 3,
+        "technical_skills": 51.27,
+        "communication_score": 59.34,
+        "problem_solving": 50.11,
+        "fit_score": 63.45
+      },
+      "protected_attrs_audit_only": {
+        "age": 50,
+        "gender": "male",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 30,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 6,
+        "education_level": 2,
+        "technical_skills": 43.69,
+        "communication_score": 83.63,
+        "problem_solving": 63.42,
+        "fit_score": 83.61
+      },
+      "protected_attrs_audit_only": {
+        "age": 41,
+        "gender": "non-binary",
+        "race": "hispanic"
+      }
+    },
+    {
+      "candidate_id": 31,
+      "decision": "HIRE",
+      "hire_probability": 0.6667,
+      "features_used": {
+        "years_experience": 5,
+        "education_level": 4,
+        "technical_skills": 72.02,
+        "communication_score": 69.86,
+        "problem_solving": 71.06,
+        "fit_score": 82.7
+      },
+      "protected_attrs_audit_only": {
+        "age": 35,
+        "gender": "female",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 32,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 3,
+        "education_level": 2,
+        "technical_skills": 44.15,
+        "communication_score": 77.11,
+        "problem_solving": 52.18,
+        "fit_score": 100
+      },
+      "protected_attrs_audit_only": {
+        "age": 54,
+        "gender": "male",
+        "race": "hispanic"
+      }
+    },
+    {
+      "candidate_id": 33,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 1,
+        "education_level": 2,
+        "technical_skills": 42.96,
+        "communication_score": 39.65,
+        "problem_solving": 73.6,
+        "fit_score": 77.18
+      },
+      "protected_attrs_audit_only": {
+        "age": 39,
+        "gender": "non-binary",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 34,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 11,
+        "education_level": 3,
+        "technical_skills": 62.55,
+        "communication_score": 60.09,
+        "problem_solving": 59.15,
+        "fit_score": 63.81
+      },
+      "protected_attrs_audit_only": {
+        "age": 45,
+        "gender": "female",
+        "race": "hispanic"
+      }
+    },
+    {
+      "candidate_id": 35,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 8,
+        "education_level": 3,
+        "technical_skills": 67.58,
+        "communication_score": 66.04,
+        "problem_solving": 63.49,
+        "fit_score": 78.42
+      },
+      "protected_attrs_audit_only": {
+        "age": 22,
+        "gender": "male",
+        "race": "white"
+      }
+    },
+    {
+      "candidate_id": 36,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 7,
+        "education_level": 3,
+        "technical_skills": 56.87,
+        "communication_score": 67.27,
+        "problem_solving": 92.52,
+        "fit_score": 64.74
+      },
+      "protected_attrs_audit_only": {
+        "age": 41,
+        "gender": "female",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 37,
+      "decision": "HIRE",
+      "hire_probability": 0.6667,
+      "features_used": {
+        "years_experience": 8,
+        "education_level": 3,
+        "technical_skills": 60.24,
+        "communication_score": 71.87,
+        "problem_solving": 41.92,
+        "fit_score": 96.47
+      },
+      "protected_attrs_audit_only": {
+        "age": 37,
+        "gender": "female",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 38,
+      "decision": "HIRE",
+      "hire_probability": 0.6667,
+      "features_used": {
+        "years_experience": 7,
+        "education_level": 3,
+        "technical_skills": 56.62,
+        "communication_score": 57.85,
+        "problem_solving": 35.77,
+        "fit_score": 61.52
+      },
+      "protected_attrs_audit_only": {
+        "age": 38,
+        "gender": "female",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 39,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 6,
+        "education_level": 4,
+        "technical_skills": 78.85,
+        "communication_score": 41.26,
+        "problem_solving": 95.43,
+        "fit_score": 75.55
+      },
+      "protected_attrs_audit_only": {
+        "age": 51,
+        "gender": "male",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 40,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 17,
+        "education_level": 2,
+        "technical_skills": 67.0,
+        "communication_score": 63.02,
+        "problem_solving": 91.35,
+        "fit_score": 52.07
+      },
+      "protected_attrs_audit_only": {
+        "age": 24,
+        "gender": "non-binary",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 41,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 16,
+        "education_level": 2,
+        "technical_skills": 68.64,
+        "communication_score": 59.65,
+        "problem_solving": 79.01,
+        "fit_score": 73.36
+      },
+      "protected_attrs_audit_only": {
+        "age": 38,
+        "gender": "female",
+        "race": "hispanic"
+      }
+    },
+    {
+      "candidate_id": 42,
+      "decision": "HIRE",
+      "hire_probability": 0.6667,
+      "features_used": {
+        "years_experience": 16,
+        "education_level": 3,
+        "technical_skills": 24.02,
+        "communication_score": 94.92,
+        "problem_solving": 28.8,
+        "fit_score": 64.53
+      },
+      "protected_attrs_audit_only": {
+        "age": 26,
+        "gender": "female",
+        "race": "hispanic"
+      }
+    },
+    {
+      "candidate_id": 43,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 16,
+        "education_level": 4,
+        "technical_skills": 64.16,
+        "communication_score": 77.15,
+        "problem_solving": 42.83,
+        "fit_score": 81.04
+      },
+      "protected_attrs_audit_only": {
+        "age": 55,
+        "gender": "male",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 44,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 13,
+        "education_level": 2,
+        "technical_skills": 52.76,
+        "communication_score": 64.68,
+        "problem_solving": 67.75,
+        "fit_score": 71.21
+      },
+      "protected_attrs_audit_only": {
+        "age": 30,
+        "gender": "non-binary",
+        "race": "white"
+      }
+    },
+    {
+      "candidate_id": 45,
+      "decision": "HIRE",
+      "hire_probability": 0.6667,
+      "features_used": {
+        "years_experience": 4,
+        "education_level": 2,
+        "technical_skills": 89.06,
+        "communication_score": 79.43,
+        "problem_solving": 60.87,
+        "fit_score": 82.64
+      },
+      "protected_attrs_audit_only": {
+        "age": 46,
+        "gender": "non-binary",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 46,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 0,
+        "education_level": 2,
+        "technical_skills": 49.68,
+        "communication_score": 78.29,
+        "problem_solving": 65.49,
+        "fit_score": 79.01
+      },
+      "protected_attrs_audit_only": {
+        "age": 44,
+        "gender": "female",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 47,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 13,
+        "education_level": 3,
+        "technical_skills": 57.86,
+        "communication_score": 87.94,
+        "problem_solving": 81.98,
+        "fit_score": 72.03
+      },
+      "protected_attrs_audit_only": {
+        "age": 22,
+        "gender": "non-binary",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 48,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 10,
+        "education_level": 2,
+        "technical_skills": 53.33,
+        "communication_score": 73.7,
+        "problem_solving": 31.94,
+        "fit_score": 77.05
+      },
+      "protected_attrs_audit_only": {
+        "age": 23,
+        "gender": "non-binary",
+        "race": "hispanic"
+      }
+    },
+    {
+      "candidate_id": 49,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 4,
+        "education_level": 2,
+        "technical_skills": 54.09,
+        "communication_score": 59.95,
+        "problem_solving": 79.82,
+        "fit_score": 50.77
+      },
+      "protected_attrs_audit_only": {
+        "age": 37,
+        "gender": "male",
+        "race": "hispanic"
+      }
+    },
+    {
+      "candidate_id": 50,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 4,
+        "education_level": 0,
+        "technical_skills": 65.66,
+        "communication_score": 87.02,
+        "problem_solving": 71.88,
+        "fit_score": 67.59
+      },
+      "protected_attrs_audit_only": {
+        "age": 32,
+        "gender": "male",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 51,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 11,
+        "education_level": 2,
+        "technical_skills": 65.99,
+        "communication_score": 91.9,
+        "problem_solving": 96.33,
+        "fit_score": 72.81
+      },
+      "protected_attrs_audit_only": {
+        "age": 23,
+        "gender": "male",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 52,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 5,
+        "education_level": 2,
+        "technical_skills": 85.99,
+        "communication_score": 65.27,
+        "problem_solving": 80.24,
+        "fit_score": 75.29
+      },
+      "protected_attrs_audit_only": {
+        "age": 36,
+        "gender": "female",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 53,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 2,
+        "education_level": 4,
+        "technical_skills": 28.63,
+        "communication_score": 49.27,
+        "problem_solving": 86.17,
+        "fit_score": 59.84
+      },
+      "protected_attrs_audit_only": {
+        "age": 41,
+        "gender": "female",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 54,
+      "decision": "HIRE",
+      "hire_probability": 0.6667,
+      "features_used": {
+        "years_experience": 1,
+        "education_level": 4,
+        "technical_skills": 64.19,
+        "communication_score": 52.99,
+        "problem_solving": 67.26,
+        "fit_score": 82.53
+      },
+      "protected_attrs_audit_only": {
+        "age": 33,
+        "gender": "non-binary",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 55,
+      "decision": "HIRE",
+      "hire_probability": 0.6667,
+      "features_used": {
+        "years_experience": 1,
+        "education_level": 3,
+        "technical_skills": 63.89,
+        "communication_score": 75.95,
+        "problem_solving": 64.99,
+        "fit_score": 82.87
+      },
+      "protected_attrs_audit_only": {
+        "age": 24,
+        "gender": "non-binary",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 56,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 13,
+        "education_level": 2,
+        "technical_skills": 55.28,
+        "communication_score": 47.96,
+        "problem_solving": 84.0,
+        "fit_score": 77.63
+      },
+      "protected_attrs_audit_only": {
+        "age": 30,
+        "gender": "male",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 57,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 6,
+        "education_level": 2,
+        "technical_skills": 70.4,
+        "communication_score": 34.03,
+        "problem_solving": 100,
+        "fit_score": 75.53
+      },
+      "protected_attrs_audit_only": {
+        "age": 25,
+        "gender": "male",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 58,
+      "decision": "HIRE",
+      "hire_probability": 0.6667,
+      "features_used": {
+        "years_experience": 4,
+        "education_level": 3,
+        "technical_skills": 91.98,
+        "communication_score": 40.43,
+        "problem_solving": 43.37,
+        "fit_score": 83.32
+      },
+      "protected_attrs_audit_only": {
+        "age": 25,
+        "gender": "female",
+        "race": "hispanic"
+      }
+    },
+    {
+      "candidate_id": 59,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 5,
+        "education_level": 2,
+        "technical_skills": 60.98,
+        "communication_score": 71.43,
+        "problem_solving": 54.8,
+        "fit_score": 90.09
+      },
+      "protected_attrs_audit_only": {
+        "age": 22,
+        "gender": "male",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 60,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 9,
+        "education_level": 4,
+        "technical_skills": 26.67,
+        "communication_score": 63.05,
+        "problem_solving": 46.99,
+        "fit_score": 60.73
+      },
+      "protected_attrs_audit_only": {
+        "age": 30,
+        "gender": "female",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 61,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 10,
+        "education_level": 1,
+        "technical_skills": 56.0,
+        "communication_score": 77.12,
+        "problem_solving": 54.64,
+        "fit_score": 92.99
+      },
+      "protected_attrs_audit_only": {
+        "age": 44,
+        "gender": "female",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 62,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 13,
+        "education_level": 3,
+        "technical_skills": 35.59,
+        "communication_score": 74.63,
+        "problem_solving": 100,
+        "fit_score": 83.09
+      },
+      "protected_attrs_audit_only": {
+        "age": 23,
+        "gender": "female",
+        "race": "hispanic"
+      }
+    },
+    {
+      "candidate_id": 63,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 9,
+        "education_level": 3,
+        "technical_skills": 76.41,
+        "communication_score": 66.89,
+        "problem_solving": 77.7,
+        "fit_score": 73.03
+      },
+      "protected_attrs_audit_only": {
+        "age": 36,
+        "gender": "non-binary",
+        "race": "white"
+      }
+    },
+    {
+      "candidate_id": 64,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 12,
+        "education_level": 2,
+        "technical_skills": 64.32,
+        "communication_score": 84.38,
+        "problem_solving": 33.55,
+        "fit_score": 49.74
+      },
+      "protected_attrs_audit_only": {
+        "age": 45,
+        "gender": "non-binary",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 65,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 0,
+        "education_level": 1,
+        "technical_skills": 80.36,
+        "communication_score": 72.08,
+        "problem_solving": 49.12,
+        "fit_score": 40.34
+      },
+      "protected_attrs_audit_only": {
+        "age": 32,
+        "gender": "male",
+        "race": "hispanic"
+      }
+    },
+    {
+      "candidate_id": 66,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 12,
+        "education_level": 3,
+        "technical_skills": 59.18,
+        "communication_score": 65.01,
+        "problem_solving": 72.66,
+        "fit_score": 44.99
+      },
+      "protected_attrs_audit_only": {
+        "age": 22,
+        "gender": "male",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 67,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 6,
+        "education_level": 2,
+        "technical_skills": 49.4,
+        "communication_score": 76.28,
+        "problem_solving": 52.48,
+        "fit_score": 71.52
+      },
+      "protected_attrs_audit_only": {
+        "age": 31,
+        "gender": "non-binary",
+        "race": "white"
+      }
+    },
+    {
+      "candidate_id": 68,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 0,
+        "education_level": 4,
+        "technical_skills": 42.73,
+        "communication_score": 48.8,
+        "problem_solving": 63.18,
+        "fit_score": 57.56
+      },
+      "protected_attrs_audit_only": {
+        "age": 46,
+        "gender": "male",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 69,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 0,
+        "education_level": 3,
+        "technical_skills": 44.9,
+        "communication_score": 65.9,
+        "problem_solving": 42.68,
+        "fit_score": 80.94
+      },
+      "protected_attrs_audit_only": {
+        "age": 32,
+        "gender": "female",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 70,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 17,
+        "education_level": 4,
+        "technical_skills": 65.78,
+        "communication_score": 86.76,
+        "problem_solving": 55.24,
+        "fit_score": 63.27
+      },
+      "protected_attrs_audit_only": {
+        "age": 33,
+        "gender": "male",
+        "race": "hispanic"
+      }
+    },
+    {
+      "candidate_id": 71,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 9,
+        "education_level": 2,
+        "technical_skills": 69.86,
+        "communication_score": 56.93,
+        "problem_solving": 87.3,
+        "fit_score": 57.14
+      },
+      "protected_attrs_audit_only": {
+        "age": 54,
+        "gender": "male",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 72,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 8,
+        "education_level": 2,
+        "technical_skills": 45.94,
+        "communication_score": 80.59,
+        "problem_solving": 69.17,
+        "fit_score": 87.89
+      },
+      "protected_attrs_audit_only": {
+        "age": 35,
+        "gender": "male",
+        "race": "white"
+      }
+    },
+    {
+      "candidate_id": 73,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 2,
+        "education_level": 2,
+        "technical_skills": 53.91,
+        "communication_score": 76.33,
+        "problem_solving": 59.6,
+        "fit_score": 60.48
+      },
+      "protected_attrs_audit_only": {
+        "age": 32,
+        "gender": "male",
+        "race": "white"
+      }
+    },
+    {
+      "candidate_id": 74,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 5,
+        "education_level": 2,
+        "technical_skills": 60.82,
+        "communication_score": 58.6,
+        "problem_solving": 67.92,
+        "fit_score": 79.1
+      },
+      "protected_attrs_audit_only": {
+        "age": 26,
+        "gender": "non-binary",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 75,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 9,
+        "education_level": 2,
+        "technical_skills": 63.96,
+        "communication_score": 57.96,
+        "problem_solving": 43.7,
+        "fit_score": 59.37
+      },
+      "protected_attrs_audit_only": {
+        "age": 37,
+        "gender": "non-binary",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 76,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 0,
+        "education_level": 2,
+        "technical_skills": 66.3,
+        "communication_score": 72.29,
+        "problem_solving": 54.7,
+        "fit_score": 69.61
+      },
+      "protected_attrs_audit_only": {
+        "age": 22,
+        "gender": "male",
+        "race": "hispanic"
+      }
+    },
+    {
+      "candidate_id": 77,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 6,
+        "education_level": 3,
+        "technical_skills": 65.15,
+        "communication_score": 63.02,
+        "problem_solving": 81.86,
+        "fit_score": 72.88
+      },
+      "protected_attrs_audit_only": {
+        "age": 48,
+        "gender": "non-binary",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 78,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 8,
+        "education_level": 4,
+        "technical_skills": 31.88,
+        "communication_score": 73.89,
+        "problem_solving": 62.59,
+        "fit_score": 75.21
+      },
+      "protected_attrs_audit_only": {
+        "age": 26,
+        "gender": "male",
+        "race": "hispanic"
+      }
+    },
+    {
+      "candidate_id": 79,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 6,
+        "education_level": 4,
+        "technical_skills": 76.69,
+        "communication_score": 75.78,
+        "problem_solving": 51.52,
+        "fit_score": 66.82
+      },
+      "protected_attrs_audit_only": {
+        "age": 33,
+        "gender": "male",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 80,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 3,
+        "education_level": 2,
+        "technical_skills": 31.58,
+        "communication_score": 80.48,
+        "problem_solving": 82.48,
+        "fit_score": 71.25
+      },
+      "protected_attrs_audit_only": {
+        "age": 24,
+        "gender": "non-binary",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 81,
+      "decision": "HIRE",
+      "hire_probability": 0.6667,
+      "features_used": {
+        "years_experience": 2,
+        "education_level": 4,
+        "technical_skills": 68.25,
+        "communication_score": 79.97,
+        "problem_solving": 62.7,
+        "fit_score": 65.08
+      },
+      "protected_attrs_audit_only": {
+        "age": 25,
+        "gender": "non-binary",
+        "race": "white"
+      }
+    },
+    {
+      "candidate_id": 82,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 9,
+        "education_level": 2,
+        "technical_skills": 52.58,
+        "communication_score": 63.08,
+        "problem_solving": 71.09,
+        "fit_score": 93.79
+      },
+      "protected_attrs_audit_only": {
+        "age": 37,
+        "gender": "male",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 83,
+      "decision": "HIRE",
+      "hire_probability": 0.6667,
+      "features_used": {
+        "years_experience": 2,
+        "education_level": 4,
+        "technical_skills": 70.94,
+        "communication_score": 49.58,
+        "problem_solving": 47.03,
+        "fit_score": 44.34
+      },
+      "protected_attrs_audit_only": {
+        "age": 32,
+        "gender": "non-binary",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 84,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 10,
+        "education_level": 4,
+        "technical_skills": 68.21,
+        "communication_score": 64.88,
+        "problem_solving": 75.35,
+        "fit_score": 82.37
+      },
+      "protected_attrs_audit_only": {
+        "age": 24,
+        "gender": "non-binary",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 85,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 1,
+        "education_level": 1,
+        "technical_skills": 54.51,
+        "communication_score": 48.44,
+        "problem_solving": 86.74,
+        "fit_score": 66.19
+      },
+      "protected_attrs_audit_only": {
+        "age": 35,
+        "gender": "female",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 86,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 7,
+        "education_level": 3,
+        "technical_skills": 61.72,
+        "communication_score": 67.92,
+        "problem_solving": 71.36,
+        "fit_score": 92.79
+      },
+      "protected_attrs_audit_only": {
+        "age": 31,
+        "gender": "male",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 87,
+      "decision": "HIRE",
+      "hire_probability": 0.6667,
+      "features_used": {
+        "years_experience": 2,
+        "education_level": 3,
+        "technical_skills": 65.92,
+        "communication_score": 60.72,
+        "problem_solving": 49.76,
+        "fit_score": 70.2
+      },
+      "protected_attrs_audit_only": {
+        "age": 44,
+        "gender": "male",
+        "race": "hispanic"
+      }
+    },
+    {
+      "candidate_id": 88,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 24,
+        "education_level": 4,
+        "technical_skills": 46.88,
+        "communication_score": 72.88,
+        "problem_solving": 64.55,
+        "fit_score": 77.94
+      },
+      "protected_attrs_audit_only": {
+        "age": 29,
+        "gender": "female",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 89,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 11,
+        "education_level": 3,
+        "technical_skills": 40.33,
+        "communication_score": 84.85,
+        "problem_solving": 75.11,
+        "fit_score": 73.37
+      },
+      "protected_attrs_audit_only": {
+        "age": 40,
+        "gender": "female",
+        "race": "hispanic"
+      }
+    },
+    {
+      "candidate_id": 90,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 9,
+        "education_level": 3,
+        "technical_skills": 100,
+        "communication_score": 70.22,
+        "problem_solving": 62.49,
+        "fit_score": 73.11
+      },
+      "protected_attrs_audit_only": {
+        "age": 35,
+        "gender": "female",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 91,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 6,
+        "education_level": 3,
+        "technical_skills": 71.54,
+        "communication_score": 88.13,
+        "problem_solving": 84.4,
+        "fit_score": 65.4
+      },
+      "protected_attrs_audit_only": {
+        "age": 22,
+        "gender": "female",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 92,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 5,
+        "education_level": 3,
+        "technical_skills": 61.12,
+        "communication_score": 57.47,
+        "problem_solving": 85.34,
+        "fit_score": 73.23
+      },
+      "protected_attrs_audit_only": {
+        "age": 33,
+        "gender": "non-binary",
+        "race": "other"
+      }
+    },
+    {
+      "candidate_id": 93,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 16,
+        "education_level": 4,
+        "technical_skills": 58.76,
+        "communication_score": 63.06,
+        "problem_solving": 80.88,
+        "fit_score": 67.22
+      },
+      "protected_attrs_audit_only": {
+        "age": 38,
+        "gender": "male",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 94,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 2,
+        "education_level": 2,
+        "technical_skills": 48.2,
+        "communication_score": 65.33,
+        "problem_solving": 85.86,
+        "fit_score": 64.14
+      },
+      "protected_attrs_audit_only": {
+        "age": 32,
+        "gender": "female",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 95,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 0,
+        "education_level": 2,
+        "technical_skills": 68.33,
+        "communication_score": 58.5,
+        "problem_solving": 95.35,
+        "fit_score": 72.36
+      },
+      "protected_attrs_audit_only": {
+        "age": 50,
+        "gender": "female",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 96,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 1,
+        "education_level": 4,
+        "technical_skills": 45.44,
+        "communication_score": 75.69,
+        "problem_solving": 53.72,
+        "fit_score": 92.64
+      },
+      "protected_attrs_audit_only": {
+        "age": 42,
+        "gender": "non-binary",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 97,
+      "decision": "HIRE",
+      "hire_probability": 1.0,
+      "features_used": {
+        "years_experience": 15,
+        "education_level": 3,
+        "technical_skills": 68.21,
+        "communication_score": 95.79,
+        "problem_solving": 95.04,
+        "fit_score": 78.27
+      },
+      "protected_attrs_audit_only": {
+        "age": 22,
+        "gender": "male",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 98,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 0,
+        "education_level": 2,
+        "technical_skills": 85.69,
+        "communication_score": 74.08,
+        "problem_solving": 39.04,
+        "fit_score": 56.83
+      },
+      "protected_attrs_audit_only": {
+        "age": 30,
+        "gender": "female",
+        "race": "black"
+      }
+    },
+    {
+      "candidate_id": 99,
+      "decision": "REJECT",
+      "hire_probability": 0.0,
+      "features_used": {
+        "years_experience": 3,
+        "education_level": 0,
+        "technical_skills": 87.48,
+        "communication_score": 93.88,
+        "problem_solving": 74.59,
+        "fit_score": 70.96
+      },
+      "protected_attrs_audit_only": {
+        "age": 43,
+        "gender": "non-binary",
+        "race": "asian"
+      }
+    },
+    {
+      "candidate_id": 100,
+      "decision": "HIRE",
+      "hire_probability": 0.6667,
+      "features_used": {
+        "years_experience": 3,
+        "education_level": 3,
+        "technical_skills": 86.01,
+        "communication_score": 46.46,
+        "problem_solving": 78.54,
+        "fit_score": 61.42
+      },
+      "protected_attrs_audit_only": {
+        "age": 37,
+        "gender": "non-binary",
+        "race": "asian"
+      }
+    }
+  ]
+}

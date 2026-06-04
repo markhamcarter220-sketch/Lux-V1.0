@@ -1,0 +1,41 @@
+=== Decision Tree — Test Set Report ===
+
+              precision    recall  f1-score   support
+
+      REJECT       1.00      0.88      0.93         8
+        HIRE       0.92      1.00      0.96        12
+
+    accuracy                           0.95        20
+   macro avg       0.96      0.94      0.95        20
+weighted avg       0.95      0.95      0.95        20
+
+=== Tree Structure ===
+
+|--- years_experience <= 5.50
+|   |--- technical_skills <= 61.05
+|   |   |--- class: 0
+|   |--- technical_skills >  61.05
+|   |   |--- fit_score <= 72.80
+|   |   |   |--- education_level <= 2.50
+|   |   |   |   |--- class: 0
+|   |   |   |--- education_level >  2.50
+|   |   |   |   |--- class: 1
+|   |   |--- fit_score >  72.80
+|   |   |   |--- problem_solving <= 71.93
+|   |   |   |   |--- class: 1
+|   |   |   |--- problem_solving >  71.93
+|   |   |   |   |--- class: 1
+|--- years_experience >  5.50
+|   |--- education_level <= 2.50
+|   |   |--- technical_skills <= 65.31
+|   |   |   |--- years_experience <= 11.00
+|   |   |   |   |--- class: 0
+|   |   |   |--- years_experience >  11.00
+|   |   |   |   |--- class: 1
+|   |   |--- technical_skills >  65.31
+|   |   |   |--- class: 1
+|   |--- education_level >  2.50
+|   |   |--- problem_solving <= 42.38
+|   |   |   |--- class: 1
+|   |   |--- problem_solving >  42.38
+|   |   |   |--- class: 1
