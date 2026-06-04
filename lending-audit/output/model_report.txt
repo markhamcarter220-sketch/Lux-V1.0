@@ -1,0 +1,22 @@
+=== Lux Credit Model — Phase 1 Report ===
+
+Total applicants : 200
+APPROVE          : 101
+DENY             : 99
+Test accuracy    : 87.5%
+
+Feature importances (RandomForest):
+  credit_score              0.4483
+  income                    0.2909
+  employment_history        0.1083
+  collateral_value          0.1000
+  debt_to_income            0.0525
+
+Classification report (test set):
+  0            precision=0.82  recall=0.95  f1=0.88
+  1            precision=0.94  recall=0.81  f1=0.87
+  macro avg    precision=0.88  recall=0.88  f1=0.87
+  weighted avg precision=0.88  recall=0.88  f1=0.87
+
+Model features used: income, credit_score, employment_history, debt_to_income, collateral_value
+Protected attrs excluded: age, gender, race, marital_status, disability

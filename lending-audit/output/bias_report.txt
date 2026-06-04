@@ -1,0 +1,55 @@
+=== Lux Lending Bias Report ===
+Regulatory framework: ECOA (15 U.S.C. § 1691), FHA (42 U.S.C. § 3605)
+
+Total decisions: 200
+  APPROVE: 101  |  DENY: 99
+  Overall approval rate: 50.5%
+
+--- Chi-squared Independence Tests (α = 0.05) ---
+Attribute                  χ²    p-value      V Result
+------------------------------------------------------------
+age                    43.127     0.8771 0.0000  INDEPENDENT
+gender                  0.189     0.9097 0.0000  INDEPENDENT
+race                    2.804     0.5911 0.0000  INDEPENDENT
+marital_status          3.421     0.3312 0.0451  INDEPENDENT
+disability              0.044     0.8333 0.0000  INDEPENDENT
+
+VERDICT: All protected attributes are statistically independent of the credit decision at α = 0.05.
+
+--- 4/5ths Disparate Impact Analysis ---
+Threshold: group approval rate / best group rate < 80%
+(Age tested on 10-year bands; individual years have n<5 cells)
+
+  age (bands):
+    18-24                rate=46.4%  ratio=0.743 ← FLAGGED
+    25-34                rate=47.5%  ratio=0.760 ← FLAGGED
+    35-44                rate=52.8%  ratio=0.844
+    45-54                rate=54.8%  ratio=0.877
+    55-64                rate=62.5%  ratio=1.000
+    65+                  rate=43.9%  ratio=0.702 ← FLAGGED
+
+  gender:
+    F                    rate=48.9%  ratio=0.940
+    M                    rate=52.1%  ratio=1.000
+    NB                   rate=50.0%  ratio=0.960
+
+  race:
+    Asian                rate=35.7%  ratio=0.617 ← FLAGGED
+    Black                rate=57.9%  ratio=1.000
+    Hispanic             rate=56.7%  ratio=0.979
+    Other                rate=33.3%  ratio=0.576 ← FLAGGED
+    White                rate=50.4%  ratio=0.870
+
+  marital_status:
+    Divorced             rate=39.4%  ratio=0.591 ← FLAGGED
+    Married              rate=54.0%  ratio=0.810
+    Single               rate=48.5%  ratio=0.728 ← FLAGGED
+    Widowed              rate=66.7%  ratio=1.000
+
+  disability:
+    False                rate=50.3%  ratio=0.950
+    True                 rate=52.9%  ratio=1.000
+
+4/5ths VERDICT: One or more groups fall below the 80% threshold. ECOA/FHA disparate impact review recommended.
+
+Note: Statistical tests on n=200 are indicative. Cells with expected count < 5 reduce chi-squared reliability.

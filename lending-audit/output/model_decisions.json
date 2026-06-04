@@ -1,0 +1,2402 @@
+[
+  {
+    "applicant_id": 1,
+    "decision": "APPROVE",
+    "confidence": 0.949537,
+    "features_used": {
+      "income": 161572.53,
+      "credit_score": 849.0,
+      "employment_history": 31.2,
+      "debt_to_income": 0.6762,
+      "collateral_value": 120686.03
+    }
+  },
+  {
+    "applicant_id": 2,
+    "decision": "DENY",
+    "confidence": 0.423128,
+    "features_used": {
+      "income": 104609.33,
+      "credit_score": 728.0,
+      "employment_history": 5.4,
+      "debt_to_income": 0.8034,
+      "collateral_value": 161246.17
+    }
+  },
+  {
+    "applicant_id": 3,
+    "decision": "APPROVE",
+    "confidence": 0.58202,
+    "features_used": {
+      "income": 175961.65,
+      "credit_score": 476.0,
+      "employment_history": 21.4,
+      "debt_to_income": 0.8329,
+      "collateral_value": 77720.78
+    }
+  },
+  {
+    "applicant_id": 4,
+    "decision": "APPROVE",
+    "confidence": 0.971837,
+    "features_used": {
+      "income": 148552.56,
+      "credit_score": 835.0,
+      "employment_history": 20.6,
+      "debt_to_income": 0.4781,
+      "collateral_value": 437157.18
+    }
+  },
+  {
+    "applicant_id": 5,
+    "decision": "DENY",
+    "confidence": 0.329472,
+    "features_used": {
+      "income": 46010.15,
+      "credit_score": 575.0,
+      "employment_history": 34.3,
+      "debt_to_income": 0.4922,
+      "collateral_value": 141623.47
+    }
+  },
+  {
+    "applicant_id": 6,
+    "decision": "APPROVE",
+    "confidence": 0.967846,
+    "features_used": {
+      "income": 195855.8,
+      "credit_score": 575.0,
+      "employment_history": 18.5,
+      "debt_to_income": 0.7299,
+      "collateral_value": 280744.7
+    }
+  },
+  {
+    "applicant_id": 7,
+    "decision": "APPROVE",
+    "confidence": 0.894484,
+    "features_used": {
+      "income": 159393.75,
+      "credit_score": 538.0,
+      "employment_history": 15.4,
+      "debt_to_income": 0.3173,
+      "collateral_value": 395987.21
+    }
+  },
+  {
+    "applicant_id": 8,
+    "decision": "DENY",
+    "confidence": 0.148816,
+    "features_used": {
+      "income": 163630.93,
+      "credit_score": 379.0,
+      "employment_history": 25.6,
+      "debt_to_income": 0.7618,
+      "collateral_value": 391912.05
+    }
+  },
+  {
+    "applicant_id": 9,
+    "decision": "DENY",
+    "confidence": 0.236243,
+    "features_used": {
+      "income": 51779.32,
+      "credit_score": 814.0,
+      "employment_history": 10.7,
+      "debt_to_income": 0.47,
+      "collateral_value": 219193.13
+    }
+  },
+  {
+    "applicant_id": 10,
+    "decision": "DENY",
+    "confidence": 0.026674,
+    "features_used": {
+      "income": 106565.61,
+      "credit_score": 307.0,
+      "employment_history": 5.6,
+      "debt_to_income": 0.1485,
+      "collateral_value": 238128.65
+    }
+  },
+  {
+    "applicant_id": 11,
+    "decision": "DENY",
+    "confidence": 0.10234,
+    "features_used": {
+      "income": 93035.66,
+      "credit_score": 396.0,
+      "employment_history": 19.1,
+      "debt_to_income": 0.1113,
+      "collateral_value": 497350.87
+    }
+  },
+  {
+    "applicant_id": 12,
+    "decision": "APPROVE",
+    "confidence": 0.656904,
+    "features_used": {
+      "income": 187550.05,
+      "credit_score": 426.0,
+      "employment_history": 16.7,
+      "debt_to_income": 0.7657,
+      "collateral_value": 337298.74
+    }
+  },
+  {
+    "applicant_id": 13,
+    "decision": "APPROVE",
+    "confidence": 0.537999,
+    "features_used": {
+      "income": 139457.07,
+      "credit_score": 453.0,
+      "employment_history": 9.3,
+      "debt_to_income": 0.0972,
+      "collateral_value": 407319.22
+    }
+  },
+  {
+    "applicant_id": 14,
+    "decision": "DENY",
+    "confidence": 0.187914,
+    "features_used": {
+      "income": 169869.47,
+      "credit_score": 372.0,
+      "employment_history": 14.7,
+      "debt_to_income": 0.2885,
+      "collateral_value": 451276.98
+    }
+  },
+  {
+    "applicant_id": 15,
+    "decision": "DENY",
+    "confidence": 0.029103,
+    "features_used": {
+      "income": 105380.41,
+      "credit_score": 309.0,
+      "employment_history": 14.7,
+      "debt_to_income": 0.334,
+      "collateral_value": 393794.92
+    }
+  },
+  {
+    "applicant_id": 16,
+    "decision": "DENY",
+    "confidence": 0.239557,
+    "features_used": {
+      "income": 68630.58,
+      "credit_score": 673.0,
+      "employment_history": 13.1,
+      "debt_to_income": 0.197,
+      "collateral_value": 92589.67
+    }
+  },
+  {
+    "applicant_id": 17,
+    "decision": "APPROVE",
+    "confidence": 0.910451,
+    "features_used": {
+      "income": 124279.41,
+      "credit_score": 834.0,
+      "employment_history": 15.2,
+      "debt_to_income": 0.3168,
+      "collateral_value": 281085.37
+    }
+  },
+  {
+    "applicant_id": 18,
+    "decision": "DENY",
+    "confidence": 0.023894,
+    "features_used": {
+      "income": 40848.93,
+      "credit_score": 367.0,
+      "employment_history": 27.4,
+      "debt_to_income": 0.6813,
+      "collateral_value": 50947.08
+    }
+  },
+  {
+    "applicant_id": 19,
+    "decision": "APPROVE",
+    "confidence": 0.773408,
+    "features_used": {
+      "income": 170697.3,
+      "credit_score": 463.0,
+      "employment_history": 11.9,
+      "debt_to_income": 0.0625,
+      "collateral_value": 326461.06
+    }
+  },
+  {
+    "applicant_id": 20,
+    "decision": "APPROVE",
+    "confidence": 0.900451,
+    "features_used": {
+      "income": 137382.95,
+      "credit_score": 578.0,
+      "employment_history": 38.0,
+      "debt_to_income": 0.7531,
+      "collateral_value": 477674.71
+    }
+  },
+  {
+    "applicant_id": 21,
+    "decision": "APPROVE",
+    "confidence": 0.975838,
+    "features_used": {
+      "income": 158874.92,
+      "credit_score": 811.0,
+      "employment_history": 36.7,
+      "debt_to_income": 0.7781,
+      "collateral_value": 256366.03
+    }
+  },
+  {
+    "applicant_id": 22,
+    "decision": "APPROVE",
+    "confidence": 0.879957,
+    "features_used": {
+      "income": 90269.41,
+      "credit_score": 682.0,
+      "employment_history": 19.2,
+      "debt_to_income": 0.3664,
+      "collateral_value": 216486.25
+    }
+  },
+  {
+    "applicant_id": 23,
+    "decision": "APPROVE",
+    "confidence": 0.730475,
+    "features_used": {
+      "income": 195018.66,
+      "credit_score": 722.0,
+      "employment_history": 13.1,
+      "debt_to_income": 0.1806,
+      "collateral_value": 17921.38
+    }
+  },
+  {
+    "applicant_id": 24,
+    "decision": "APPROVE",
+    "confidence": 0.953266,
+    "features_used": {
+      "income": 181830.59,
+      "credit_score": 620.0,
+      "employment_history": 21.4,
+      "debt_to_income": 0.5607,
+      "collateral_value": 479887.26
+    }
+  },
+  {
+    "applicant_id": 25,
+    "decision": "APPROVE",
+    "confidence": 0.816253,
+    "features_used": {
+      "income": 162325.19,
+      "credit_score": 529.0,
+      "employment_history": 33.9,
+      "debt_to_income": 0.1517,
+      "collateral_value": 51501.34
+    }
+  },
+  {
+    "applicant_id": 26,
+    "decision": "DENY",
+    "confidence": 0.038623,
+    "features_used": {
+      "income": 63088.58,
+      "credit_score": 410.0,
+      "employment_history": 26.1,
+      "debt_to_income": 0.3602,
+      "collateral_value": 20539.55
+    }
+  },
+  {
+    "applicant_id": 27,
+    "decision": "APPROVE",
+    "confidence": 0.833136,
+    "features_used": {
+      "income": 109342.57,
+      "credit_score": 776.0,
+      "employment_history": 32.2,
+      "debt_to_income": 0.8647,
+      "collateral_value": 123033.31
+    }
+  },
+  {
+    "applicant_id": 28,
+    "decision": "DENY",
+    "confidence": 0.189779,
+    "features_used": {
+      "income": 37446.64,
+      "credit_score": 743.0,
+      "employment_history": 21.3,
+      "debt_to_income": 0.8961,
+      "collateral_value": 32765.22
+    }
+  },
+  {
+    "applicant_id": 29,
+    "decision": "DENY",
+    "confidence": 0.01118,
+    "features_used": {
+      "income": 56229.21,
+      "credit_score": 313.0,
+      "employment_history": 25.3,
+      "debt_to_income": 0.7063,
+      "collateral_value": 227558.92
+    }
+  },
+  {
+    "applicant_id": 30,
+    "decision": "APPROVE",
+    "confidence": 0.942957,
+    "features_used": {
+      "income": 146118.32,
+      "credit_score": 694.0,
+      "employment_history": 11.5,
+      "debt_to_income": 0.3143,
+      "collateral_value": 258043.9
+    }
+  },
+  {
+    "applicant_id": 31,
+    "decision": "DENY",
+    "confidence": 0.081527,
+    "features_used": {
+      "income": 156609.57,
+      "credit_score": 346.0,
+      "employment_history": 29.4,
+      "debt_to_income": 0.6345,
+      "collateral_value": 156284.97
+    }
+  },
+  {
+    "applicant_id": 32,
+    "decision": "APPROVE",
+    "confidence": 0.689309,
+    "features_used": {
+      "income": 194476.65,
+      "credit_score": 707.0,
+      "employment_history": 8.1,
+      "debt_to_income": 0.6496,
+      "collateral_value": 25480.24
+    }
+  },
+  {
+    "applicant_id": 33,
+    "decision": "APPROVE",
+    "confidence": 0.775409,
+    "features_used": {
+      "income": 85390.31,
+      "credit_score": 755.0,
+      "employment_history": 27.8,
+      "debt_to_income": 0.3797,
+      "collateral_value": 55800.18
+    }
+  },
+  {
+    "applicant_id": 34,
+    "decision": "DENY",
+    "confidence": 0.097639,
+    "features_used": {
+      "income": 92978.15,
+      "credit_score": 372.0,
+      "employment_history": 34.4,
+      "debt_to_income": 0.5948,
+      "collateral_value": 192252.19
+    }
+  },
+  {
+    "applicant_id": 35,
+    "decision": "DENY",
+    "confidence": 0.181435,
+    "features_used": {
+      "income": 109824.49,
+      "credit_score": 539.0,
+      "employment_history": 5.3,
+      "debt_to_income": 0.0591,
+      "collateral_value": 30264.23
+    }
+  },
+  {
+    "applicant_id": 36,
+    "decision": "DENY",
+    "confidence": 0.02999,
+    "features_used": {
+      "income": 62210.13,
+      "credit_score": 368.0,
+      "employment_history": 24.6,
+      "debt_to_income": 0.2277,
+      "collateral_value": 349094.86
+    }
+  },
+  {
+    "applicant_id": 37,
+    "decision": "DENY",
+    "confidence": 0.059959,
+    "features_used": {
+      "income": 52086.66,
+      "credit_score": 612.0,
+      "employment_history": 3.8,
+      "debt_to_income": 0.4963,
+      "collateral_value": 103510.27
+    }
+  },
+  {
+    "applicant_id": 38,
+    "decision": "APPROVE",
+    "confidence": 0.924096,
+    "features_used": {
+      "income": 110869.84,
+      "credit_score": 811.0,
+      "employment_history": 29.0,
+      "debt_to_income": 0.1892,
+      "collateral_value": 151035.78
+    }
+  },
+  {
+    "applicant_id": 39,
+    "decision": "DENY",
+    "confidence": 0.034005,
+    "features_used": {
+      "income": 68574.59,
+      "credit_score": 344.0,
+      "employment_history": 3.4,
+      "debt_to_income": 0.191,
+      "collateral_value": 197062.89
+    }
+  },
+  {
+    "applicant_id": 40,
+    "decision": "APPROVE",
+    "confidence": 0.871316,
+    "features_used": {
+      "income": 143868.38,
+      "credit_score": 519.0,
+      "employment_history": 37.4,
+      "debt_to_income": 0.7609,
+      "collateral_value": 208304.82
+    }
+  },
+  {
+    "applicant_id": 41,
+    "decision": "DENY",
+    "confidence": 0.320611,
+    "features_used": {
+      "income": 104315.83,
+      "credit_score": 836.0,
+      "employment_history": 5.5,
+      "debt_to_income": 0.8908,
+      "collateral_value": 830.35
+    }
+  },
+  {
+    "applicant_id": 42,
+    "decision": "APPROVE",
+    "confidence": 0.713575,
+    "features_used": {
+      "income": 171555.29,
+      "credit_score": 465.0,
+      "employment_history": 38.4,
+      "debt_to_income": 0.5226,
+      "collateral_value": 56035.19
+    }
+  },
+  {
+    "applicant_id": 43,
+    "decision": "DENY",
+    "confidence": 0.171335,
+    "features_used": {
+      "income": 149045.07,
+      "credit_score": 372.0,
+      "employment_history": 32.0,
+      "debt_to_income": 0.7632,
+      "collateral_value": 431382.28
+    }
+  },
+  {
+    "applicant_id": 44,
+    "decision": "DENY",
+    "confidence": 0.30377,
+    "features_used": {
+      "income": 83102.33,
+      "credit_score": 569.0,
+      "employment_history": 23.7,
+      "debt_to_income": 0.8918,
+      "collateral_value": 616.53
+    }
+  },
+  {
+    "applicant_id": 45,
+    "decision": "APPROVE",
+    "confidence": 0.983341,
+    "features_used": {
+      "income": 171484.17,
+      "credit_score": 580.0,
+      "employment_history": 31.3,
+      "debt_to_income": 0.1704,
+      "collateral_value": 254083.68
+    }
+  },
+  {
+    "applicant_id": 46,
+    "decision": "APPROVE",
+    "confidence": 0.997666,
+    "features_used": {
+      "income": 166809.94,
+      "credit_score": 665.0,
+      "employment_history": 31.8,
+      "debt_to_income": 0.431,
+      "collateral_value": 244751.0
+    }
+  },
+  {
+    "applicant_id": 47,
+    "decision": "DENY",
+    "confidence": 0.244541,
+    "features_used": {
+      "income": 95871.32,
+      "credit_score": 472.0,
+      "employment_history": 37.8,
+      "debt_to_income": 0.3837,
+      "collateral_value": 166547.08
+    }
+  },
+  {
+    "applicant_id": 48,
+    "decision": "APPROVE",
+    "confidence": 0.780202,
+    "features_used": {
+      "income": 79015.78,
+      "credit_score": 826.0,
+      "employment_history": 10.1,
+      "debt_to_income": 0.118,
+      "collateral_value": 215663.51
+    }
+  },
+  {
+    "applicant_id": 49,
+    "decision": "APPROVE",
+    "confidence": 0.949969,
+    "features_used": {
+      "income": 146024.24,
+      "credit_score": 587.0,
+      "employment_history": 23.6,
+      "debt_to_income": 0.692,
+      "collateral_value": 390290.57
+    }
+  },
+  {
+    "applicant_id": 50,
+    "decision": "DENY",
+    "confidence": 0.079093,
+    "features_used": {
+      "income": 53757.92,
+      "credit_score": 457.0,
+      "employment_history": 3.8,
+      "debt_to_income": 0.4187,
+      "collateral_value": 420601.85
+    }
+  },
+  {
+    "applicant_id": 51,
+    "decision": "APPROVE",
+    "confidence": 0.643129,
+    "features_used": {
+      "income": 63984.39,
+      "credit_score": 829.0,
+      "employment_history": 24.6,
+      "debt_to_income": 0.4489,
+      "collateral_value": 130174.27
+    }
+  },
+  {
+    "applicant_id": 52,
+    "decision": "DENY",
+    "confidence": 0.173668,
+    "features_used": {
+      "income": 31251.59,
+      "credit_score": 809.0,
+      "employment_history": 6.9,
+      "debt_to_income": 0.1781,
+      "collateral_value": 161245.22
+    }
+  },
+  {
+    "applicant_id": 53,
+    "decision": "APPROVE",
+    "confidence": 0.955757,
+    "features_used": {
+      "income": 163777.14,
+      "credit_score": 575.0,
+      "employment_history": 22.6,
+      "debt_to_income": 0.2038,
+      "collateral_value": 121241.43
+    }
+  },
+  {
+    "applicant_id": 54,
+    "decision": "DENY",
+    "confidence": 0.070325,
+    "features_used": {
+      "income": 143024.65,
+      "credit_score": 313.0,
+      "employment_history": 22.9,
+      "debt_to_income": 0.821,
+      "collateral_value": 239931.7
+    }
+  },
+  {
+    "applicant_id": 55,
+    "decision": "APPROVE",
+    "confidence": 0.959193,
+    "features_used": {
+      "income": 149878.11,
+      "credit_score": 628.0,
+      "employment_history": 18.6,
+      "debt_to_income": 0.088,
+      "collateral_value": 341629.18
+    }
+  },
+  {
+    "applicant_id": 56,
+    "decision": "APPROVE",
+    "confidence": 0.958638,
+    "features_used": {
+      "income": 162723.94,
+      "credit_score": 605.0,
+      "employment_history": 20.9,
+      "debt_to_income": 0.2479,
+      "collateral_value": 114126.44
+    }
+  },
+  {
+    "applicant_id": 57,
+    "decision": "DENY",
+    "confidence": 0.069551,
+    "features_used": {
+      "income": 108015.68,
+      "credit_score": 381.0,
+      "employment_history": 30.6,
+      "debt_to_income": 0.2983,
+      "collateral_value": 165367.87
+    }
+  },
+  {
+    "applicant_id": 58,
+    "decision": "APPROVE",
+    "confidence": 0.951562,
+    "features_used": {
+      "income": 126686.0,
+      "credit_score": 649.0,
+      "employment_history": 32.0,
+      "debt_to_income": 0.4667,
+      "collateral_value": 465192.31
+    }
+  },
+  {
+    "applicant_id": 59,
+    "decision": "DENY",
+    "confidence": 0.206591,
+    "features_used": {
+      "income": 53765.49,
+      "credit_score": 763.0,
+      "employment_history": 19.7,
+      "debt_to_income": 0.5485,
+      "collateral_value": 24284.64
+    }
+  },
+  {
+    "applicant_id": 60,
+    "decision": "DENY",
+    "confidence": 0.008444,
+    "features_used": {
+      "income": 49470.11,
+      "credit_score": 358.0,
+      "employment_history": 24.0,
+      "debt_to_income": 0.4693,
+      "collateral_value": 230384.8
+    }
+  },
+  {
+    "applicant_id": 61,
+    "decision": "APPROVE",
+    "confidence": 0.968467,
+    "features_used": {
+      "income": 143628.5,
+      "credit_score": 698.0,
+      "employment_history": 37.2,
+      "debt_to_income": 0.1215,
+      "collateral_value": 355779.02
+    }
+  },
+  {
+    "applicant_id": 62,
+    "decision": "DENY",
+    "confidence": 0.024777,
+    "features_used": {
+      "income": 110086.36,
+      "credit_score": 377.0,
+      "employment_history": 4.8,
+      "debt_to_income": 0.2571,
+      "collateral_value": 75227.01
+    }
+  },
+  {
+    "applicant_id": 63,
+    "decision": "DENY",
+    "confidence": 0.282352,
+    "features_used": {
+      "income": 126090.14,
+      "credit_score": 712.0,
+      "employment_history": 4.7,
+      "debt_to_income": 0.7671,
+      "collateral_value": 23687.01
+    }
+  },
+  {
+    "applicant_id": 64,
+    "decision": "DENY",
+    "confidence": 0.34778,
+    "features_used": {
+      "income": 160049.81,
+      "credit_score": 530.0,
+      "employment_history": 3.5,
+      "debt_to_income": 0.592,
+      "collateral_value": 69102.69
+    }
+  },
+  {
+    "applicant_id": 65,
+    "decision": "DENY",
+    "confidence": 0.06455,
+    "features_used": {
+      "income": 137902.11,
+      "credit_score": 303.0,
+      "employment_history": 26.3,
+      "debt_to_income": 0.6018,
+      "collateral_value": 459411.6
+    }
+  },
+  {
+    "applicant_id": 66,
+    "decision": "APPROVE",
+    "confidence": 0.604459,
+    "features_used": {
+      "income": 124108.5,
+      "credit_score": 832.0,
+      "employment_history": 16.7,
+      "debt_to_income": 0.6197,
+      "collateral_value": 4629.89
+    }
+  },
+  {
+    "applicant_id": 67,
+    "decision": "DENY",
+    "confidence": 0.092946,
+    "features_used": {
+      "income": 125065.22,
+      "credit_score": 391.0,
+      "employment_history": 31.0,
+      "debt_to_income": 0.6985,
+      "collateral_value": 94160.99
+    }
+  },
+  {
+    "applicant_id": 68,
+    "decision": "DENY",
+    "confidence": 0.331555,
+    "features_used": {
+      "income": 81671.52,
+      "credit_score": 628.0,
+      "employment_history": 26.8,
+      "debt_to_income": 0.0994,
+      "collateral_value": 15641.76
+    }
+  },
+  {
+    "applicant_id": 69,
+    "decision": "DENY",
+    "confidence": 0.01398,
+    "features_used": {
+      "income": 35239.03,
+      "credit_score": 399.0,
+      "employment_history": 13.3,
+      "debt_to_income": 0.3616,
+      "collateral_value": 55314.73
+    }
+  },
+  {
+    "applicant_id": 70,
+    "decision": "APPROVE",
+    "confidence": 0.932654,
+    "features_used": {
+      "income": 104241.96,
+      "credit_score": 814.0,
+      "employment_history": 35.9,
+      "debt_to_income": 0.5086,
+      "collateral_value": 310074.64
+    }
+  },
+  {
+    "applicant_id": 71,
+    "decision": "APPROVE",
+    "confidence": 0.551262,
+    "features_used": {
+      "income": 66479.39,
+      "credit_score": 706.0,
+      "employment_history": 30.5,
+      "debt_to_income": 0.3377,
+      "collateral_value": 120819.45
+    }
+  },
+  {
+    "applicant_id": 72,
+    "decision": "APPROVE",
+    "confidence": 0.868593,
+    "features_used": {
+      "income": 99449.87,
+      "credit_score": 743.0,
+      "employment_history": 10.8,
+      "debt_to_income": 0.7678,
+      "collateral_value": 284606.03
+    }
+  },
+  {
+    "applicant_id": 73,
+    "decision": "APPROVE",
+    "confidence": 0.828185,
+    "features_used": {
+      "income": 175078.52,
+      "credit_score": 538.0,
+      "employment_history": 14.6,
+      "debt_to_income": 0.4602,
+      "collateral_value": 295097.69
+    }
+  },
+  {
+    "applicant_id": 74,
+    "decision": "DENY",
+    "confidence": 0.273279,
+    "features_used": {
+      "income": 69769.71,
+      "credit_score": 557.0,
+      "employment_history": 12.6,
+      "debt_to_income": 0.7033,
+      "collateral_value": 424717.67
+    }
+  },
+  {
+    "applicant_id": 75,
+    "decision": "DENY",
+    "confidence": 0.078937,
+    "features_used": {
+      "income": 39911.47,
+      "credit_score": 649.0,
+      "employment_history": 6.3,
+      "debt_to_income": 0.7742,
+      "collateral_value": 2370.7
+    }
+  },
+  {
+    "applicant_id": 76,
+    "decision": "APPROVE",
+    "confidence": 0.806876,
+    "features_used": {
+      "income": 77835.26,
+      "credit_score": 732.0,
+      "employment_history": 5.9,
+      "debt_to_income": 0.4791,
+      "collateral_value": 426684.73
+    }
+  },
+  {
+    "applicant_id": 77,
+    "decision": "APPROVE",
+    "confidence": 0.904163,
+    "features_used": {
+      "income": 79910.94,
+      "credit_score": 766.0,
+      "employment_history": 37.4,
+      "debt_to_income": 0.8231,
+      "collateral_value": 309559.54
+    }
+  },
+  {
+    "applicant_id": 78,
+    "decision": "DENY",
+    "confidence": 0.051308,
+    "features_used": {
+      "income": 142525.81,
+      "credit_score": 309.0,
+      "employment_history": 17.5,
+      "debt_to_income": 0.5491,
+      "collateral_value": 81371.74
+    }
+  },
+  {
+    "applicant_id": 79,
+    "decision": "APPROVE",
+    "confidence": 0.889254,
+    "features_used": {
+      "income": 124695.47,
+      "credit_score": 665.0,
+      "employment_history": 15.3,
+      "debt_to_income": 0.7727,
+      "collateral_value": 386468.69
+    }
+  },
+  {
+    "applicant_id": 80,
+    "decision": "DENY",
+    "confidence": 0.177575,
+    "features_used": {
+      "income": 163262.7,
+      "credit_score": 360.0,
+      "employment_history": 29.2,
+      "debt_to_income": 0.3395,
+      "collateral_value": 427745.77
+    }
+  },
+  {
+    "applicant_id": 81,
+    "decision": "DENY",
+    "confidence": 0.303181,
+    "features_used": {
+      "income": 142933.3,
+      "credit_score": 458.0,
+      "employment_history": 22.1,
+      "debt_to_income": 0.474,
+      "collateral_value": 127131.74
+    }
+  },
+  {
+    "applicant_id": 82,
+    "decision": "APPROVE",
+    "confidence": 0.943171,
+    "features_used": {
+      "income": 99085.77,
+      "credit_score": 757.0,
+      "employment_history": 37.4,
+      "debt_to_income": 0.5017,
+      "collateral_value": 459396.84
+    }
+  },
+  {
+    "applicant_id": 83,
+    "decision": "APPROVE",
+    "confidence": 0.808276,
+    "features_used": {
+      "income": 168383.47,
+      "credit_score": 438.0,
+      "employment_history": 31.2,
+      "debt_to_income": 0.1392,
+      "collateral_value": 227228.72
+    }
+  },
+  {
+    "applicant_id": 84,
+    "decision": "DENY",
+    "confidence": 0.428664,
+    "features_used": {
+      "income": 58385.4,
+      "credit_score": 739.0,
+      "employment_history": 19.2,
+      "debt_to_income": 0.3888,
+      "collateral_value": 301712.23
+    }
+  },
+  {
+    "applicant_id": 85,
+    "decision": "DENY",
+    "confidence": 0.141768,
+    "features_used": {
+      "income": 33861.05,
+      "credit_score": 555.0,
+      "employment_history": 15.1,
+      "debt_to_income": 0.8297,
+      "collateral_value": 492324.77
+    }
+  },
+  {
+    "applicant_id": 86,
+    "decision": "DENY",
+    "confidence": 0.115916,
+    "features_used": {
+      "income": 45308.14,
+      "credit_score": 428.0,
+      "employment_history": 39.5,
+      "debt_to_income": 0.5862,
+      "collateral_value": 180768.04
+    }
+  },
+  {
+    "applicant_id": 87,
+    "decision": "APPROVE",
+    "confidence": 0.772328,
+    "features_used": {
+      "income": 152801.09,
+      "credit_score": 484.0,
+      "employment_history": 28.7,
+      "debt_to_income": 0.2009,
+      "collateral_value": 406579.67
+    }
+  },
+  {
+    "applicant_id": 88,
+    "decision": "APPROVE",
+    "confidence": 0.827105,
+    "features_used": {
+      "income": 108519.13,
+      "credit_score": 592.0,
+      "employment_history": 38.0,
+      "debt_to_income": 0.338,
+      "collateral_value": 159199.56
+    }
+  },
+  {
+    "applicant_id": 89,
+    "decision": "DENY",
+    "confidence": 0.215366,
+    "features_used": {
+      "income": 57416.2,
+      "credit_score": 721.0,
+      "employment_history": 4.7,
+      "debt_to_income": 0.2129,
+      "collateral_value": 399606.76
+    }
+  },
+  {
+    "applicant_id": 90,
+    "decision": "APPROVE",
+    "confidence": 0.88429,
+    "features_used": {
+      "income": 115177.61,
+      "credit_score": 633.0,
+      "employment_history": 34.0,
+      "debt_to_income": 0.0711,
+      "collateral_value": 300366.96
+    }
+  },
+  {
+    "applicant_id": 91,
+    "decision": "DENY",
+    "confidence": 0.318173,
+    "features_used": {
+      "income": 55893.06,
+      "credit_score": 814.0,
+      "employment_history": 25.5,
+      "debt_to_income": 0.8383,
+      "collateral_value": 108177.85
+    }
+  },
+  {
+    "applicant_id": 92,
+    "decision": "APPROVE",
+    "confidence": 0.794051,
+    "features_used": {
+      "income": 148374.46,
+      "credit_score": 778.0,
+      "employment_history": 4.9,
+      "debt_to_income": 0.431,
+      "collateral_value": 207013.05
+    }
+  },
+  {
+    "applicant_id": 93,
+    "decision": "APPROVE",
+    "confidence": 0.880928,
+    "features_used": {
+      "income": 105846.57,
+      "credit_score": 715.0,
+      "employment_history": 23.5,
+      "debt_to_income": 0.3114,
+      "collateral_value": 158817.82
+    }
+  },
+  {
+    "applicant_id": 94,
+    "decision": "DENY",
+    "confidence": 0.35009,
+    "features_used": {
+      "income": 94773.61,
+      "credit_score": 632.0,
+      "employment_history": 27.4,
+      "debt_to_income": 0.5587,
+      "collateral_value": 39054.2
+    }
+  },
+  {
+    "applicant_id": 95,
+    "decision": "DENY",
+    "confidence": 0.099216,
+    "features_used": {
+      "income": 81257.06,
+      "credit_score": 459.0,
+      "employment_history": 0.5,
+      "debt_to_income": 0.0562,
+      "collateral_value": 14917.39
+    }
+  },
+  {
+    "applicant_id": 96,
+    "decision": "APPROVE",
+    "confidence": 0.780523,
+    "features_used": {
+      "income": 137148.04,
+      "credit_score": 527.0,
+      "employment_history": 18.2,
+      "debt_to_income": 0.2863,
+      "collateral_value": 173239.33
+    }
+  },
+  {
+    "applicant_id": 97,
+    "decision": "DENY",
+    "confidence": 0.070953,
+    "features_used": {
+      "income": 91508.14,
+      "credit_score": 365.0,
+      "employment_history": 33.0,
+      "debt_to_income": 0.6476,
+      "collateral_value": 9517.07
+    }
+  },
+  {
+    "applicant_id": 98,
+    "decision": "DENY",
+    "confidence": 0.01675,
+    "features_used": {
+      "income": 44900.49,
+      "credit_score": 506.0,
+      "employment_history": 11.8,
+      "debt_to_income": 0.5887,
+      "collateral_value": 82743.88
+    }
+  },
+  {
+    "applicant_id": 99,
+    "decision": "APPROVE",
+    "confidence": 0.50609,
+    "features_used": {
+      "income": 50061.0,
+      "credit_score": 810.0,
+      "employment_history": 18.3,
+      "debt_to_income": 0.8845,
+      "collateral_value": 362591.66
+    }
+  },
+  {
+    "applicant_id": 100,
+    "decision": "APPROVE",
+    "confidence": 0.922295,
+    "features_used": {
+      "income": 193522.6,
+      "credit_score": 534.0,
+      "employment_history": 17.7,
+      "debt_to_income": 0.5773,
+      "collateral_value": 354045.62
+    }
+  },
+  {
+    "applicant_id": 101,
+    "decision": "DENY",
+    "confidence": 0.14025,
+    "features_used": {
+      "income": 184458.72,
+      "credit_score": 362.0,
+      "employment_history": 12.1,
+      "debt_to_income": 0.4559,
+      "collateral_value": 369290.19
+    }
+  },
+  {
+    "applicant_id": 102,
+    "decision": "APPROVE",
+    "confidence": 0.972638,
+    "features_used": {
+      "income": 148950.21,
+      "credit_score": 659.0,
+      "employment_history": 36.7,
+      "debt_to_income": 0.6972,
+      "collateral_value": 158576.59
+    }
+  },
+  {
+    "applicant_id": 103,
+    "decision": "APPROVE",
+    "confidence": 0.91142,
+    "features_used": {
+      "income": 75197.89,
+      "credit_score": 830.0,
+      "employment_history": 31.3,
+      "debt_to_income": 0.8178,
+      "collateral_value": 445009.73
+    }
+  },
+  {
+    "applicant_id": 104,
+    "decision": "APPROVE",
+    "confidence": 0.872815,
+    "features_used": {
+      "income": 194759.98,
+      "credit_score": 777.0,
+      "employment_history": 4.4,
+      "debt_to_income": 0.6626,
+      "collateral_value": 296915.27
+    }
+  },
+  {
+    "applicant_id": 105,
+    "decision": "DENY",
+    "confidence": 0.410713,
+    "features_used": {
+      "income": 162387.65,
+      "credit_score": 451.0,
+      "employment_history": 39.9,
+      "debt_to_income": 0.8687,
+      "collateral_value": 63013.17
+    }
+  },
+  {
+    "applicant_id": 106,
+    "decision": "APPROVE",
+    "confidence": 0.807879,
+    "features_used": {
+      "income": 151871.33,
+      "credit_score": 550.0,
+      "employment_history": 35.2,
+      "debt_to_income": 0.7147,
+      "collateral_value": 71859.33
+    }
+  },
+  {
+    "applicant_id": 107,
+    "decision": "APPROVE",
+    "confidence": 0.520766,
+    "features_used": {
+      "income": 106391.46,
+      "credit_score": 592.0,
+      "employment_history": 11.4,
+      "debt_to_income": 0.7868,
+      "collateral_value": 346547.71
+    }
+  },
+  {
+    "applicant_id": 108,
+    "decision": "DENY",
+    "confidence": 0.229193,
+    "features_used": {
+      "income": 76281.07,
+      "credit_score": 436.0,
+      "employment_history": 33.5,
+      "debt_to_income": 0.147,
+      "collateral_value": 86471.97
+    }
+  },
+  {
+    "applicant_id": 109,
+    "decision": "DENY",
+    "confidence": 0.034144,
+    "features_used": {
+      "income": 46386.46,
+      "credit_score": 448.0,
+      "employment_history": 4.3,
+      "debt_to_income": 0.6726,
+      "collateral_value": 253646.35
+    }
+  },
+  {
+    "applicant_id": 110,
+    "decision": "APPROVE",
+    "confidence": 0.767319,
+    "features_used": {
+      "income": 183442.41,
+      "credit_score": 430.0,
+      "employment_history": 40.0,
+      "debt_to_income": 0.4241,
+      "collateral_value": 495887.24
+    }
+  },
+  {
+    "applicant_id": 111,
+    "decision": "APPROVE",
+    "confidence": 0.667505,
+    "features_used": {
+      "income": 107481.97,
+      "credit_score": 848.0,
+      "employment_history": 26.6,
+      "debt_to_income": 0.5201,
+      "collateral_value": 2003.8
+    }
+  },
+  {
+    "applicant_id": 112,
+    "decision": "DENY",
+    "confidence": 0.240876,
+    "features_used": {
+      "income": 64401.77,
+      "credit_score": 711.0,
+      "employment_history": 26.0,
+      "debt_to_income": 0.606,
+      "collateral_value": 8289.9
+    }
+  },
+  {
+    "applicant_id": 113,
+    "decision": "APPROVE",
+    "confidence": 0.70522,
+    "features_used": {
+      "income": 82012.63,
+      "credit_score": 763.0,
+      "employment_history": 3.6,
+      "debt_to_income": 0.8743,
+      "collateral_value": 496542.29
+    }
+  },
+  {
+    "applicant_id": 114,
+    "decision": "APPROVE",
+    "confidence": 0.899908,
+    "features_used": {
+      "income": 128467.33,
+      "credit_score": 749.0,
+      "employment_history": 35.9,
+      "debt_to_income": 0.8869,
+      "collateral_value": 292319.42
+    }
+  },
+  {
+    "applicant_id": 115,
+    "decision": "DENY",
+    "confidence": 0.113982,
+    "features_used": {
+      "income": 60051.37,
+      "credit_score": 828.0,
+      "employment_history": 1.2,
+      "debt_to_income": 0.295,
+      "collateral_value": 63454.99
+    }
+  },
+  {
+    "applicant_id": 116,
+    "decision": "DENY",
+    "confidence": 0.133378,
+    "features_used": {
+      "income": 175624.43,
+      "credit_score": 358.0,
+      "employment_history": 9.6,
+      "debt_to_income": 0.6737,
+      "collateral_value": 448651.1
+    }
+  },
+  {
+    "applicant_id": 117,
+    "decision": "APPROVE",
+    "confidence": 0.903,
+    "features_used": {
+      "income": 158948.32,
+      "credit_score": 785.0,
+      "employment_history": 5.7,
+      "debt_to_income": 0.6875,
+      "collateral_value": 440190.15
+    }
+  },
+  {
+    "applicant_id": 118,
+    "decision": "DENY",
+    "confidence": 0.11534,
+    "features_used": {
+      "income": 152308.7,
+      "credit_score": 336.0,
+      "employment_history": 31.1,
+      "debt_to_income": 0.3445,
+      "collateral_value": 268100.21
+    }
+  },
+  {
+    "applicant_id": 119,
+    "decision": "DENY",
+    "confidence": 0.356753,
+    "features_used": {
+      "income": 103455.82,
+      "credit_score": 561.0,
+      "employment_history": 7.9,
+      "debt_to_income": 0.1553,
+      "collateral_value": 310896.01
+    }
+  },
+  {
+    "applicant_id": 120,
+    "decision": "APPROVE",
+    "confidence": 0.883741,
+    "features_used": {
+      "income": 136642.5,
+      "credit_score": 627.0,
+      "employment_history": 36.4,
+      "debt_to_income": 0.0848,
+      "collateral_value": 136593.6
+    }
+  },
+  {
+    "applicant_id": 121,
+    "decision": "DENY",
+    "confidence": 0.150974,
+    "features_used": {
+      "income": 129296.65,
+      "credit_score": 497.0,
+      "employment_history": 26.3,
+      "debt_to_income": 0.7107,
+      "collateral_value": 25259.85
+    }
+  },
+  {
+    "applicant_id": 122,
+    "decision": "DENY",
+    "confidence": 0.069696,
+    "features_used": {
+      "income": 140473.92,
+      "credit_score": 380.0,
+      "employment_history": 1.4,
+      "debt_to_income": 0.4662,
+      "collateral_value": 297283.8
+    }
+  },
+  {
+    "applicant_id": 123,
+    "decision": "DENY",
+    "confidence": 0.051513,
+    "features_used": {
+      "income": 44355.53,
+      "credit_score": 405.0,
+      "employment_history": 0.2,
+      "debt_to_income": 0.8877,
+      "collateral_value": 147377.6
+    }
+  },
+  {
+    "applicant_id": 124,
+    "decision": "APPROVE",
+    "confidence": 0.786658,
+    "features_used": {
+      "income": 100687.26,
+      "credit_score": 754.0,
+      "employment_history": 2.1,
+      "debt_to_income": 0.4452,
+      "collateral_value": 331810.52
+    }
+  },
+  {
+    "applicant_id": 125,
+    "decision": "DENY",
+    "confidence": 0.106611,
+    "features_used": {
+      "income": 37074.41,
+      "credit_score": 475.0,
+      "employment_history": 24.2,
+      "debt_to_income": 0.8812,
+      "collateral_value": 418122.59
+    }
+  },
+  {
+    "applicant_id": 126,
+    "decision": "DENY",
+    "confidence": 0.174617,
+    "features_used": {
+      "income": 113978.44,
+      "credit_score": 470.0,
+      "employment_history": 32.1,
+      "debt_to_income": 0.3998,
+      "collateral_value": 9080.27
+    }
+  },
+  {
+    "applicant_id": 127,
+    "decision": "APPROVE",
+    "confidence": 0.868062,
+    "features_used": {
+      "income": 86076.41,
+      "credit_score": 808.0,
+      "employment_history": 9.5,
+      "debt_to_income": 0.7246,
+      "collateral_value": 297856.89
+    }
+  },
+  {
+    "applicant_id": 128,
+    "decision": "DENY",
+    "confidence": 0.106419,
+    "features_used": {
+      "income": 54569.11,
+      "credit_score": 379.0,
+      "employment_history": 34.0,
+      "debt_to_income": 0.1221,
+      "collateral_value": 115640.27
+    }
+  },
+  {
+    "applicant_id": 129,
+    "decision": "DENY",
+    "confidence": 0.24018,
+    "features_used": {
+      "income": 47578.5,
+      "credit_score": 804.0,
+      "employment_history": 2.3,
+      "debt_to_income": 0.5221,
+      "collateral_value": 436944.25
+    }
+  },
+  {
+    "applicant_id": 130,
+    "decision": "APPROVE",
+    "confidence": 0.910589,
+    "features_used": {
+      "income": 129899.58,
+      "credit_score": 807.0,
+      "employment_history": 32.0,
+      "debt_to_income": 0.7318,
+      "collateral_value": 126832.25
+    }
+  },
+  {
+    "applicant_id": 131,
+    "decision": "DENY",
+    "confidence": 0.373947,
+    "features_used": {
+      "income": 59000.8,
+      "credit_score": 629.0,
+      "employment_history": 37.1,
+      "debt_to_income": 0.836,
+      "collateral_value": 305385.07
+    }
+  },
+  {
+    "applicant_id": 132,
+    "decision": "APPROVE",
+    "confidence": 0.543176,
+    "features_used": {
+      "income": 187270.42,
+      "credit_score": 391.0,
+      "employment_history": 30.9,
+      "debt_to_income": 0.7492,
+      "collateral_value": 276770.42
+    }
+  },
+  {
+    "applicant_id": 133,
+    "decision": "DENY",
+    "confidence": 0.086301,
+    "features_used": {
+      "income": 128780.39,
+      "credit_score": 385.0,
+      "employment_history": 27.9,
+      "debt_to_income": 0.0814,
+      "collateral_value": 198083.25
+    }
+  },
+  {
+    "applicant_id": 134,
+    "decision": "DENY",
+    "confidence": 0.240386,
+    "features_used": {
+      "income": 88967.87,
+      "credit_score": 456.0,
+      "employment_history": 33.5,
+      "debt_to_income": 0.3668,
+      "collateral_value": 338810.38
+    }
+  },
+  {
+    "applicant_id": 135,
+    "decision": "APPROVE",
+    "confidence": 0.730505,
+    "features_used": {
+      "income": 130455.63,
+      "credit_score": 618.0,
+      "employment_history": 1.6,
+      "debt_to_income": 0.0914,
+      "collateral_value": 362884.82
+    }
+  },
+  {
+    "applicant_id": 136,
+    "decision": "DENY",
+    "confidence": 0.02944,
+    "features_used": {
+      "income": 33876.66,
+      "credit_score": 384.0,
+      "employment_history": 8.1,
+      "debt_to_income": 0.1429,
+      "collateral_value": 283468.9
+    }
+  },
+  {
+    "applicant_id": 137,
+    "decision": "APPROVE",
+    "confidence": 0.741172,
+    "features_used": {
+      "income": 192955.07,
+      "credit_score": 551.0,
+      "employment_history": 5.0,
+      "debt_to_income": 0.624,
+      "collateral_value": 379211.12
+    }
+  },
+  {
+    "applicant_id": 138,
+    "decision": "DENY",
+    "confidence": 0.034026,
+    "features_used": {
+      "income": 111991.58,
+      "credit_score": 363.0,
+      "employment_history": 20.2,
+      "debt_to_income": 0.6563,
+      "collateral_value": 491708.54
+    }
+  },
+  {
+    "applicant_id": 139,
+    "decision": "APPROVE",
+    "confidence": 0.967765,
+    "features_used": {
+      "income": 163064.99,
+      "credit_score": 597.0,
+      "employment_history": 29.8,
+      "debt_to_income": 0.7077,
+      "collateral_value": 209636.19
+    }
+  },
+  {
+    "applicant_id": 140,
+    "decision": "DENY",
+    "confidence": 0.024644,
+    "features_used": {
+      "income": 44064.1,
+      "credit_score": 311.0,
+      "employment_history": 25.2,
+      "debt_to_income": 0.7856,
+      "collateral_value": 257291.53
+    }
+  },
+  {
+    "applicant_id": 141,
+    "decision": "APPROVE",
+    "confidence": 0.680069,
+    "features_used": {
+      "income": 112731.92,
+      "credit_score": 690.0,
+      "employment_history": 34.0,
+      "debt_to_income": 0.6785,
+      "collateral_value": 6234.94
+    }
+  },
+  {
+    "applicant_id": 142,
+    "decision": "DENY",
+    "confidence": 0.051349,
+    "features_used": {
+      "income": 113420.19,
+      "credit_score": 330.0,
+      "employment_history": 6.2,
+      "debt_to_income": 0.7307,
+      "collateral_value": 398014.28
+    }
+  },
+  {
+    "applicant_id": 143,
+    "decision": "APPROVE",
+    "confidence": 0.729281,
+    "features_used": {
+      "income": 189430.5,
+      "credit_score": 407.0,
+      "employment_history": 29.4,
+      "debt_to_income": 0.0916,
+      "collateral_value": 260115.03
+    }
+  },
+  {
+    "applicant_id": 144,
+    "decision": "DENY",
+    "confidence": 0.049117,
+    "features_used": {
+      "income": 127193.77,
+      "credit_score": 396.0,
+      "employment_history": 7.7,
+      "debt_to_income": 0.2494,
+      "collateral_value": 203980.72
+    }
+  },
+  {
+    "applicant_id": 145,
+    "decision": "APPROVE",
+    "confidence": 0.609081,
+    "features_used": {
+      "income": 110493.2,
+      "credit_score": 757.0,
+      "employment_history": 10.8,
+      "debt_to_income": 0.5786,
+      "collateral_value": 47035.98
+    }
+  },
+  {
+    "applicant_id": 146,
+    "decision": "DENY",
+    "confidence": 0.084383,
+    "features_used": {
+      "income": 75385.86,
+      "credit_score": 329.0,
+      "employment_history": 28.4,
+      "debt_to_income": 0.7794,
+      "collateral_value": 444828.21
+    }
+  },
+  {
+    "applicant_id": 147,
+    "decision": "APPROVE",
+    "confidence": 0.593331,
+    "features_used": {
+      "income": 86366.73,
+      "credit_score": 536.0,
+      "employment_history": 39.2,
+      "debt_to_income": 0.0538,
+      "collateral_value": 197503.62
+    }
+  },
+  {
+    "applicant_id": 148,
+    "decision": "APPROVE",
+    "confidence": 0.901021,
+    "features_used": {
+      "income": 118514.31,
+      "credit_score": 625.0,
+      "employment_history": 24.5,
+      "debt_to_income": 0.4874,
+      "collateral_value": 341290.8
+    }
+  },
+  {
+    "applicant_id": 149,
+    "decision": "DENY",
+    "confidence": 0.304567,
+    "features_used": {
+      "income": 104614.95,
+      "credit_score": 584.0,
+      "employment_history": 2.2,
+      "debt_to_income": 0.6257,
+      "collateral_value": 74687.08
+    }
+  },
+  {
+    "applicant_id": 150,
+    "decision": "DENY",
+    "confidence": 0.456987,
+    "features_used": {
+      "income": 33674.05,
+      "credit_score": 675.0,
+      "employment_history": 24.7,
+      "debt_to_income": 0.0752,
+      "collateral_value": 480774.81
+    }
+  },
+  {
+    "applicant_id": 151,
+    "decision": "APPROVE",
+    "confidence": 0.763662,
+    "features_used": {
+      "income": 170469.63,
+      "credit_score": 742.0,
+      "employment_history": 1.7,
+      "debt_to_income": 0.3912,
+      "collateral_value": 89220.88
+    }
+  },
+  {
+    "applicant_id": 152,
+    "decision": "APPROVE",
+    "confidence": 0.836324,
+    "features_used": {
+      "income": 182347.33,
+      "credit_score": 516.0,
+      "employment_history": 35.4,
+      "debt_to_income": 0.8113,
+      "collateral_value": 99771.0
+    }
+  },
+  {
+    "applicant_id": 153,
+    "decision": "APPROVE",
+    "confidence": 0.593839,
+    "features_used": {
+      "income": 53842.35,
+      "credit_score": 756.0,
+      "employment_history": 28.4,
+      "debt_to_income": 0.6209,
+      "collateral_value": 429491.43
+    }
+  },
+  {
+    "applicant_id": 154,
+    "decision": "DENY",
+    "confidence": 0.219166,
+    "features_used": {
+      "income": 124186.14,
+      "credit_score": 475.0,
+      "employment_history": 6.9,
+      "debt_to_income": 0.252,
+      "collateral_value": 456291.37
+    }
+  },
+  {
+    "applicant_id": 155,
+    "decision": "DENY",
+    "confidence": 0.10693,
+    "features_used": {
+      "income": 48457.88,
+      "credit_score": 842.0,
+      "employment_history": 3.7,
+      "debt_to_income": 0.7749,
+      "collateral_value": 106073.7
+    }
+  },
+  {
+    "applicant_id": 156,
+    "decision": "APPROVE",
+    "confidence": 0.822614,
+    "features_used": {
+      "income": 144280.82,
+      "credit_score": 577.0,
+      "employment_history": 7.3,
+      "debt_to_income": 0.3458,
+      "collateral_value": 234900.44
+    }
+  },
+  {
+    "applicant_id": 157,
+    "decision": "APPROVE",
+    "confidence": 0.892664,
+    "features_used": {
+      "income": 77809.74,
+      "credit_score": 705.0,
+      "employment_history": 39.2,
+      "debt_to_income": 0.7753,
+      "collateral_value": 366747.45
+    }
+  },
+  {
+    "applicant_id": 158,
+    "decision": "APPROVE",
+    "confidence": 0.959679,
+    "features_used": {
+      "income": 142101.85,
+      "credit_score": 782.0,
+      "employment_history": 18.3,
+      "debt_to_income": 0.3041,
+      "collateral_value": 439182.87
+    }
+  },
+  {
+    "applicant_id": 159,
+    "decision": "APPROVE",
+    "confidence": 0.989921,
+    "features_used": {
+      "income": 153589.08,
+      "credit_score": 736.0,
+      "employment_history": 31.4,
+      "debt_to_income": 0.5518,
+      "collateral_value": 189526.35
+    }
+  },
+  {
+    "applicant_id": 160,
+    "decision": "APPROVE",
+    "confidence": 0.993693,
+    "features_used": {
+      "income": 160670.07,
+      "credit_score": 768.0,
+      "employment_history": 25.5,
+      "debt_to_income": 0.3874,
+      "collateral_value": 258509.74
+    }
+  },
+  {
+    "applicant_id": 161,
+    "decision": "DENY",
+    "confidence": 0.26237,
+    "features_used": {
+      "income": 48315.96,
+      "credit_score": 595.0,
+      "employment_history": 22.9,
+      "debt_to_income": 0.2836,
+      "collateral_value": 370858.21
+    }
+  },
+  {
+    "applicant_id": 162,
+    "decision": "DENY",
+    "confidence": 0.155231,
+    "features_used": {
+      "income": 185722.01,
+      "credit_score": 323.0,
+      "employment_history": 5.8,
+      "debt_to_income": 0.8036,
+      "collateral_value": 365567.99
+    }
+  },
+  {
+    "applicant_id": 163,
+    "decision": "APPROVE",
+    "confidence": 0.692786,
+    "features_used": {
+      "income": 69136.38,
+      "credit_score": 571.0,
+      "employment_history": 37.8,
+      "debt_to_income": 0.2095,
+      "collateral_value": 391480.07
+    }
+  },
+  {
+    "applicant_id": 164,
+    "decision": "DENY",
+    "confidence": 0.053623,
+    "features_used": {
+      "income": 36360.13,
+      "credit_score": 400.0,
+      "employment_history": 12.1,
+      "debt_to_income": 0.1221,
+      "collateral_value": 284966.91
+    }
+  },
+  {
+    "applicant_id": 165,
+    "decision": "APPROVE",
+    "confidence": 0.829709,
+    "features_used": {
+      "income": 124324.92,
+      "credit_score": 789.0,
+      "employment_history": 23.1,
+      "debt_to_income": 0.3406,
+      "collateral_value": 52307.55
+    }
+  },
+  {
+    "applicant_id": 166,
+    "decision": "DENY",
+    "confidence": 0.188744,
+    "features_used": {
+      "income": 93056.79,
+      "credit_score": 430.0,
+      "employment_history": 28.0,
+      "debt_to_income": 0.66,
+      "collateral_value": 451986.65
+    }
+  },
+  {
+    "applicant_id": 167,
+    "decision": "APPROVE",
+    "confidence": 0.708081,
+    "features_used": {
+      "income": 171064.26,
+      "credit_score": 425.0,
+      "employment_history": 26.0,
+      "debt_to_income": 0.7363,
+      "collateral_value": 432786.27
+    }
+  },
+  {
+    "applicant_id": 168,
+    "decision": "APPROVE",
+    "confidence": 0.73557,
+    "features_used": {
+      "income": 167402.75,
+      "credit_score": 437.0,
+      "employment_history": 37.6,
+      "debt_to_income": 0.8989,
+      "collateral_value": 399048.72
+    }
+  },
+  {
+    "applicant_id": 169,
+    "decision": "DENY",
+    "confidence": 0.373656,
+    "features_used": {
+      "income": 83913.61,
+      "credit_score": 654.0,
+      "employment_history": 5.9,
+      "debt_to_income": 0.3019,
+      "collateral_value": 49931.24
+    }
+  },
+  {
+    "applicant_id": 170,
+    "decision": "APPROVE",
+    "confidence": 0.952647,
+    "features_used": {
+      "income": 191992.9,
+      "credit_score": 614.0,
+      "employment_history": 20.3,
+      "debt_to_income": 0.3968,
+      "collateral_value": 102198.68
+    }
+  },
+  {
+    "applicant_id": 171,
+    "decision": "APPROVE",
+    "confidence": 0.91416,
+    "features_used": {
+      "income": 79456.03,
+      "credit_score": 822.0,
+      "employment_history": 16.2,
+      "debt_to_income": 0.1663,
+      "collateral_value": 371800.18
+    }
+  },
+  {
+    "applicant_id": 172,
+    "decision": "DENY",
+    "confidence": 0.336736,
+    "features_used": {
+      "income": 117559.71,
+      "credit_score": 529.0,
+      "employment_history": 19.0,
+      "debt_to_income": 0.5386,
+      "collateral_value": 11570.05
+    }
+  },
+  {
+    "applicant_id": 173,
+    "decision": "DENY",
+    "confidence": 0.136519,
+    "features_used": {
+      "income": 73514.07,
+      "credit_score": 455.0,
+      "employment_history": 4.8,
+      "debt_to_income": 0.8979,
+      "collateral_value": 489612.32
+    }
+  },
+  {
+    "applicant_id": 174,
+    "decision": "DENY",
+    "confidence": 0.128711,
+    "features_used": {
+      "income": 189127.41,
+      "credit_score": 327.0,
+      "employment_history": 5.4,
+      "debt_to_income": 0.6457,
+      "collateral_value": 188572.34
+    }
+  },
+  {
+    "applicant_id": 175,
+    "decision": "DENY",
+    "confidence": 0.006388,
+    "features_used": {
+      "income": 57983.33,
+      "credit_score": 303.0,
+      "employment_history": 11.1,
+      "debt_to_income": 0.5559,
+      "collateral_value": 359656.27
+    }
+  },
+  {
+    "applicant_id": 176,
+    "decision": "DENY",
+    "confidence": 0.072688,
+    "features_used": {
+      "income": 37634.81,
+      "credit_score": 505.0,
+      "employment_history": 12.2,
+      "debt_to_income": 0.3835,
+      "collateral_value": 443785.54
+    }
+  },
+  {
+    "applicant_id": 177,
+    "decision": "APPROVE",
+    "confidence": 0.867095,
+    "features_used": {
+      "income": 103966.5,
+      "credit_score": 810.0,
+      "employment_history": 17.1,
+      "debt_to_income": 0.828,
+      "collateral_value": 197314.94
+    }
+  },
+  {
+    "applicant_id": 178,
+    "decision": "APPROVE",
+    "confidence": 0.971064,
+    "features_used": {
+      "income": 198703.85,
+      "credit_score": 588.0,
+      "employment_history": 24.4,
+      "debt_to_income": 0.4724,
+      "collateral_value": 159566.24
+    }
+  },
+  {
+    "applicant_id": 179,
+    "decision": "APPROVE",
+    "confidence": 0.988186,
+    "features_used": {
+      "income": 181585.14,
+      "credit_score": 792.0,
+      "employment_history": 25.4,
+      "debt_to_income": 0.1642,
+      "collateral_value": 304370.56
+    }
+  },
+  {
+    "applicant_id": 180,
+    "decision": "DENY",
+    "confidence": 0.103756,
+    "features_used": {
+      "income": 157263.36,
+      "credit_score": 356.0,
+      "employment_history": 16.5,
+      "debt_to_income": 0.3606,
+      "collateral_value": 290494.69
+    }
+  },
+  {
+    "applicant_id": 181,
+    "decision": "DENY",
+    "confidence": 0.191163,
+    "features_used": {
+      "income": 181434.72,
+      "credit_score": 351.0,
+      "employment_history": 16.4,
+      "debt_to_income": 0.1071,
+      "collateral_value": 204569.99
+    }
+  },
+  {
+    "applicant_id": 182,
+    "decision": "APPROVE",
+    "confidence": 0.956065,
+    "features_used": {
+      "income": 181885.93,
+      "credit_score": 759.0,
+      "employment_history": 8.7,
+      "debt_to_income": 0.2217,
+      "collateral_value": 300887.38
+    }
+  },
+  {
+    "applicant_id": 183,
+    "decision": "DENY",
+    "confidence": 0.089393,
+    "features_used": {
+      "income": 118205.92,
+      "credit_score": 358.0,
+      "employment_history": 23.5,
+      "debt_to_income": 0.065,
+      "collateral_value": 467690.68
+    }
+  },
+  {
+    "applicant_id": 184,
+    "decision": "DENY",
+    "confidence": 0.029697,
+    "features_used": {
+      "income": 83707.94,
+      "credit_score": 328.0,
+      "employment_history": 12.7,
+      "debt_to_income": 0.4353,
+      "collateral_value": 233820.13
+    }
+  },
+  {
+    "applicant_id": 185,
+    "decision": "DENY",
+    "confidence": 0.366909,
+    "features_used": {
+      "income": 161242.11,
+      "credit_score": 522.0,
+      "employment_history": 1.4,
+      "debt_to_income": 0.5894,
+      "collateral_value": 98371.09
+    }
+  },
+  {
+    "applicant_id": 186,
+    "decision": "APPROVE",
+    "confidence": 0.954641,
+    "features_used": {
+      "income": 142482.41,
+      "credit_score": 809.0,
+      "employment_history": 16.7,
+      "debt_to_income": 0.3418,
+      "collateral_value": 188602.99
+    }
+  },
+  {
+    "applicant_id": 187,
+    "decision": "APPROVE",
+    "confidence": 0.883965,
+    "features_used": {
+      "income": 93521.81,
+      "credit_score": 679.0,
+      "employment_history": 19.0,
+      "debt_to_income": 0.4073,
+      "collateral_value": 197053.49
+    }
+  },
+  {
+    "applicant_id": 188,
+    "decision": "DENY",
+    "confidence": 0.022656,
+    "features_used": {
+      "income": 46059.33,
+      "credit_score": 354.0,
+      "employment_history": 9.0,
+      "debt_to_income": 0.8653,
+      "collateral_value": 65554.35
+    }
+  },
+  {
+    "applicant_id": 189,
+    "decision": "APPROVE",
+    "confidence": 0.864226,
+    "features_used": {
+      "income": 156954.23,
+      "credit_score": 761.0,
+      "employment_history": 22.9,
+      "debt_to_income": 0.6892,
+      "collateral_value": 81435.75
+    }
+  },
+  {
+    "applicant_id": 190,
+    "decision": "APPROVE",
+    "confidence": 0.960854,
+    "features_used": {
+      "income": 74618.29,
+      "credit_score": 764.0,
+      "employment_history": 22.6,
+      "debt_to_income": 0.5097,
+      "collateral_value": 342281.04
+    }
+  },
+  {
+    "applicant_id": 191,
+    "decision": "APPROVE",
+    "confidence": 0.994127,
+    "features_used": {
+      "income": 189258.24,
+      "credit_score": 741.0,
+      "employment_history": 28.1,
+      "debt_to_income": 0.2919,
+      "collateral_value": 169738.88
+    }
+  },
+  {
+    "applicant_id": 192,
+    "decision": "APPROVE",
+    "confidence": 0.869528,
+    "features_used": {
+      "income": 70965.0,
+      "credit_score": 797.0,
+      "employment_history": 25.9,
+      "debt_to_income": 0.8124,
+      "collateral_value": 477449.2
+    }
+  },
+  {
+    "applicant_id": 193,
+    "decision": "DENY",
+    "confidence": 0.06113,
+    "features_used": {
+      "income": 50868.85,
+      "credit_score": 432.0,
+      "employment_history": 26.1,
+      "debt_to_income": 0.2498,
+      "collateral_value": 121798.37
+    }
+  },
+  {
+    "applicant_id": 194,
+    "decision": "APPROVE",
+    "confidence": 0.79265,
+    "features_used": {
+      "income": 171289.15,
+      "credit_score": 839.0,
+      "employment_history": 12.6,
+      "debt_to_income": 0.3265,
+      "collateral_value": 49462.25
+    }
+  },
+  {
+    "applicant_id": 195,
+    "decision": "DENY",
+    "confidence": 0.157066,
+    "features_used": {
+      "income": 56058.33,
+      "credit_score": 476.0,
+      "employment_history": 31.5,
+      "debt_to_income": 0.8227,
+      "collateral_value": 376752.28
+    }
+  },
+  {
+    "applicant_id": 196,
+    "decision": "DENY",
+    "confidence": 0.485093,
+    "features_used": {
+      "income": 60475.61,
+      "credit_score": 741.0,
+      "employment_history": 22.0,
+      "debt_to_income": 0.5001,
+      "collateral_value": 440518.03
+    }
+  },
+  {
+    "applicant_id": 197,
+    "decision": "APPROVE",
+    "confidence": 0.820182,
+    "features_used": {
+      "income": 131895.07,
+      "credit_score": 619.0,
+      "employment_history": 17.3,
+      "debt_to_income": 0.681,
+      "collateral_value": 139056.68
+    }
+  },
+  {
+    "applicant_id": 198,
+    "decision": "APPROVE",
+    "confidence": 0.949795,
+    "features_used": {
+      "income": 178675.55,
+      "credit_score": 729.0,
+      "employment_history": 25.0,
+      "debt_to_income": 0.5521,
+      "collateral_value": 101044.05
+    }
+  },
+  {
+    "applicant_id": 199,
+    "decision": "DENY",
+    "confidence": 0.097034,
+    "features_used": {
+      "income": 63393.89,
+      "credit_score": 645.0,
+      "employment_history": 14.4,
+      "debt_to_income": 0.6054,
+      "collateral_value": 92883.07
+    }
+  },
+  {
+    "applicant_id": 200,
+    "decision": "APPROVE",
+    "confidence": 0.879141,
+    "features_used": {
+      "income": 82755.02,
+      "credit_score": 654.0,
+      "employment_history": 20.5,
+      "debt_to_income": 0.3045,
+      "collateral_value": 261006.15
+    }
+  }
+]
