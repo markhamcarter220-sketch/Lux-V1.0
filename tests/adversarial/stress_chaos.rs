@@ -8,7 +8,7 @@ use lux_kernel::{
         capability::{Capability, CapabilitySet},
         policy::Policy,
     },
-    audit::{AuditLog, EventKind, Outcome},
+    audit::{AuditLog, EventKind},
     boot::{BootCredentials, BootState, ManifestDecoder},
     error::Error,
     metabolism::ledger::Ledger,
@@ -221,13 +221,13 @@ fn attack_5_8_audit_log_at_capacity_no_overwrite_chain_intact() {
     let mut log = AuditLog::new();
 
     for i in 0..MAX_AUDIT_EVENTS {
-        let ok = log.append(EventKind::CapabilityCheck, i as u32, Outcome::Permitted);
+        let ok = log.append(EventKind::CapabilityCheck, i as u32, 0, None);
         assert!(ok, "append {i} must succeed");
     }
     assert_eq!(log.len(), MAX_AUDIT_EVENTS);
 
     // Overflow: must return false, not panic.
-    assert!(!log.append(EventKind::CapabilityRevoked, 9999, Outcome::Denied),
+    assert!(!log.append(EventKind::CapabilityRevoked, 9999, 0, Some((lux_kernel::audit::DenialClass::Halt, "revoked"))),
         "overflow append must return false");
     assert_eq!(log.len(), MAX_AUDIT_EVENTS, "length must not exceed capacity");
 

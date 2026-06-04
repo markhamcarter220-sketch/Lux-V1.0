@@ -3,11 +3,48 @@
 //! All errors are non-recoverable from the caller's perspective — the kernel
 //! never silently degrades.  The sentinel value for "unknown / catch-all" is
 //! intentionally absent: every rejection must carry a precise cause.
+//!
+//! ## HALT vs. FAILURE
+//!
+//! Every denial is classified as one of two kinds via [`Error::denial_class`]:
+//!
+//! - **[`DenialClass::Halt`]** — the operation was stopped *before* execution
+//!   because authorization was never established.  No kernel state was modified.
+//!   Examples: missing or expired token, wrong generation, revoked nonce,
+//!   undeclared topology edge, boot manifest rejection.
+//!
+//! - **[`DenialClass::Failure`]** — authorization was checked and passed, but
+//!   the operation could not complete during execution.  The failure occurred
+//!   after the authorization gate.  Examples: ledger underflow on resource
+//!   deduction, scheduler invariant broken mid-scheduling.
+//!
+//! This distinction is load-bearing for the audit log: HALT events indicate
+//! that a caller lacked standing; FAILURE events indicate an execution-time
+//! invariant was violated despite valid standing.
 
 use thiserror::Error;
 
 /// Canonical result type for all kernel operations.
 pub type Result<T> = core::result::Result<T, Error>;
+
+/// Classification of a denial — indicates *when* in the call sequence the
+/// denial was generated.
+///
+/// Used by the audit log to distinguish pre-authorization stops (HALT) from
+/// post-authorization execution failures (FAILURE).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DenialClass {
+    /// Operation stopped before execution; authorization was never established.
+    ///
+    /// Covers: invalid/expired tokens, revoked nonces, undeclared topology
+    /// edges, boot manifest failures, undefined state transitions.
+    Halt,
+
+    /// Authorization checked and passed; operation failed during execution.
+    ///
+    /// Covers: resource ledger underflow, scheduler invariant violations.
+    Failure,
+}
 
 /// Every path that returns `Err` **denies** the requested operation.
 /// Adding a variant here requires a corresponding entry in `docs/SECURITY.md`.
@@ -58,4 +95,49 @@ pub enum Error {
         /// The context in which the undefined state was encountered.
         context: &'static str,
     },
+}
+
+impl Error {
+    /// Returns the [`DenialClass`] for this error.
+    ///
+    /// Every variant is assigned to exactly one class — no ambiguous variants
+    /// exist.  See the module-level documentation for the HALT / FAILURE
+    /// semantics.
+    #[must_use]
+    pub fn denial_class(&self) -> DenialClass {
+        match self {
+            // ── HALT: authorization never established ─────────────────────────
+            //
+            // CapabilityDenied: token is absent, expired, revoked, replayed, or
+            //   the nonce window is exhausted.  No execution was attempted.
+            Self::CapabilityDenied { .. } => DenialClass::Halt,
+
+            // TopologyViolation: the requested edge is not declared in the boot
+            //   manifest, so no authorization path for this traversal exists.
+            //   Also covers BootingGraph configuration errors (pre-operational).
+            Self::TopologyViolation { .. } => DenialClass::Halt,
+
+            // ManifestInvalid: boot-time validation failed before any
+            //   operational state was established.
+            Self::ManifestInvalid { .. } => DenialClass::Halt,
+
+            // UndefinedState: the state machine reached an unrecognised
+            //   transition.  The fail-closed contract requires halting the
+            //   sub-system rather than proceeding in an unknown state.
+            Self::UndefinedState { .. } => DenialClass::Halt,
+
+            // ── FAILURE: authorization passed, execution failed ───────────────
+            //
+            // QuotaExceeded: the caller held valid rights and the Policy gate
+            //   passed, but the resource ledger could not satisfy the requested
+            //   deduction.  Execution was attempted; atomicity holds (ledger
+            //   unchanged on failure).
+            Self::QuotaExceeded { .. } => DenialClass::Failure,
+
+            // SchedulerInvariant: a correctness invariant (e.g. priority
+            //   inversion) was detected during scheduling execution, after the
+            //   caller's authority was confirmed.
+            Self::SchedulerInvariant { .. } => DenialClass::Failure,
+        }
+    }
 }

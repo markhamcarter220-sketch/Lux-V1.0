@@ -9,5 +9,6 @@
 pub mod event;
 pub mod log;
 
+pub use crate::error::DenialClass;
 pub use event::{AuditEvent, EventKind, Outcome};
 pub use log::AuditLog;

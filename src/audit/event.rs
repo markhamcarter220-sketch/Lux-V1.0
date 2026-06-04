@@ -1,5 +1,7 @@
 //! Audit event types.
 
+use crate::error::DenialClass;
+
 /// Classification of the operation that generated the event.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
@@ -25,19 +27,39 @@ pub enum Outcome {
 }
 
 /// A single immutable entry in the audit log.
+///
+/// # Fields
+///
+/// - `timestamp` — caller-provided monotonic counter (hardware tick or
+///   logical clock).  The kernel does not own a wall clock; callers supply
+///   this value.
+/// - `denial_class` — [`DenialClass::Halt`] or [`DenialClass::Failure`] for
+///   denied events; `None` for permitted events.  See `docs/error.rs` for the
+///   HALT/FAILURE semantics.
+/// - `denial_reason` — the static reason string from the originating
+///   [`crate::error::Error`]; `None` for permitted events.
+///
+/// All fields except `hash` are inputs to the SHA-256 chain.  Mutating any
+/// field after insertion is detectable via [`crate::audit::AuditLog::verify_chain`].
 #[derive(Debug, Clone)]
 pub struct AuditEvent {
     /// Classification of the audited operation.
-    pub kind:      EventKind,
+    pub kind:          EventKind,
     /// Raw node ID of the actor that initiated the operation.
-    pub actor:     u32,
+    pub actor:         u32,
     /// Monotonic sequence number (incremented per event, resets to 0 at startup).
-    pub seq:       u64,
+    pub seq:           u64,
+    /// Caller-provided monotonic timestamp (hardware tick, not wall time).
+    pub timestamp:     u64,
     /// Whether the operation was permitted or denied.
-    pub outcome:   Outcome,
-    /// SHA-256 of `(prev_hash || kind || actor || seq || outcome)`.
+    pub outcome:       Outcome,
+    /// HALT or FAILURE classification for denied events; `None` for permitted.
+    pub denial_class:  Option<DenialClass>,
+    /// Static reason string for denied events; `None` for permitted.
+    pub denial_reason: Option<&'static str>,
+    /// SHA-256 of the chain input for this event (see `AuditLog` for wire format).
     /// For the genesis event, `prev_hash` is `[0u8; 32]`.
-    pub hash:      [u8; 32],
+    pub hash:          [u8; 32],
 }
 
 impl AuditEvent {
@@ -49,6 +71,17 @@ impl AuditEvent {
             EventKind::CapabilityRevoked => "cap_revoked",
             EventKind::ResourceDeduction => "resource_deduct",
             EventKind::TopologyTraverse  => "topo_traverse",
+        }
+    }
+
+    /// Returns a string label for the denial class, suitable for JSON export.
+    /// Returns `None` for permitted events.
+    #[must_use]
+    pub fn denial_class_str(&self) -> Option<&'static str> {
+        match self.denial_class {
+            Some(DenialClass::Halt)    => Some("halt"),
+            Some(DenialClass::Failure) => Some("failure"),
+            None                       => None,
         }
     }
 }

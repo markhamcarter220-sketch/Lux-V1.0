@@ -9,7 +9,7 @@ use lux_kernel::{
         capability::{Capability, CapabilitySet},
         policy::Policy,
     },
-    audit::{AuditLog, EventKind, Outcome},
+    audit::{AuditLog, EventKind},
     topology::BootingGraph,
     types::{Generation, MAX_NODES},
 };
@@ -109,17 +109,17 @@ fn attack_6_3_revocation_is_immediate_no_cached_decision() {
 #[test]
 fn attack_6_4_audit_log_hash_chain_detects_any_mutation() {
     let mut log = AuditLog::new();
-    log.append(EventKind::CapabilityCheck, 1, Outcome::Permitted);
-    log.append(EventKind::ResourceDeduction, 2, Outcome::Permitted);
-    log.append(EventKind::CapabilityRevoked, 3, Outcome::Denied);
-    log.append(EventKind::TopologyTraverse, 4, Outcome::Denied);
+    log.append(EventKind::CapabilityCheck,   1, 0, None);
+    log.append(EventKind::ResourceDeduction, 2, 0, None);
+    log.append(EventKind::CapabilityRevoked, 3, 0, Some((lux_kernel::audit::DenialClass::Halt,    "revoked")));
+    log.append(EventKind::TopologyTraverse,  4, 0, Some((lux_kernel::audit::DenialClass::Halt,    "undeclared edge")));
 
     // Intact chain must verify.
     assert!(log.verify_chain(), "intact chain must verify");
 
     // Grow the log further — chain must stay valid.
     for i in 5u32..55 {
-        log.append(EventKind::CapabilityCheck, i, Outcome::Permitted);
+        log.append(EventKind::CapabilityCheck, i, 0, None);
     }
     assert!(log.verify_chain(), "chain must verify after 54 events");
 
