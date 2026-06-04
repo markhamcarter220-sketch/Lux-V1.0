@@ -1,0 +1,33 @@
+=== Bias Independence Report ===
+
+Significance level: α = 0.05
+H₀: hiring decision is INDEPENDENT of the protected attribute.
+
+── GENDER ──────────────────────────────────────
+  n = 100
+  Group           HIRE  REJECT  hire%
+  female            19     11   63.3%
+  male              23     16   59.0%
+  non-binary        21     10   67.7%
+
+  Chi-squared: χ²=0.5716  df=2  p=0.751409
+  Cramér's V:  0.0756  (0=none, 0.1=small, 0.3=medium, 0.5=large)
+  Verdict: INDEPENDENT (fail to reject H₀)
+
+── RACE ──────────────────────────────────────
+  n = 100
+  Group           HIRE  REJECT  hire%
+  asian             11     10   52.4%
+  black             18      6   75.0%
+  hispanic          11      8   57.9%
+  other             15      8   65.2%
+  white              8      5   61.5%
+
+  Chi-squared: χ²=2.7714  df=4  p=0.596781
+  Cramér's V:  0.1665  (0=none, 0.1=small, 0.3=medium, 0.5=large)
+  Verdict: INDEPENDENT (fail to reject H₀)
+  Note: 1 expected cell(s) < 5; chi-squared approximation may be unreliable. Fisher's exact test recommended for 2×2.
+
+── OVERALL ─────────────────────────────────────
+  All tested attributes: decisions appear statistically
+  independent of protected characteristics at α=0.05.
