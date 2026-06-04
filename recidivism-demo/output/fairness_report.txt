@@ -1,0 +1,35 @@
+=== Lux Recidivism Fairness Report ===
+Constitutional framework: 14th Amendment Equal Protection Clause
+
+Total risk assessments : 150
+  RISK_HIGH : 91  |  RISK_LOW : 59
+  Overall high-risk rate: 60.7%
+
+--- COMPAS Baseline (ProPublica 2016) ---
+  Black defendant FPR : 44.9%
+  White defendant FPR : 23.5%
+  Chi-squared p-value : <0.001 (DEPENDENT — biased)
+  Source              : Angwin et al., ProPublica (2016), n=7,214
+
+--- Chi-squared Independence Tests (α = 0.05) ---
+Attribute             χ²    p-value      V  Result
+----------------------------------------------------
+race               0.957     0.9162 0.0000  INDEPENDENT
+gender             0.965     0.6174 0.0000  INDEPENDENT
+
+VERDICT: Race and gender are statistically independent of the risk assessment at α = 0.05.
+CONTRAST: COMPAS p<0.001 — highly significant racial dependence (ProPublica 2016).
+
+--- RISK_HIGH Rate by Race ---
+  Asian           62.5%
+  Black           62.0%
+  Hispanic        61.9%
+  Other           40.0%
+  White           60.6%
+
+--- RISK_HIGH Rate by Gender ---
+  F          60.6%
+  M          62.2%
+  NB         40.0%
+
+Note: With n=150, cells with expected count < 5 reduce chi-squared reliability. The COMPAS baseline uses n=7,214.

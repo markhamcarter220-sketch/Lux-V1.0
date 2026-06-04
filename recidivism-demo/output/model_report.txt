@@ -1,0 +1,22 @@
+=== Lux Recidivism Model — Phase 1 Report ===
+
+Total defendants : 150
+RISK_HIGH        : 91
+RISK_LOW         : 59
+Test accuracy    : 93.3%
+
+Logistic regression coefficients (scaled features):
+  prior_convictions              +3.2443
+  substance_abuse_history        +2.4097
+  age_at_arrest                  -1.4534
+  family_support                 -1.2566
+  employment_status              -1.2479
+
+Classification report (test set):
+  0            precision=1.00  recall=0.83  f1=0.91
+  1            precision=0.90  recall=1.00  f1=0.95
+  macro avg    precision=0.95  recall=0.92  f1=0.93
+  weighted avg precision=0.94  recall=0.93  f1=0.93
+
+Model features (approved): prior_convictions, age_at_arrest, employment_status, substance_abuse_history, family_support
+Protected attributes excluded: race, gender, ethnicity, national_origin, disability, prior_drug_convictions

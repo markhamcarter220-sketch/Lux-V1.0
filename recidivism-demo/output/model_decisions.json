@@ -1,0 +1,1802 @@
+[
+  {
+    "defendant_id": 1,
+    "decision": "RISK_LOW",
+    "risk_score": 0.373153,
+    "features_used": {
+      "prior_convictions": 0.0,
+      "age_at_arrest": 59.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 2,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.844841,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 31.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 3,
+    "decision": "RISK_LOW",
+    "risk_score": 0.320792,
+    "features_used": {
+      "prior_convictions": 7.0,
+      "age_at_arrest": 62.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 4,
+    "decision": "RISK_LOW",
+    "risk_score": 0.312809,
+    "features_used": {
+      "prior_convictions": 4.0,
+      "age_at_arrest": 32.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 5,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.545002,
+    "features_used": {
+      "prior_convictions": 4.0,
+      "age_at_arrest": 38.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 6,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.937638,
+    "features_used": {
+      "prior_convictions": 9.0,
+      "age_at_arrest": 49.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 7,
+    "decision": "RISK_LOW",
+    "risk_score": 0.356766,
+    "features_used": {
+      "prior_convictions": 0.0,
+      "age_at_arrest": 24.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 8,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.72477,
+    "features_used": {
+      "prior_convictions": 7.0,
+      "age_at_arrest": 44.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 9,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.65833,
+    "features_used": {
+      "prior_convictions": 2.0,
+      "age_at_arrest": 42.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 10,
+    "decision": "RISK_LOW",
+    "risk_score": 0.077254,
+    "features_used": {
+      "prior_convictions": 1.0,
+      "age_at_arrest": 55.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 11,
+    "decision": "RISK_LOW",
+    "risk_score": 0.418234,
+    "features_used": {
+      "prior_convictions": 5.0,
+      "age_at_arrest": 65.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 12,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.653365,
+    "features_used": {
+      "prior_convictions": 10.0,
+      "age_at_arrest": 49.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 13,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.940312,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 37.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 14,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.832578,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 37.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 15,
+    "decision": "RISK_LOW",
+    "risk_score": 0.498012,
+    "features_used": {
+      "prior_convictions": 7.0,
+      "age_at_arrest": 38.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 16,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.709027,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 57.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 17,
+    "decision": "RISK_LOW",
+    "risk_score": 0.379067,
+    "features_used": {
+      "prior_convictions": 5.0,
+      "age_at_arrest": 33.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 18,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.69739,
+    "features_used": {
+      "prior_convictions": 1.0,
+      "age_at_arrest": 26.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 19,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.684233,
+    "features_used": {
+      "prior_convictions": 9.0,
+      "age_at_arrest": 34.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 20,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.883363,
+    "features_used": {
+      "prior_convictions": 4.0,
+      "age_at_arrest": 19.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 21,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.969919,
+    "features_used": {
+      "prior_convictions": 5.0,
+      "age_at_arrest": 23.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 22,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.960068,
+    "features_used": {
+      "prior_convictions": 4.0,
+      "age_at_arrest": 22.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 23,
+    "decision": "RISK_LOW",
+    "risk_score": 0.104599,
+    "features_used": {
+      "prior_convictions": 2.0,
+      "age_at_arrest": 55.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 24,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.632066,
+    "features_used": {
+      "prior_convictions": 10.0,
+      "age_at_arrest": 52.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 25,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.745776,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 51.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 26,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.973312,
+    "features_used": {
+      "prior_convictions": 7.0,
+      "age_at_arrest": 40.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 27,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.904831,
+    "features_used": {
+      "prior_convictions": 4.0,
+      "age_at_arrest": 52.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 28,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.908839,
+    "features_used": {
+      "prior_convictions": 9.0,
+      "age_at_arrest": 25.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 29,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.739158,
+    "features_used": {
+      "prior_convictions": 5.0,
+      "age_at_arrest": 61.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 30,
+    "decision": "RISK_LOW",
+    "risk_score": 0.250441,
+    "features_used": {
+      "prior_convictions": 4.0,
+      "age_at_arrest": 42.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 31,
+    "decision": "RISK_LOW",
+    "risk_score": 0.047323,
+    "features_used": {
+      "prior_convictions": 4.0,
+      "age_at_arrest": 63.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 32,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.919693,
+    "features_used": {
+      "prior_convictions": 2.0,
+      "age_at_arrest": 25.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 33,
+    "decision": "RISK_LOW",
+    "risk_score": 0.312017,
+    "features_used": {
+      "prior_convictions": 1.0,
+      "age_at_arrest": 41.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 34,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.843427,
+    "features_used": {
+      "prior_convictions": 6.0,
+      "age_at_arrest": 51.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 35,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.858726,
+    "features_used": {
+      "prior_convictions": 9.0,
+      "age_at_arrest": 41.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 36,
+    "decision": "RISK_LOW",
+    "risk_score": 0.027711,
+    "features_used": {
+      "prior_convictions": 0.0,
+      "age_at_arrest": 39.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 37,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.741084,
+    "features_used": {
+      "prior_convictions": 9.0,
+      "age_at_arrest": 25.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 38,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.987495,
+    "features_used": {
+      "prior_convictions": 9.0,
+      "age_at_arrest": 36.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 39,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.799361,
+    "features_used": {
+      "prior_convictions": 3.0,
+      "age_at_arrest": 29.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 40,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.733979,
+    "features_used": {
+      "prior_convictions": 6.0,
+      "age_at_arrest": 32.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 41,
+    "decision": "RISK_LOW",
+    "risk_score": 0.237961,
+    "features_used": {
+      "prior_convictions": 1.0,
+      "age_at_arrest": 50.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 42,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.918108,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 48.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 43,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.705884,
+    "features_used": {
+      "prior_convictions": 7.0,
+      "age_at_arrest": 47.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 44,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.769492,
+    "features_used": {
+      "prior_convictions": 3.0,
+      "age_at_arrest": 35.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 45,
+    "decision": "RISK_LOW",
+    "risk_score": 0.012984,
+    "features_used": {
+      "prior_convictions": 0.0,
+      "age_at_arrest": 64.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 46,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.938007,
+    "features_used": {
+      "prior_convictions": 10.0,
+      "age_at_arrest": 22.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 47,
+    "decision": "RISK_LOW",
+    "risk_score": 0.299671,
+    "features_used": {
+      "prior_convictions": 4.0,
+      "age_at_arrest": 34.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 48,
+    "decision": "RISK_LOW",
+    "risk_score": 0.464274,
+    "features_used": {
+      "prior_convictions": 9.0,
+      "age_at_arrest": 23.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 49,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.925904,
+    "features_used": {
+      "prior_convictions": 7.0,
+      "age_at_arrest": 34.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 50,
+    "decision": "RISK_LOW",
+    "risk_score": 0.380471,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 64.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 51,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.602989,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 35.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 52,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.517068,
+    "features_used": {
+      "prior_convictions": 2.0,
+      "age_at_arrest": 61.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 53,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.930362,
+    "features_used": {
+      "prior_convictions": 4.0,
+      "age_at_arrest": 41.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 54,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.794267,
+    "features_used": {
+      "prior_convictions": 5.0,
+      "age_at_arrest": 51.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 55,
+    "decision": "RISK_LOW",
+    "risk_score": 0.126125,
+    "features_used": {
+      "prior_convictions": 5.0,
+      "age_at_arrest": 39.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 56,
+    "decision": "RISK_LOW",
+    "risk_score": 0.036281,
+    "features_used": {
+      "prior_convictions": 0.0,
+      "age_at_arrest": 30.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 57,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.829558,
+    "features_used": {
+      "prior_convictions": 6.0,
+      "age_at_arrest": 54.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 58,
+    "decision": "RISK_LOW",
+    "risk_score": 0.017872,
+    "features_used": {
+      "prior_convictions": 1.0,
+      "age_at_arrest": 64.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 59,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.860624,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 30.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 60,
+    "decision": "RISK_LOW",
+    "risk_score": 0.371688,
+    "features_used": {
+      "prior_convictions": 7.0,
+      "age_at_arrest": 55.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 61,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.974196,
+    "features_used": {
+      "prior_convictions": 10.0,
+      "age_at_arrest": 30.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 62,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.739869,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 52.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 63,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.896536,
+    "features_used": {
+      "prior_convictions": 4.0,
+      "age_at_arrest": 55.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 64,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.966196,
+    "features_used": {
+      "prior_convictions": 10.0,
+      "age_at_arrest": 39.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 65,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.724033,
+    "features_used": {
+      "prior_convictions": 4.0,
+      "age_at_arrest": 53.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 66,
+    "decision": "RISK_LOW",
+    "risk_score": 0.088094,
+    "features_used": {
+      "prior_convictions": 3.0,
+      "age_at_arrest": 31.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 67,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.972782,
+    "features_used": {
+      "prior_convictions": 9.0,
+      "age_at_arrest": 21.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 68,
+    "decision": "RISK_LOW",
+    "risk_score": 0.380728,
+    "features_used": {
+      "prior_convictions": 4.0,
+      "age_at_arrest": 22.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 69,
+    "decision": "RISK_LOW",
+    "risk_score": 0.090306,
+    "features_used": {
+      "prior_convictions": 0.0,
+      "age_at_arrest": 39.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 70,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.740829,
+    "features_used": {
+      "prior_convictions": 5.0,
+      "age_at_arrest": 61.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 71,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.679052,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 24.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 72,
+    "decision": "RISK_LOW",
+    "risk_score": 0.051712,
+    "features_used": {
+      "prior_convictions": 2.0,
+      "age_at_arrest": 39.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 73,
+    "decision": "RISK_LOW",
+    "risk_score": 0.257533,
+    "features_used": {
+      "prior_convictions": 5.0,
+      "age_at_arrest": 51.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 74,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.88614,
+    "features_used": {
+      "prior_convictions": 1.0,
+      "age_at_arrest": 27.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 75,
+    "decision": "RISK_LOW",
+    "risk_score": 0.155932,
+    "features_used": {
+      "prior_convictions": 7.0,
+      "age_at_arrest": 52.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 76,
+    "decision": "RISK_LOW",
+    "risk_score": 0.384316,
+    "features_used": {
+      "prior_convictions": 5.0,
+      "age_at_arrest": 32.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 77,
+    "decision": "RISK_LOW",
+    "risk_score": 0.331686,
+    "features_used": {
+      "prior_convictions": 3.0,
+      "age_at_arrest": 56.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 78,
+    "decision": "RISK_LOW",
+    "risk_score": 0.1373,
+    "features_used": {
+      "prior_convictions": 2.0,
+      "age_at_arrest": 45.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 79,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.868954,
+    "features_used": {
+      "prior_convictions": 6.0,
+      "age_at_arrest": 44.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 80,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.941189,
+    "features_used": {
+      "prior_convictions": 7.0,
+      "age_at_arrest": 26.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 81,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.964878,
+    "features_used": {
+      "prior_convictions": 10.0,
+      "age_at_arrest": 40.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 82,
+    "decision": "RISK_LOW",
+    "risk_score": 0.164933,
+    "features_used": {
+      "prior_convictions": 4.0,
+      "age_at_arrest": 59.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 83,
+    "decision": "RISK_LOW",
+    "risk_score": 0.070176,
+    "features_used": {
+      "prior_convictions": 1.0,
+      "age_at_arrest": 18.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 84,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.536466,
+    "features_used": {
+      "prior_convictions": 9.0,
+      "age_at_arrest": 54.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 85,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.962353,
+    "features_used": {
+      "prior_convictions": 6.0,
+      "age_at_arrest": 41.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 86,
+    "decision": "RISK_LOW",
+    "risk_score": 0.391529,
+    "features_used": {
+      "prior_convictions": 7.0,
+      "age_at_arrest": 52.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 87,
+    "decision": "RISK_LOW",
+    "risk_score": 0.261516,
+    "features_used": {
+      "prior_convictions": 1.0,
+      "age_at_arrest": 49.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 88,
+    "decision": "RISK_LOW",
+    "risk_score": 0.072185,
+    "features_used": {
+      "prior_convictions": 3.0,
+      "age_at_arrest": 38.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 89,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.948845,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 32.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 90,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.582166,
+    "features_used": {
+      "prior_convictions": 9.0,
+      "age_at_arrest": 48.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 91,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.648724,
+    "features_used": {
+      "prior_convictions": 4.0,
+      "age_at_arrest": 24.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 92,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.517265,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 46.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 93,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.756889,
+    "features_used": {
+      "prior_convictions": 9.0,
+      "age_at_arrest": 22.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 94,
+    "decision": "RISK_LOW",
+    "risk_score": 0.071138,
+    "features_used": {
+      "prior_convictions": 4.0,
+      "age_at_arrest": 49.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 95,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.939915,
+    "features_used": {
+      "prior_convictions": 9.0,
+      "age_at_arrest": 48.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 96,
+    "decision": "RISK_LOW",
+    "risk_score": 0.309553,
+    "features_used": {
+      "prior_convictions": 3.0,
+      "age_at_arrest": 22.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 97,
+    "decision": "RISK_LOW",
+    "risk_score": 0.1067,
+    "features_used": {
+      "prior_convictions": 2.0,
+      "age_at_arrest": 54.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 98,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.919283,
+    "features_used": {
+      "prior_convictions": 7.0,
+      "age_at_arrest": 37.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 99,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.958218,
+    "features_used": {
+      "prior_convictions": 7.0,
+      "age_at_arrest": 55.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 100,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.908819,
+    "features_used": {
+      "prior_convictions": 1.0,
+      "age_at_arrest": 19.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 101,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.897867,
+    "features_used": {
+      "prior_convictions": 9.0,
+      "age_at_arrest": 26.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 102,
+    "decision": "RISK_LOW",
+    "risk_score": 0.048762,
+    "features_used": {
+      "prior_convictions": 2.0,
+      "age_at_arrest": 41.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 103,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.986913,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 27.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 104,
+    "decision": "RISK_LOW",
+    "risk_score": 0.107583,
+    "features_used": {
+      "prior_convictions": 0.0,
+      "age_at_arrest": 33.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 105,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.974484,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 49.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 106,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.87115,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 24.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 107,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.973703,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 50.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 108,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.947673,
+    "features_used": {
+      "prior_convictions": 7.0,
+      "age_at_arrest": 22.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 109,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.894034,
+    "features_used": {
+      "prior_convictions": 5.0,
+      "age_at_arrest": 26.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 110,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.968044,
+    "features_used": {
+      "prior_convictions": 7.0,
+      "age_at_arrest": 46.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 111,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.633521,
+    "features_used": {
+      "prior_convictions": 3.0,
+      "age_at_arrest": 56.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 112,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.665426,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 26.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 113,
+    "decision": "RISK_LOW",
+    "risk_score": 0.463356,
+    "features_used": {
+      "prior_convictions": 6.0,
+      "age_at_arrest": 32.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 114,
+    "decision": "RISK_LOW",
+    "risk_score": 0.197975,
+    "features_used": {
+      "prior_convictions": 5.0,
+      "age_at_arrest": 62.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 115,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.714614,
+    "features_used": {
+      "prior_convictions": 5.0,
+      "age_at_arrest": 65.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 116,
+    "decision": "RISK_LOW",
+    "risk_score": 0.142244,
+    "features_used": {
+      "prior_convictions": 6.0,
+      "age_at_arrest": 45.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 117,
+    "decision": "RISK_LOW",
+    "risk_score": 0.027711,
+    "features_used": {
+      "prior_convictions": 0.0,
+      "age_at_arrest": 39.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 118,
+    "decision": "RISK_LOW",
+    "risk_score": 0.360259,
+    "features_used": {
+      "prior_convictions": 1.0,
+      "age_at_arrest": 34.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 119,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.85294,
+    "features_used": {
+      "prior_convictions": 2.0,
+      "age_at_arrest": 47.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 120,
+    "decision": "RISK_LOW",
+    "risk_score": 0.261113,
+    "features_used": {
+      "prior_convictions": 1.0,
+      "age_at_arrest": 46.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 121,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.83516,
+    "features_used": {
+      "prior_convictions": 4.0,
+      "age_at_arrest": 32.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 122,
+    "decision": "RISK_LOW",
+    "risk_score": 0.338874,
+    "features_used": {
+      "prior_convictions": 7.0,
+      "age_at_arrest": 19.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 123,
+    "decision": "RISK_LOW",
+    "risk_score": 0.298624,
+    "features_used": {
+      "prior_convictions": 7.0,
+      "age_at_arrest": 25.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 124,
+    "decision": "RISK_LOW",
+    "risk_score": 0.189669,
+    "features_used": {
+      "prior_convictions": 5.0,
+      "age_at_arrest": 64.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 125,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.65496,
+    "features_used": {
+      "prior_convictions": 9.0,
+      "age_at_arrest": 38.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 126,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.696662,
+    "features_used": {
+      "prior_convictions": 6.0,
+      "age_at_arrest": 41.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 127,
+    "decision": "RISK_LOW",
+    "risk_score": 0.235218,
+    "features_used": {
+      "prior_convictions": 0.0,
+      "age_at_arrest": 40.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 128,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.901066,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 55.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 129,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.979359,
+    "features_used": {
+      "prior_convictions": 6.0,
+      "age_at_arrest": 21.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 130,
+    "decision": "RISK_LOW",
+    "risk_score": 0.258344,
+    "features_used": {
+      "prior_convictions": 6.0,
+      "age_at_arrest": 21.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 131,
+    "decision": "RISK_LOW",
+    "risk_score": 0.471054,
+    "features_used": {
+      "prior_convictions": 6.0,
+      "age_at_arrest": 31.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 132,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.880081,
+    "features_used": {
+      "prior_convictions": 6.0,
+      "age_at_arrest": 41.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 133,
+    "decision": "RISK_LOW",
+    "risk_score": 0.019879,
+    "features_used": {
+      "prior_convictions": 0.0,
+      "age_at_arrest": 50.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 134,
+    "decision": "RISK_LOW",
+    "risk_score": 0.395284,
+    "features_used": {
+      "prior_convictions": 6.0,
+      "age_at_arrest": 41.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 135,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.823779,
+    "features_used": {
+      "prior_convictions": 8.0,
+      "age_at_arrest": 39.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 136,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.581974,
+    "features_used": {
+      "prior_convictions": 3.0,
+      "age_at_arrest": 63.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 137,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.774059,
+    "features_used": {
+      "prior_convictions": 6.0,
+      "age_at_arrest": 25.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 138,
+    "decision": "RISK_LOW",
+    "risk_score": 0.076791,
+    "features_used": {
+      "prior_convictions": 0.0,
+      "age_at_arrest": 45.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 139,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.714725,
+    "features_used": {
+      "prior_convictions": 3.0,
+      "age_at_arrest": 44.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 140,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.796826,
+    "features_used": {
+      "prior_convictions": 4.0,
+      "age_at_arrest": 40.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 141,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.827848,
+    "features_used": {
+      "prior_convictions": 10.0,
+      "age_at_arrest": 56.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 142,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.736325,
+    "features_used": {
+      "prior_convictions": 2.0,
+      "age_at_arrest": 30.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 143,
+    "decision": "RISK_LOW",
+    "risk_score": 0.111176,
+    "features_used": {
+      "prior_convictions": 3.0,
+      "age_at_arrest": 63.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 144,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.944781,
+    "features_used": {
+      "prior_convictions": 4.0,
+      "age_at_arrest": 33.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 145,
+    "decision": "RISK_LOW",
+    "risk_score": 0.38506,
+    "features_used": {
+      "prior_convictions": 10.0,
+      "age_at_arrest": 44.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 0.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 146,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.949577,
+    "features_used": {
+      "prior_convictions": 9.0,
+      "age_at_arrest": 42.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 147,
+    "decision": "RISK_LOW",
+    "risk_score": 0.380414,
+    "features_used": {
+      "prior_convictions": 0.0,
+      "age_at_arrest": 58.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 1.0
+    }
+  },
+  {
+    "defendant_id": 148,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.680771,
+    "features_used": {
+      "prior_convictions": 2.0,
+      "age_at_arrest": 39.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 149,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.963587,
+    "features_used": {
+      "prior_convictions": 9.0,
+      "age_at_arrest": 31.0,
+      "employment_status": 1.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  },
+  {
+    "defendant_id": 150,
+    "decision": "RISK_HIGH",
+    "risk_score": 0.878132,
+    "features_used": {
+      "prior_convictions": 0.0,
+      "age_at_arrest": 19.0,
+      "employment_status": 0.0,
+      "substance_abuse_history": 1.0,
+      "family_support": 0.0
+    }
+  }
+]
