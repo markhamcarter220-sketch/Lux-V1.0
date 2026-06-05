@@ -3,6 +3,9 @@
 //! 10 attack vectors proving that ambiguity and error states produce DENIAL,
 //! never ACCESS.  Every test asserts an Err or a failed authorisation.
 
+use core::num::NonZeroU32;
+use ed25519_dalek::{Signer, SigningKey};
+use lux_kernel::audit::AuditLog;
 use lux_kernel::{
     auth::{
         capability::{Capability, CapabilitySet},
@@ -14,11 +17,10 @@ use lux_kernel::{
     topology::BootingGraph,
     types::{Generation, Quota},
 };
-use lux_kernel::audit::AuditLog;
-use core::num::NonZeroU32;
-use ed25519_dalek::{SigningKey, Signer};
 
-fn nz(n: u32) -> NonZeroU32 { NonZeroU32::new(n).unwrap() }
+fn nz(n: u32) -> NonZeroU32 {
+    NonZeroU32::new(n).unwrap()
+}
 
 const ALL_RIGHTS: [CapabilitySet; 5] = [
     CapabilitySet::READ_TOPOLOGY,
@@ -28,7 +30,9 @@ const ALL_RIGHTS: [CapabilitySet; 5] = [
     CapabilitySet::SHUTDOWN,
 ];
 
-fn test_key() -> SigningKey { SigningKey::from_bytes(&[7u8; 32]) }
+fn test_key() -> SigningKey {
+    SigningKey::from_bytes(&[7u8; 32])
+}
 
 fn signed_wire(payload: &[u8], sk: &SigningKey) -> Vec<u8> {
     let sig = sk.sign(payload);
@@ -51,7 +55,8 @@ fn attack_1_1_empty_rights_capability_denied_for_all_rights() {
     let mut policy = Policy::new(gen);
 
     for (i, &right) in ALL_RIGHTS.iter().enumerate() {
-        let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::empty(), gen, 100 + i as u64);
+        let cap =
+            Capability::new_for_test(nz(1), nz(2), CapabilitySet::empty(), gen, 100 + i as u64);
         // Empty rights fail at step 1 (authorises); nonce is never consumed.
         assert!(
             policy.check(&cap, right, &mut AuditLog::new()).is_err(),
@@ -118,7 +123,10 @@ fn attack_1_4_single_bit_flip_in_signature_is_denied() {
     // Original wire is still valid.
     let last_idx = wire.len() - 1;
     wire[last_idx] ^= 0x01; // flip a payload byte instead
-    assert!(ManifestDecoder::decode(&wire, &creds).is_err(), "payload flip must be denied");
+    assert!(
+        ManifestDecoder::decode(&wire, &creds).is_err(),
+        "payload flip must be denied"
+    );
 }
 
 // ── Attack 1.5 ────────────────────────────────────────────────────────────────
@@ -132,7 +140,9 @@ fn attack_1_5_stale_generation_acts_as_temporal_expiry() {
 
     // Caps at gen 0 are valid now.
     let valid = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen0, 1);
-    assert!(policy.check(&valid, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
+    assert!(policy
+        .check(&valid, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+        .is_ok());
 
     // Rotate — gen 0 caps are now "expired".
     policy.rotate_generation();
@@ -140,18 +150,24 @@ fn attack_1_5_stale_generation_acts_as_temporal_expiry() {
 
     let expired = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen0, 99);
     assert!(
-        policy.check(&expired, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err(),
+        policy
+            .check(&expired, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+            .is_err(),
         "gen-0 cap must be expired after rotation to gen 1"
     );
 
     // Gen 1 caps are valid.
     let current = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen1, 100);
-    assert!(policy.check(&current, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
+    assert!(policy
+        .check(&current, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+        .is_ok());
 
     // Rotate again — gen 1 caps also expire.
     policy.rotate_generation();
     let gen1_expired = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen1, 200);
-    assert!(policy.check(&gen1_expired, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err());
+    assert!(policy
+        .check(&gen1_expired, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+        .is_err());
 }
 
 // ── Attack 1.6 ────────────────────────────────────────────────────────────────
@@ -171,7 +187,9 @@ fn attack_1_6_revoked_capability_stays_denied_persistently() {
         assert!(
             matches!(
                 policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()),
-                Err(Error::CapabilityDenied { reason: "capability revoked" })
+                Err(Error::CapabilityDenied {
+                    reason: "capability revoked"
+                })
             ),
             "attempt {i}: revoked cap must be denied"
         );
@@ -214,8 +232,15 @@ fn attack_1_8_over_quota_deduction_is_atomic() {
     assert_eq!(ledger.balance(n), Some(50));
 
     // Deduct more than available — must fail atomically.
-    assert!(ledger.deduct(n, 100).is_none(), "deduct 100 from 50 must fail");
-    assert_eq!(ledger.balance(n), Some(50), "balance must be unchanged after failed deduction");
+    assert!(
+        ledger.deduct(n, 100).is_none(),
+        "deduct 100 from 50 must fail"
+    );
+    assert_eq!(
+        ledger.balance(n),
+        Some(50),
+        "balance must be unchanged after failed deduction"
+    );
 
     // 1 over limit.
     assert!(ledger.deduct(n, 51).is_none());
@@ -273,18 +298,26 @@ fn attack_1_10_check_revoke_sequence_is_consistent() {
 
     // Use nonce_a successfully.
     let cap_a = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, nonce_a);
-    assert!(policy.check(&cap_a, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
+    assert!(policy
+        .check(&cap_a, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+        .is_ok());
 
     // Revoke nonce_b, then attempt use.
     policy.revoke_capability(nonce_b);
     let cap_b = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, nonce_b);
-    assert!(policy.check(&cap_b, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err());
+    assert!(policy
+        .check(&cap_b, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+        .is_err());
 
     // nonce_a replay denied (already consumed in nonce window).
     let cap_a2 = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, nonce_a);
-    assert!(policy.check(&cap_a2, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err());
+    assert!(policy
+        .check(&cap_a2, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+        .is_err());
 
     // nonce_b repeated attempt also denied (still revoked).
     let cap_b2 = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, nonce_b);
-    assert!(policy.check(&cap_b2, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err());
+    assert!(policy
+        .check(&cap_b2, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+        .is_err());
 }

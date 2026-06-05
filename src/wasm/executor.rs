@@ -33,7 +33,7 @@ use crate::{error::Error, wasm::WasmShim, Result};
 pub struct WasmExecutor {
     engine: Engine,
     linker: Linker<WasmShim>,
-    store:  Store<WasmShim>,
+    store: Store<WasmShim>,
 }
 
 impl std::fmt::Debug for WasmExecutor {
@@ -69,7 +69,9 @@ impl WasmExecutor {
                         .policy_check(cap_handle as u32, right_bits as u32)
                 },
             )
-            .map_err(|_| Error::WasmFault { detail: "failed to register host function" })?;
+            .map_err(|_| Error::WasmFault {
+                detail: "failed to register host function",
+            })?;
 
         linker
             .func_wrap(
@@ -82,7 +84,9 @@ impl WasmExecutor {
                         .ledger_deduct(node_id as u32, amount as u64)
                 },
             )
-            .map_err(|_| Error::WasmFault { detail: "failed to register host function" })?;
+            .map_err(|_| Error::WasmFault {
+                detail: "failed to register host function",
+            })?;
 
         linker
             .func_wrap(
@@ -95,11 +99,17 @@ impl WasmExecutor {
                         .topology_traverse(src_id as u32, dst_id as u32)
                 },
             )
-            .map_err(|_| Error::WasmFault { detail: "failed to register host function" })?;
+            .map_err(|_| Error::WasmFault {
+                detail: "failed to register host function",
+            })?;
 
         let store = Store::new(&engine, shim);
 
-        Ok(Self { engine, linker, store })
+        Ok(Self {
+            engine,
+            linker,
+            store,
+        })
     }
 
     /// Borrow the current [`WasmShim`] state.
@@ -137,24 +147,27 @@ impl WasmExecutor {
     ///   `func_name` does not exist in the module or has the wrong signature.
     /// - [`Error::WasmFault`] with `detail = "WASM guest trapped"` if the guest
     ///   executes an `unreachable` instruction or otherwise traps.
-    pub fn call_nullary(
-        &mut self,
-        wasm_bytes: impl AsRef<[u8]>,
-        func_name: &str,
-    ) -> Result<i32> {
-        let module = Module::new(&self.engine, wasm_bytes)
-            .map_err(|_| Error::WasmFault { detail: "failed to compile WASM module" })?;
+    pub fn call_nullary(&mut self, wasm_bytes: impl AsRef<[u8]>, func_name: &str) -> Result<i32> {
+        let module = Module::new(&self.engine, wasm_bytes).map_err(|_| Error::WasmFault {
+            detail: "failed to compile WASM module",
+        })?;
 
         let instance = self
             .linker
             .instantiate(&mut self.store, &module)
-            .map_err(|_| Error::WasmFault { detail: "failed to instantiate WASM module" })?;
+            .map_err(|_| Error::WasmFault {
+                detail: "failed to instantiate WASM module",
+            })?;
 
         let func = instance
             .get_typed_func::<(), i32>(&mut self.store, func_name)
-            .map_err(|_| Error::WasmFault { detail: "WASM function not found or wrong type" })?;
+            .map_err(|_| Error::WasmFault {
+                detail: "WASM function not found or wrong type",
+            })?;
 
         func.call(&mut self.store, ())
-            .map_err(|_| Error::WasmFault { detail: "WASM guest trapped" })
+            .map_err(|_| Error::WasmFault {
+                detail: "WASM guest trapped",
+            })
     }
 }

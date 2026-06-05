@@ -31,7 +31,7 @@ pub struct EdgeDecl {
 #[derive(Debug, Clone, Copy)]
 pub struct QuotaDecl {
     /// The node to which this quota applies.
-    pub node:    NodeId,
+    pub node: NodeId,
     /// Resource ceiling for the node.
     pub ceiling: Quota,
 }
@@ -39,8 +39,8 @@ pub struct QuotaDecl {
 /// The sealed, validated boot manifest.
 #[derive(Debug)]
 pub struct Manifest {
-    pub(crate) edges:   HVec<EdgeDecl, MAX_EDGES>,
-    pub(crate) quotas:  HVec<QuotaDecl, MAX_NODES>,
+    pub(crate) edges: HVec<EdgeDecl, MAX_EDGES>,
+    pub(crate) quotas: HVec<QuotaDecl, MAX_NODES>,
     pub(crate) version: u32,
 }
 
@@ -54,11 +54,15 @@ impl Manifest {
     /// Returns `Err(ManifestInvalid)` if `bytes` is empty or the parser stub rejects it.
     pub const fn parse_and_verify(bytes: &[u8]) -> Result<Self> {
         if bytes.is_empty() {
-            return Err(Error::ManifestInvalid { detail: "zero-length manifest" });
+            return Err(Error::ManifestInvalid {
+                detail: "zero-length manifest",
+            });
         }
         // Placeholder — replace with wire-format decoder (CBOR/protobuf).
         let _ = bytes;
-        Err(Error::ManifestInvalid { detail: "parser not yet wired (stub)" })
+        Err(Error::ManifestInvalid {
+            detail: "parser not yet wired (stub)",
+        })
     }
 
     /// Returns `true` if the directed edge (src → dst) is declared.
@@ -70,7 +74,10 @@ impl Manifest {
     /// Returns the resource ceiling for `node`, or `None` if undeclared.
     #[must_use]
     pub fn quota_for(&self, node: NodeId) -> Option<Quota> {
-        self.quotas.iter().find(|q| q.node == node).map(|q| q.ceiling)
+        self.quotas
+            .iter()
+            .find(|q| q.node == node)
+            .map(|q| q.ceiling)
     }
 
     /// Wire-format version of this manifest.

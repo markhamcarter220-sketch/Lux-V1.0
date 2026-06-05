@@ -3,6 +3,8 @@
 //! Each test corresponds to exactly one kernel security invariant.
 //! These tests must pass at 100%.  A failure here is a P0 security regression.
 
+use core::num::NonZeroU32;
+use lux_kernel::audit::AuditLog;
 use lux_kernel::{
     auth::{
         capability::{Capability, CapabilitySet},
@@ -13,8 +15,6 @@ use lux_kernel::{
     metabolism::quota::QuotaEnforcer,
     types::{Generation, Quota},
 };
-use lux_kernel::audit::AuditLog;
-use core::num::NonZeroU32;
 
 fn node(n: u32) -> NonZeroU32 {
     NonZeroU32::new(n).unwrap()
@@ -24,13 +24,7 @@ fn node(n: u32) -> NonZeroU32 {
 #[test]
 fn inv1_no_capability_no_access() {
     let mut policy = Policy::new(Generation(0));
-    let cap = Capability::new_for_test(
-        node(1),
-        node(2),
-        CapabilitySet::empty(),
-        Generation(0),
-        10,
-    );
+    let cap = Capability::new_for_test(node(1), node(2), CapabilitySet::empty(), Generation(0), 10);
     assert_eq!(
         policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()),
         Err(Error::CapabilityDenied {
@@ -52,7 +46,10 @@ fn inv2_delegation_never_amplifies() {
     );
     let all = CapabilitySet::all();
     let result = cap.delegate(node(12), all, 2);
-    assert!(result.is_none(), "Invariant 2 violated: delegation amplified rights");
+    assert!(
+        result.is_none(),
+        "Invariant 2 violated: delegation amplified rights"
+    );
 }
 
 // Invariant 3: Accountable Resources — over-quota must hard-reject.
@@ -64,7 +61,9 @@ fn inv3_quota_overflow_is_rejected() {
     let result = enforcer.deduct(&mut ledger, node(1), 200, "compute", &mut AuditLog::new());
     assert_eq!(
         result,
-        Err(Error::QuotaExceeded { resource: "compute" }),
+        Err(Error::QuotaExceeded {
+            resource: "compute"
+        }),
         "Invariant 3 violated: over-quota deduction was permitted"
     );
 }

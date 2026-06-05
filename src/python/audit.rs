@@ -47,13 +47,13 @@ fn map_denial_reason(s: &str) -> &'static str {
 
 fn parse_kind(s: &str) -> PyResult<EventKind> {
     match s {
-        "hiring_decision"   => Ok(EventKind::HiringDecision),
+        "hiring_decision" => Ok(EventKind::HiringDecision),
         "policy_gate_check" => Ok(EventKind::PolicyGateCheck),
-        "capability_check"  => Ok(EventKind::CapabilityCheck),
-        "cap_revoked"       => Ok(EventKind::CapabilityRevoked),
-        "resource_deduct"   => Ok(EventKind::ResourceDeduction),
-        "topo_traverse"     => Ok(EventKind::TopologyTraverse),
-        "topo_change"       => Ok(EventKind::TopologyChange),
+        "capability_check" => Ok(EventKind::CapabilityCheck),
+        "cap_revoked" => Ok(EventKind::CapabilityRevoked),
+        "resource_deduct" => Ok(EventKind::ResourceDeduction),
+        "topo_traverse" => Ok(EventKind::TopologyTraverse),
+        "topo_change" => Ok(EventKind::TopologyChange),
         other => Err(pyo3::exceptions::PyValueError::new_err(format!(
             "unknown EventKind {other:?}; accepted: hiring_decision, policy_gate_check, \
              capability_check, cap_revoked, resource_deduct, topo_traverse, topo_change"
@@ -63,7 +63,7 @@ fn parse_kind(s: &str) -> PyResult<EventKind> {
 
 fn parse_denial_class(s: &str) -> PyResult<DenialClass> {
     match s {
-        "halt"    => Ok(DenialClass::Halt),
+        "halt" => Ok(DenialClass::Halt),
         "failure" => Ok(DenialClass::Failure),
         other => Err(pyo3::exceptions::PyValueError::new_err(format!(
             "unknown DenialClass {other:?}; use \"halt\" or \"failure\""
@@ -97,7 +97,9 @@ impl PyAuditLog {
     #[new]
     #[must_use]
     pub const fn new() -> Self {
-        Self { inner: AuditLog::new() }
+        Self {
+            inner: AuditLog::new(),
+        }
     }
 
     /// Append one event to the audit log.
@@ -129,21 +131,20 @@ impl PyAuditLog {
     /// Returns `Err` if `kind` or `denial_class` is an unrecognised string.
     pub fn append(
         &mut self,
-        kind:          &str,
-        actor:         u64,
-        timestamp:     u64,
-        denial_class:  Option<&str>,
+        kind: &str,
+        actor: u64,
+        timestamp: u64,
+        denial_class: Option<&str>,
         denial_reason: Option<&str>,
     ) -> PyResult<bool> {
-        let kind  = parse_kind(kind)?;
+        let kind = parse_kind(kind)?;
         let actor = u32::try_from(actor).unwrap_or(u32::MAX); // caller-responsible: candidate_id always fits u32
 
         let denial = match denial_class {
             None => None,
             Some(cls_str) => {
-                let cls    = parse_denial_class(cls_str)?;
-                let reason = denial_reason
-                    .map_or("policy violation", map_denial_reason);
+                let cls = parse_denial_class(cls_str)?;
+                let reason = denial_reason.map_or("policy violation", map_denial_reason);
                 Some((cls, reason))
             }
         };
@@ -172,11 +173,9 @@ impl PyAuditLog {
     /// Returns `Err` if the internal JSON writer fails.
     pub fn export_json(&self) -> PyResult<String> {
         let mut buf = String::new();
-        self.inner
-            .export_json(&mut buf)
-            .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(
-                format!("export_json failed: {e:?}"),
-            ))?;
+        self.inner.export_json(&mut buf).map_err(|e| {
+            pyo3::exceptions::PyRuntimeError::new_err(format!("export_json failed: {e:?}"))
+        })?;
         Ok(buf)
     }
 
@@ -196,11 +195,14 @@ impl PyAuditLog {
     /// Returns 64 zeros for an empty log.
     #[must_use]
     pub fn head_hash(&self) -> String {
-        self.inner.head_hash().iter().fold(String::with_capacity(64), |mut s, b| {
-            use core::fmt::Write;
-            let _ = write!(s, "{b:02x}");
-            s
-        })
+        self.inner
+            .head_hash()
+            .iter()
+            .fold(String::with_capacity(64), |mut s, b| {
+                use core::fmt::Write;
+                let _ = write!(s, "{b:02x}");
+                s
+            })
     }
 
     fn __len__(&self) -> usize {
@@ -208,6 +210,10 @@ impl PyAuditLog {
     }
 
     fn __repr__(&self) -> String {
-        format!("PyAuditLog(len={}, chain_valid={})", self.inner.len(), self.inner.verify_chain())
+        format!(
+            "PyAuditLog(len={}, chain_valid={})",
+            self.inner.len(),
+            self.inner.verify_chain()
+        )
     }
 }

@@ -4,8 +4,8 @@
 //! ∀ declared edge between active nodes: traverse returns Ok.
 //! Sealing the graph makes activate unreachable at the type level (structural).
 
-use lux_kernel::{audit::AuditLog, topology::graph::BootingGraph};
 use core::num::NonZeroU32;
+use lux_kernel::{audit::AuditLog, topology::graph::BootingGraph};
 use proptest::prelude::*;
 
 fn node(n: u32) -> NonZeroU32 {

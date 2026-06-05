@@ -43,13 +43,7 @@ static KNOWN_APPROVED: &[&str] = &[
 ];
 
 /// Compile-time table of all valid blocked-attribute substrings.
-static KNOWN_BLOCKED_SUBSTRINGS: &[&str] = &[
-    "age",
-    "gender",
-    "race",
-    "ethnicity",
-    "sex",
-];
+static KNOWN_BLOCKED_SUBSTRINGS: &[&str] = &["age", "gender", "race", "ethnicity", "sex"];
 
 /// Exact-match protected attribute names (subset of `KNOWN_BLOCKED_SUBSTRINGS`).
 /// Checked first to give the most precise denial reason.
@@ -61,8 +55,8 @@ static PROTECTED_EXACT: &[&str] = &["age", "gender", "race"];
 
 const REASON_PROTECTED_EXACT: &str = "protected attribute in feature vector";
 const REASON_PROTECTED_ALIAS: &str = "aliased protected attribute in feature vector";
-const REASON_UNAPPROVED:      &str = "unapproved feature in feature vector";
-const REASON_ALLOWED:         &str = "all approved features; no protected attributes";
+const REASON_UNAPPROVED: &str = "unapproved feature in feature vector";
+const REASON_ALLOWED: &str = "all approved features; no protected attributes";
 
 fn str_to_static_approved(s: &str) -> Option<&'static str> {
     KNOWN_APPROVED.iter().copied().find(|&k| k == s)
@@ -87,7 +81,7 @@ fn str_to_static_blocked(s: &str) -> Option<&'static str> {
 #[derive(Debug)]
 pub struct PyPolicyGate {
     approved: HVec<&'static str, MAX_GATE_FEATURES>,
-    blocked:  HVec<&'static str, MAX_GATE_FEATURES>,
+    blocked: HVec<&'static str, MAX_GATE_FEATURES>,
 }
 
 #[pymethods]
@@ -115,12 +109,9 @@ impl PyPolicyGate {
     /// Returns `Err` if any feature/attribute string is unknown or a list exceeds capacity.
     #[new]
     #[allow(clippy::needless_pass_by_value)]
-    pub fn new(
-        approved_features: Vec<String>,
-        blocked_attrs:     Vec<String>,
-    ) -> PyResult<Self> {
+    pub fn new(approved_features: Vec<String>, blocked_attrs: Vec<String>) -> PyResult<Self> {
         let mut approved: HVec<&'static str, MAX_GATE_FEATURES> = HVec::new();
-        let mut blocked:  HVec<&'static str, MAX_GATE_FEATURES> = HVec::new();
+        let mut blocked: HVec<&'static str, MAX_GATE_FEATURES> = HVec::new();
 
         for feat in &approved_features {
             let s = str_to_static_approved(feat).ok_or_else(|| {
@@ -142,9 +133,7 @@ impl PyPolicyGate {
                 ))
             })?;
             blocked.push(s).map_err(|_| {
-                pyo3::exceptions::PyValueError::new_err(
-                    "blocked_attrs list exceeds capacity (16)",
-                )
+                pyo3::exceptions::PyValueError::new_err("blocked_attrs list exceeds capacity (16)")
             })?;
         }
 
@@ -178,8 +167,8 @@ impl PyPolicyGate {
             // Invariant 1: exact protected-attribute match.
             for name in &feature_names {
                 if PROTECTED_EXACT.contains(&name.as_str()) {
-                    result.set_item("allowed",      false)?;
-                    result.set_item("reason",       REASON_PROTECTED_EXACT)?;
+                    result.set_item("allowed", false)?;
+                    result.set_item("reason", REASON_PROTECTED_EXACT)?;
                     result.set_item("denial_class", "halt")?;
                     return Ok(result.into());
                 }
@@ -189,8 +178,8 @@ impl PyPolicyGate {
             for name in &feature_names {
                 let lower = name.to_lowercase();
                 if self.blocked.iter().any(|&sub| lower.contains(sub)) {
-                    result.set_item("allowed",      false)?;
-                    result.set_item("reason",       REASON_PROTECTED_ALIAS)?;
+                    result.set_item("allowed", false)?;
+                    result.set_item("reason", REASON_PROTECTED_ALIAS)?;
                     result.set_item("denial_class", "halt")?;
                     return Ok(result.into());
                 }
@@ -199,16 +188,16 @@ impl PyPolicyGate {
             // Invariant 3: all features must be in the approved list.
             for name in &feature_names {
                 if !self.approved.contains(&name.as_str()) {
-                    result.set_item("allowed",      false)?;
-                    result.set_item("reason",       REASON_UNAPPROVED)?;
+                    result.set_item("allowed", false)?;
+                    result.set_item("reason", REASON_UNAPPROVED)?;
                     result.set_item("denial_class", "halt")?;
                     return Ok(result.into());
                 }
             }
 
             // All invariants pass → ALLOW.
-            result.set_item("allowed",      true)?;
-            result.set_item("reason",       REASON_ALLOWED)?;
+            result.set_item("allowed", true)?;
+            result.set_item("reason", REASON_ALLOWED)?;
             result.set_item("denial_class", py.None())?;
             Ok(result.into())
         })

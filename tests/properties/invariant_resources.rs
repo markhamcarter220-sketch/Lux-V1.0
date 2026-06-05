@@ -4,15 +4,17 @@
 //! ∀ amount ≤ balance: deduction succeeds, balance decremented exactly.
 //! ∀ sequential deductions summing to ceiling: all succeed, remainder = 0.
 
+use core::num::NonZeroU32;
+use lux_kernel::audit::AuditLog;
 use lux_kernel::{
     metabolism::{ledger::Ledger, quota::QuotaEnforcer},
     types::Quota,
 };
-use lux_kernel::audit::AuditLog;
-use core::num::NonZeroU32;
 use proptest::prelude::*;
 
-fn node(n: u32) -> NonZeroU32 { NonZeroU32::new(n.max(1)).unwrap() }
+fn node(n: u32) -> NonZeroU32 {
+    NonZeroU32::new(n.max(1)).unwrap()
+}
 
 proptest! {
     #![proptest_config(ProptestConfig { cases: 2048, ..Default::default() })]

@@ -86,10 +86,10 @@ use super::event::{AuditEvent, EventKind, Outcome};
 /// re-evaluated.
 #[derive(Debug)]
 pub struct AuditLog {
-    events:          heapless::Vec<AuditEvent, MAX_AUDIT_EVENTS>,
-    last_hash:       [u8; 32],
-    next_seq:        u64,
-    _not_send_sync:  core::marker::PhantomData<*mut ()>,
+    events: heapless::Vec<AuditEvent, MAX_AUDIT_EVENTS>,
+    last_hash: [u8; 32],
+    next_seq: u64,
+    _not_send_sync: core::marker::PhantomData<*mut ()>,
 }
 
 impl AuditLog {
@@ -97,9 +97,9 @@ impl AuditLog {
     #[must_use]
     pub const fn new() -> Self {
         Self {
-            events:         heapless::Vec::new(),
-            last_hash:      [0u8; 32],
-            next_seq:       0,
+            events: heapless::Vec::new(),
+            last_hash: [0u8; 32],
+            next_seq: 0,
             _not_send_sync: core::marker::PhantomData,
         }
     }
@@ -127,11 +127,15 @@ impl AuditLog {
         timestamp: u64,
         denial: Option<(DenialClass, &'static str)>,
     ) -> bool {
-        let seq     = self.next_seq;
-        let outcome = if denial.is_some() { Outcome::Denied } else { Outcome::Permitted };
+        let seq = self.next_seq;
+        let outcome = if denial.is_some() {
+            Outcome::Denied
+        } else {
+            Outcome::Permitted
+        };
         let (denial_class, denial_reason) = match denial {
             Some((c, r)) => (Some(c), Some(r)),
-            None         => (None, None),
+            None => (None, None),
         };
 
         let hash = Self::compute_hash(
@@ -158,7 +162,7 @@ impl AuditLog {
 
         if self.events.push(event).is_ok() {
             self.last_hash = hash;
-            self.next_seq  = self.next_seq.saturating_add(1);
+            self.next_seq = self.next_seq.saturating_add(1);
             true
         } else {
             false
@@ -235,13 +239,19 @@ impl AuditLog {
             let ok = ev.outcome == Outcome::Permitted;
 
             // Common prefix fields.
-            write!(writer,
+            write!(
+                writer,
                 r#"{{"seq":{},"kind":"{}","actor":{},"ts":{},"ok":{},"#,
-                ev.seq, ev.kind_str(), ev.actor, ev.timestamp, ok)?;
+                ev.seq,
+                ev.kind_str(),
+                ev.actor,
+                ev.timestamp,
+                ok
+            )?;
 
             // class / reason fields.
             match ev.denial_class_str() {
-                None    => write!(writer, r#""class":null,"reason":null,"#)?,
+                None => write!(writer, r#""class":null,"reason":null,"#)?,
                 Some(c) => {
                     let reason = ev.denial_reason.unwrap_or("");
                     write!(writer, r#""class":"{c}","reason":"{reason}","#)?;
@@ -262,12 +272,12 @@ impl AuditLog {
 
     #[allow(clippy::too_many_arguments)]
     fn compute_hash(
-        prev:         &[u8; 32],
-        kind:         EventKind,
-        actor:        u32,
-        seq:          u64,
-        timestamp:    u64,
-        outcome:      Outcome,
+        prev: &[u8; 32],
+        kind: EventKind,
+        actor: u32,
+        seq: u64,
+        timestamp: u64,
+        outcome: Outcome,
         denial_class: Option<DenialClass>,
         denial_reason: Option<&'static str>,
     ) -> [u8; 32] {
@@ -275,8 +285,8 @@ impl AuditLog {
         //   prev_hash || kind_u8 || actor_le32 || seq_le64 || timestamp_le64
         //   || outcome_u8 || denial_class_u8 || denial_reason_bytes
         let class_byte: u8 = match denial_class {
-            None                       => 0x00,
-            Some(DenialClass::Halt)    => 0x01,
+            None => 0x00,
+            Some(DenialClass::Halt) => 0x01,
             Some(DenialClass::Failure) => 0x02,
         };
         let mut h = Sha256::new();

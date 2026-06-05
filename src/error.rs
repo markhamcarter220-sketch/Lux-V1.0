@@ -117,13 +117,13 @@ impl Error {
     #[must_use]
     pub const fn denial_reason_str(&self) -> &'static str {
         match self {
-            Self::CapabilityDenied { reason }                               => reason,
-            Self::QuotaExceeded { resource }                                => resource,
-            Self::TopologyViolation { .. }                                  => "edge not in boot manifest",
+            Self::CapabilityDenied { reason } => reason,
+            Self::QuotaExceeded { resource } => resource,
+            Self::TopologyViolation { .. } => "edge not in boot manifest",
             Self::ManifestInvalid { detail }
             | Self::SchedulerInvariant { detail }
-            | Self::WasmFault { detail }                                    => detail,
-            Self::UndefinedState { context }                                => context,
+            | Self::WasmFault { detail } => detail,
+            Self::UndefinedState { context } => context,
         }
     }
 

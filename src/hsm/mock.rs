@@ -24,7 +24,7 @@ use crate::{error::Error, hsm::HsmProvider, Result};
 #[derive(Debug)]
 pub struct SoftwareHsm {
     verifying_key: VerifyingKey,
-    signing_key:   Option<SigningKey>,
+    signing_key: Option<SigningKey>,
 }
 
 impl SoftwareHsm {
@@ -39,7 +39,10 @@ impl SoftwareHsm {
     /// curve point.
     pub fn from_verifying_key(bytes: [u8; 32]) -> Result<Self> {
         VerifyingKey::from_bytes(&bytes)
-            .map(|verifying_key| Self { verifying_key, signing_key: None })
+            .map(|verifying_key| Self {
+                verifying_key,
+                signing_key: None,
+            })
             .map_err(|_| Error::ManifestInvalid {
                 detail: "invalid Ed25519 public key bytes",
             })
@@ -51,9 +54,12 @@ impl SoftwareHsm {
     /// The verifying key is derived deterministically from the seed.
     #[must_use]
     pub fn from_signing_key(seed: [u8; 32]) -> Self {
-        let signing_key   = SigningKey::from_bytes(&seed);
+        let signing_key = SigningKey::from_bytes(&seed);
         let verifying_key = signing_key.verifying_key();
-        Self { verifying_key, signing_key: Some(signing_key) }
+        Self {
+            verifying_key,
+            signing_key: Some(signing_key),
+        }
     }
 
     /// Returns the raw 32-byte verifying key.

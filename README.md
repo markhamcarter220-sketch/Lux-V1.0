@@ -356,6 +356,39 @@ test coverage obligations.
 
 ---
 
+## Project Origin and Verification Status
+
+Lux V1.0 was scaffolded over approximately four days using AI-assisted
+development (Claude Code).  This is disclosed explicitly so that reviewers
+calibrate their trust accordingly.
+
+**What this means for consumers:**
+
+- The architecture, invariants (I1–I4), and security contracts were designed
+  by the project contributors and are documented in `docs/ARCHITECTURE.md`.
+- The implementation was produced with AI assistance and has undergone
+  internal review, adversarial testing (63 attack vectors), and TLA+ model
+  checking (322,560 states).
+- **Third-party security audit is not yet complete.**  Do not rely on this
+  codebase in production until the external audit is finished
+  (target: Q3 2026 — see [`AUDIT_ROADMAP.md`](AUDIT_ROADMAP.md)).
+
+**Manual verification checklist (in progress):**
+
+- [ ] Independent re-implementation of `Capability::authorises` to confirm
+      generation and rights semantics
+- [ ] End-to-end happy-path + denial-path trace through
+      `BootState::run_topology_consensus` by a human reviewer
+- [ ] All call sites of `Policy::check` audited for I1–I4 compliance across
+      all feature flag combinations
+- [ ] Lean 4 formal proof mechanical verification (`lake build` in `lean/`)
+
+If you are performing the external audit, start with
+[`docs/SECURITY.md`](docs/SECURITY.md) and
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+---
+
 ## License
 
 Apache License, Version 2.0.  See [`LICENSE`](LICENSE) for the full text.

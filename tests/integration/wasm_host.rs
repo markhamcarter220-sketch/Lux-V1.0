@@ -11,6 +11,7 @@
 
 #![cfg(feature = "wasm")]
 
+use core::num::NonZeroU32;
 use lux_kernel::{
     auth::{
         capability::{Capability, CapabilitySet},
@@ -21,7 +22,6 @@ use lux_kernel::{
     types::{Generation, Quota},
     wasm::{host, WasmShim},
 };
-use core::num::NonZeroU32;
 
 fn node(n: u32) -> NonZeroU32 {
     NonZeroU32::new(n).unwrap()
@@ -81,17 +81,20 @@ fn topology_traverse_dst_zero_returns_minus_one() {
 #[test]
 fn policy_check_valid_cap_correct_rights_returns_zero() {
     let mut shim = make_shim();
-    let cap      = make_cap(2, CapabilitySet::SCHEDULE);
-    let handle   = shim.register_cap(cap).expect("table must not be full");
+    let cap = make_cap(2, CapabilitySet::SCHEDULE);
+    let handle = shim.register_cap(cap).expect("table must not be full");
     let rc = host::lux_policy_check(&mut shim, handle, CapabilitySet::SCHEDULE.bits());
-    assert_eq!(rc, 0, "valid capability with matching rights must be permitted");
+    assert_eq!(
+        rc, 0,
+        "valid capability with matching rights must be permitted"
+    );
 }
 
 #[test]
 fn policy_check_insufficient_rights_returns_one() {
     let mut shim = make_shim();
     // Cap only has SCHEDULE; request ALLOC_RESOURCE → denied.
-    let cap    = make_cap(2, CapabilitySet::SCHEDULE);
+    let cap = make_cap(2, CapabilitySet::SCHEDULE);
     let handle = shim.register_cap(cap).unwrap();
     let rc = host::lux_policy_check(&mut shim, handle, CapabilitySet::ALLOC_RESOURCE.bits());
     assert_eq!(rc, 1, "insufficient rights must return RC_CAP_DENIED");
@@ -102,8 +105,11 @@ fn policy_check_out_of_range_handle_returns_minus_one() {
     let mut shim = make_shim();
     let cap = make_cap(2, CapabilitySet::SCHEDULE);
     shim.register_cap(cap).unwrap(); // handle 0
-    // Handle 99 is out of range.
-    assert_eq!(host::lux_policy_check(&mut shim, 99, CapabilitySet::SCHEDULE.bits()), -1);
+                                     // Handle 99 is out of range.
+    assert_eq!(
+        host::lux_policy_check(&mut shim, 99, CapabilitySet::SCHEDULE.bits()),
+        -1
+    );
 }
 
 // ── I3: Accountable Resources ─────────────────────────────────────────────────
@@ -126,7 +132,11 @@ fn ledger_deduct_exceeds_quota_returns_two() {
 fn ledger_deduct_exact_quota_returns_zero_then_next_returns_two() {
     let mut shim = make_shim();
     assert_eq!(host::lux_ledger_deduct(&mut shim, 1, 1_000), 0);
-    assert_eq!(host::lux_ledger_deduct(&mut shim, 1, 1), 2, "exhausted quota must reject further deductions");
+    assert_eq!(
+        host::lux_ledger_deduct(&mut shim, 1, 1),
+        2,
+        "exhausted quota must reject further deductions"
+    );
 }
 
 #[test]
@@ -134,7 +144,10 @@ fn ledger_deduct_unknown_node_returns_two() {
     let mut shim = make_shim();
     // Node 99 was never seeded — no quota ≡ zero balance → quota exceeded.
     let rc = host::lux_ledger_deduct(&mut shim, 99, 1);
-    assert_eq!(rc, 2, "unknown node returns quota-exceeded (no quota ≡ 0 quota)");
+    assert_eq!(
+        rc, 2,
+        "unknown node returns quota-exceeded (no quota ≡ 0 quota)"
+    );
 }
 
 // ── I4: Topology-Bounded ─────────────────────────────────────────────────────
@@ -167,7 +180,7 @@ fn topology_traverse_unknown_node_returns_three() {
 #[test]
 fn each_host_call_appends_to_audit_log() {
     let mut shim = make_shim();
-    let cap    = make_cap(2, CapabilitySet::SCHEDULE);
+    let cap = make_cap(2, CapabilitySet::SCHEDULE);
     let handle = shim.register_cap(cap).unwrap();
 
     let _ = host::lux_policy_check(&mut shim, handle, CapabilitySet::SCHEDULE.bits());

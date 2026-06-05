@@ -1,5 +1,6 @@
 //! Throughput benchmark for the work queue under sustained load.
 
+use core::num::NonZeroU32;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use lux_kernel::{
     audit::AuditLog,
@@ -12,7 +13,6 @@ use lux_kernel::{
     topology::graph::{BootingGraph, OperationalGraph},
     types::{Generation, Quota, MAX_QUEUE},
 };
-use core::num::NonZeroU32;
 
 fn enqueue_dequeue_cycle(c: &mut Criterion) {
     let node = NonZeroU32::new(1).unwrap();
@@ -22,8 +22,8 @@ fn enqueue_dequeue_cycle(c: &mut Criterion) {
             for i in 0u8..=255 {
                 let _ = q.enqueue(lux_kernel::scheduler::queue::WorkItem {
                     priority: i,
-                    target:   node,
-                    payload:  black_box(u64::from(i)),
+                    target: node,
+                    payload: black_box(u64::from(i)),
                 });
             }
             while q.dequeue().is_some() {}
@@ -32,7 +32,7 @@ fn enqueue_dequeue_cycle(c: &mut Criterion) {
 }
 
 fn policy_check_throughput(c: &mut Criterion) {
-    let gen  = Generation(0);
+    let gen = Generation(0);
     let node = NonZeroU32::new(1).unwrap();
     let right = CapabilitySet::SCHEDULE;
 
@@ -59,8 +59,8 @@ fn ledger_deduct_throughput(c: &mut Criterion) {
 }
 
 fn topology_traverse_throughput(c: &mut Criterion) {
-    let src  = NonZeroU32::new(1).unwrap();
-    let dst  = NonZeroU32::new(2).unwrap();
+    let src = NonZeroU32::new(1).unwrap();
+    let dst = NonZeroU32::new(2).unwrap();
     let mut bg = BootingGraph::new();
     bg.activate(src).unwrap();
     bg.activate(dst).unwrap();
@@ -92,5 +92,12 @@ fn audit_append_throughput(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, enqueue_dequeue_cycle, policy_check_throughput, ledger_deduct_throughput, topology_traverse_throughput, audit_append_throughput);
+criterion_group!(
+    benches,
+    enqueue_dequeue_cycle,
+    policy_check_throughput,
+    ledger_deduct_throughput,
+    topology_traverse_throughput,
+    audit_append_throughput
+);
 criterion_main!(benches);

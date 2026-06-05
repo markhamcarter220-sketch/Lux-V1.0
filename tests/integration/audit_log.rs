@@ -1,22 +1,33 @@
 //! Integration tests: audit log integrity, hash chain, and export.
 
+use core::num::NonZeroU32;
 use lux_kernel::{
     audit::{AuditLog, DenialClass, EventKind, Outcome},
-    auth::{capability::{Capability, CapabilitySet}, policy::Policy},
+    auth::{
+        capability::{Capability, CapabilitySet},
+        policy::Policy,
+    },
     metabolism::{ledger::Ledger, quota::QuotaEnforcer},
-    topology::{graph::BootingGraph},
+    topology::graph::BootingGraph,
     types::{Generation, Quota},
 };
-use core::num::NonZeroU32;
 
-fn nz(n: u32) -> NonZeroU32 { NonZeroU32::new(n).unwrap() }
+fn nz(n: u32) -> NonZeroU32 {
+    NonZeroU32::new(n).unwrap()
+}
 
 // Shorthand helpers so test bodies stay readable.
 fn permit(log: &mut AuditLog, kind: EventKind, actor: u32) -> bool {
     log.append(kind, actor, 0, None)
 }
 
-fn deny(log: &mut AuditLog, kind: EventKind, actor: u32, class: DenialClass, reason: &'static str) -> bool {
+fn deny(
+    log: &mut AuditLog,
+    kind: EventKind,
+    actor: u32,
+    class: DenialClass,
+    reason: &'static str,
+) -> bool {
     log.append(kind, actor, 0, Some((class, reason)))
 }
 
@@ -39,8 +50,14 @@ fn append_single_event_increments_len() {
 #[test]
 fn events_returned_in_insertion_order() {
     let mut log = AuditLog::new();
-    permit(&mut log, EventKind::CapabilityCheck,   1);
-    deny(  &mut log, EventKind::TopologyTraverse,  2, DenialClass::Halt,    "undeclared edge");
+    permit(&mut log, EventKind::CapabilityCheck, 1);
+    deny(
+        &mut log,
+        EventKind::TopologyTraverse,
+        2,
+        DenialClass::Halt,
+        "undeclared edge",
+    );
     permit(&mut log, EventKind::ResourceDeduction, 3);
 
     let evs: Vec<_> = log.events().collect();
@@ -66,41 +83,66 @@ fn permitted_event_has_no_denial_fields() {
     let mut log = AuditLog::new();
     permit(&mut log, EventKind::CapabilityCheck, 1);
     let ev = log.events().next().unwrap();
-    assert_eq!(ev.outcome,       Outcome::Permitted);
-    assert_eq!(ev.denial_class,  None);
+    assert_eq!(ev.outcome, Outcome::Permitted);
+    assert_eq!(ev.denial_class, None);
     assert_eq!(ev.denial_reason, None);
 }
 
 #[test]
 fn halt_denial_fields_are_recorded() {
     let mut log = AuditLog::new();
-    deny(&mut log, EventKind::CapabilityCheck, 1, DenialClass::Halt, "token expired");
+    deny(
+        &mut log,
+        EventKind::CapabilityCheck,
+        1,
+        DenialClass::Halt,
+        "token expired",
+    );
     let ev = log.events().next().unwrap();
-    assert_eq!(ev.outcome,                  Outcome::Denied);
-    assert_eq!(ev.denial_class,             Some(DenialClass::Halt));
-    assert_eq!(ev.denial_reason,            Some("token expired"));
+    assert_eq!(ev.outcome, Outcome::Denied);
+    assert_eq!(ev.denial_class, Some(DenialClass::Halt));
+    assert_eq!(ev.denial_reason, Some("token expired"));
 }
 
 #[test]
 fn failure_denial_fields_are_recorded() {
     let mut log = AuditLog::new();
-    deny(&mut log, EventKind::ResourceDeduction, 5, DenialClass::Failure, "quota exceeded: compute");
+    deny(
+        &mut log,
+        EventKind::ResourceDeduction,
+        5,
+        DenialClass::Failure,
+        "quota exceeded: compute",
+    );
     let ev = log.events().next().unwrap();
-    assert_eq!(ev.outcome,       Outcome::Denied);
-    assert_eq!(ev.denial_class,  Some(DenialClass::Failure));
+    assert_eq!(ev.outcome, Outcome::Denied);
+    assert_eq!(ev.denial_class, Some(DenialClass::Failure));
     assert_eq!(ev.denial_reason, Some("quota exceeded: compute"));
 }
 
 #[test]
 fn halt_and_failure_produce_different_hashes() {
     let mut log_halt = AuditLog::new();
-    deny(&mut log_halt, EventKind::CapabilityCheck, 1, DenialClass::Halt,    "reason");
+    deny(
+        &mut log_halt,
+        EventKind::CapabilityCheck,
+        1,
+        DenialClass::Halt,
+        "reason",
+    );
 
     let mut log_fail = AuditLog::new();
-    deny(&mut log_fail, EventKind::CapabilityCheck, 1, DenialClass::Failure, "reason");
+    deny(
+        &mut log_fail,
+        EventKind::CapabilityCheck,
+        1,
+        DenialClass::Failure,
+        "reason",
+    );
 
     assert_ne!(
-        log_halt.head_hash(), log_fail.head_hash(),
+        log_halt.head_hash(),
+        log_fail.head_hash(),
         "Halt and Failure classifications must produce distinct hashes"
     );
 }
@@ -132,9 +174,21 @@ fn multi_event_chain_is_valid() {
 #[test]
 fn mixed_permit_deny_chain_is_valid() {
     let mut log = AuditLog::new();
-    permit(&mut log, EventKind::CapabilityCheck,   1);
-    deny(  &mut log, EventKind::TopologyTraverse,  2, DenialClass::Halt,    "undeclared edge");
-    deny(  &mut log, EventKind::ResourceDeduction, 3, DenialClass::Failure, "quota exceeded: mem");
+    permit(&mut log, EventKind::CapabilityCheck, 1);
+    deny(
+        &mut log,
+        EventKind::TopologyTraverse,
+        2,
+        DenialClass::Halt,
+        "undeclared edge",
+    );
+    deny(
+        &mut log,
+        EventKind::ResourceDeduction,
+        3,
+        DenialClass::Failure,
+        "quota exceeded: mem",
+    );
     permit(&mut log, EventKind::CapabilityRevoked, 4);
     assert!(log.verify_chain());
 }
@@ -147,12 +201,20 @@ fn chain_detects_hash_field_mutation() {
     let hash_after_2 = log.head_hash();
 
     let mut log2 = AuditLog::new();
-    permit(&mut log2, EventKind::CapabilityCheck,  1);
-    deny(  &mut log2, EventKind::TopologyTraverse, 2, DenialClass::Halt, "undeclared edge");
+    permit(&mut log2, EventKind::CapabilityCheck, 1);
+    deny(
+        &mut log2,
+        EventKind::TopologyTraverse,
+        2,
+        DenialClass::Halt,
+        "undeclared edge",
+    );
     let hash2_after_2 = log2.head_hash();
 
-    assert_ne!(hash_after_2, hash2_after_2,
-        "different events must produce different chain heads");
+    assert_ne!(
+        hash_after_2, hash2_after_2,
+        "different events must produce different chain heads"
+    );
 }
 
 #[test]
@@ -161,7 +223,13 @@ fn different_outcomes_produce_different_hashes() {
     permit(&mut log_a, EventKind::CapabilityCheck, 1);
 
     let mut log_b = AuditLog::new();
-    deny(&mut log_b, EventKind::CapabilityCheck, 1, DenialClass::Halt, "any reason");
+    deny(
+        &mut log_b,
+        EventKind::CapabilityCheck,
+        1,
+        DenialClass::Halt,
+        "any reason",
+    );
 
     assert_ne!(log_a.head_hash(), log_b.head_hash());
 }
@@ -191,10 +259,22 @@ fn different_timestamps_produce_different_hashes() {
 #[test]
 fn different_reasons_produce_different_hashes() {
     let mut log_a = AuditLog::new();
-    deny(&mut log_a, EventKind::CapabilityCheck, 1, DenialClass::Halt, "reason A");
+    deny(
+        &mut log_a,
+        EventKind::CapabilityCheck,
+        1,
+        DenialClass::Halt,
+        "reason A",
+    );
 
     let mut log_b = AuditLog::new();
-    deny(&mut log_b, EventKind::CapabilityCheck, 1, DenialClass::Halt, "reason B");
+    deny(
+        &mut log_b,
+        EventKind::CapabilityCheck,
+        1,
+        DenialClass::Halt,
+        "reason B",
+    );
 
     assert_ne!(log_a.head_hash(), log_b.head_hash());
 }
@@ -223,7 +303,13 @@ fn json_export_permitted_event_has_null_denial_fields() {
 #[test]
 fn json_export_denied_halt_event_has_class_field() {
     let mut log = AuditLog::new();
-    deny(&mut log, EventKind::TopologyTraverse, 7, DenialClass::Halt, "undeclared edge");
+    deny(
+        &mut log,
+        EventKind::TopologyTraverse,
+        7,
+        DenialClass::Halt,
+        "undeclared edge",
+    );
     let mut out = String::new();
     log.export_json(&mut out).unwrap();
     assert!(out.contains(r#""ok":false"#));
@@ -234,7 +320,13 @@ fn json_export_denied_halt_event_has_class_field() {
 #[test]
 fn json_export_denied_failure_event_has_class_field() {
     let mut log = AuditLog::new();
-    deny(&mut log, EventKind::ResourceDeduction, 9, DenialClass::Failure, "quota exceeded: io");
+    deny(
+        &mut log,
+        EventKind::ResourceDeduction,
+        9,
+        DenialClass::Failure,
+        "quota exceeded: io",
+    );
     let mut out = String::new();
     log.export_json(&mut out).unwrap();
     assert!(out.contains(r#""class":"failure""#));
@@ -245,7 +337,13 @@ fn json_export_denied_failure_event_has_class_field() {
 fn json_export_contains_expected_fields() {
     let mut log = AuditLog::new();
     permit(&mut log, EventKind::CapabilityCheck, 3);
-    deny(  &mut log, EventKind::TopologyTraverse, 7, DenialClass::Halt, "undeclared edge");
+    deny(
+        &mut log,
+        EventKind::TopologyTraverse,
+        7,
+        DenialClass::Halt,
+        "undeclared edge",
+    );
 
     let mut out = String::new();
     log.export_json(&mut out).unwrap();
@@ -290,11 +388,13 @@ fn policy_check_denied_emits_halt_event() {
     let mut log = AuditLog::new();
     // Empty rights → CapabilityDenied (HALT)
     let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::empty(), gen, 1);
-    assert!(policy.check(&cap, CapabilitySet::SCHEDULE, &mut log).is_err());
+    assert!(policy
+        .check(&cap, CapabilitySet::SCHEDULE, &mut log)
+        .is_err());
     assert_eq!(log.len(), 1);
     let ev = log.events().next().unwrap();
-    assert_eq!(ev.kind,         EventKind::CapabilityCheck);
-    assert_eq!(ev.outcome,      Outcome::Denied);
+    assert_eq!(ev.kind, EventKind::CapabilityCheck);
+    assert_eq!(ev.outcome, Outcome::Denied);
     assert_eq!(ev.denial_class, Some(DenialClass::Halt));
 }
 
@@ -304,10 +404,12 @@ fn policy_check_permitted_emits_permitted_event() {
     let mut policy = Policy::new(gen);
     let mut log = AuditLog::new();
     let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, 1);
-    assert!(policy.check(&cap, CapabilitySet::SCHEDULE, &mut log).is_ok());
+    assert!(policy
+        .check(&cap, CapabilitySet::SCHEDULE, &mut log)
+        .is_ok());
     assert_eq!(log.len(), 1);
     let ev = log.events().next().unwrap();
-    assert_eq!(ev.outcome,      Outcome::Permitted);
+    assert_eq!(ev.outcome, Outcome::Permitted);
     assert_eq!(ev.denial_class, None);
 }
 
@@ -320,11 +422,13 @@ fn quota_deduct_over_limit_emits_failure_event() {
     let mut log = AuditLog::new();
     ledger.seed(nz(1), Quota::new(5));
     // Deduct more than available → Err(QuotaExceeded) → FAILURE class
-    assert!(enforcer.deduct(&mut ledger, nz(1), 10, "compute", &mut log).is_err());
+    assert!(enforcer
+        .deduct(&mut ledger, nz(1), 10, "compute", &mut log)
+        .is_err());
     assert_eq!(log.len(), 1);
     let ev = log.events().next().unwrap();
-    assert_eq!(ev.kind,         EventKind::ResourceDeduction);
-    assert_eq!(ev.outcome,      Outcome::Denied);
+    assert_eq!(ev.kind, EventKind::ResourceDeduction);
+    assert_eq!(ev.outcome, Outcome::Denied);
     assert_eq!(ev.denial_class, Some(DenialClass::Failure));
 }
 
@@ -334,10 +438,12 @@ fn quota_deduct_within_limit_emits_permitted_event() {
     let mut ledger = Ledger::new();
     let mut log = AuditLog::new();
     ledger.seed(nz(1), Quota::new(100));
-    assert!(enforcer.deduct(&mut ledger, nz(1), 10, "compute", &mut log).is_ok());
+    assert!(enforcer
+        .deduct(&mut ledger, nz(1), 10, "compute", &mut log)
+        .is_ok());
     assert_eq!(log.len(), 1);
     let ev = log.events().next().unwrap();
-    assert_eq!(ev.outcome,      Outcome::Permitted);
+    assert_eq!(ev.outcome, Outcome::Permitted);
     assert_eq!(ev.denial_class, None);
 }
 
@@ -350,8 +456,8 @@ fn traverse_denied_emits_halt_event() {
     assert!(op.traverse(nz(1), nz(2), &mut log).is_err());
     assert_eq!(log.len(), 1);
     let ev = log.events().next().unwrap();
-    assert_eq!(ev.kind,         EventKind::TopologyTraverse);
-    assert_eq!(ev.outcome,      Outcome::Denied);
+    assert_eq!(ev.kind, EventKind::TopologyTraverse);
+    assert_eq!(ev.outcome, Outcome::Denied);
     assert_eq!(ev.denial_class, Some(DenialClass::Halt));
 }
 
@@ -366,7 +472,7 @@ fn traverse_permitted_emits_permitted_event() {
     assert!(op.traverse(nz(1), nz(2), &mut log).is_ok());
     assert_eq!(log.len(), 1);
     let ev = log.events().next().unwrap();
-    assert_eq!(ev.outcome,      Outcome::Permitted);
+    assert_eq!(ev.outcome, Outcome::Permitted);
     assert_eq!(ev.denial_class, None);
 }
 
@@ -376,7 +482,13 @@ fn traverse_permitted_emits_permitted_event() {
 fn json_export_includes_hash_field_on_every_entry() {
     let mut log = AuditLog::new();
     permit(&mut log, EventKind::CapabilityCheck, 1);
-    deny(  &mut log, EventKind::TopologyTraverse, 2, DenialClass::Halt, "undeclared edge");
+    deny(
+        &mut log,
+        EventKind::TopologyTraverse,
+        2,
+        DenialClass::Halt,
+        "undeclared edge",
+    );
     let mut out = String::new();
     log.export_json(&mut out).unwrap();
     // Both entries must contain the hash field with 64 lowercase hex chars.
@@ -397,8 +509,15 @@ fn json_export_hash_field_is_64_hex_chars() {
     let rest = &out[start..];
     let end = rest.find('"').unwrap();
     let hash_hex = &rest[..end];
-    assert_eq!(hash_hex.len(), 64, "hash must be exactly 64 hex chars (32 bytes)");
-    assert!(hash_hex.chars().all(|c| c.is_ascii_hexdigit()), "hash must be lowercase hex");
+    assert_eq!(
+        hash_hex.len(),
+        64,
+        "hash must be exactly 64 hex chars (32 bytes)"
+    );
+    assert!(
+        hash_hex.chars().all(|c| c.is_ascii_hexdigit()),
+        "hash must be lowercase hex"
+    );
 }
 
 #[test]
@@ -409,7 +528,10 @@ fn json_export_hash_matches_event_hash_field() {
     let expected_hex: String = event_hash.iter().map(|b| format!("{:02x}", b)).collect();
     let mut out = String::new();
     log.export_json(&mut out).unwrap();
-    assert!(out.contains(&expected_hex), "JSON hash must match event.hash field");
+    assert!(
+        out.contains(&expected_hex),
+        "JSON hash must match event.hash field"
+    );
 }
 
 #[test]

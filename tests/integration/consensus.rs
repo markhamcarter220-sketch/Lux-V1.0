@@ -30,7 +30,7 @@ fn node(n: u32) -> NodeId {
 struct MockRaftTransport {
     incoming: heapless::Vec<(NodeId, RaftMessage), 64>,
     recv_idx: usize,
-    sent:     heapless::Vec<(NodeId, RaftMessage), 64>,
+    sent: heapless::Vec<(NodeId, RaftMessage), 64>,
 }
 
 impl MockRaftTransport {
@@ -38,7 +38,7 @@ impl MockRaftTransport {
         Self {
             incoming: heapless::Vec::new(),
             recv_idx: 0,
-            sent:     heapless::Vec::new(),
+            sent: heapless::Vec::new(),
         }
     }
 
@@ -120,28 +120,28 @@ fn peer_set_add_beyond_capacity_fails() {
 
 /// Build a minimal signed manifest with edge 1→2 and quota 1000 on node 1.
 fn boot_with_edge() -> BootState {
-    let sk    = SigningKey::from_bytes(&[0u8; 32]);
+    let sk = SigningKey::from_bytes(&[0u8; 32]);
     let creds = BootCredentials::from_key_bytes(sk.verifying_key().to_bytes()).unwrap();
     let payload = {
         let mut b = Vec::new();
         b.push(0x83u8); // array(3)
-        b.push(0x01);   // version = 1
-        // edges = [[1, 2]]
-        b.push(0x81);   // array(1)
-        b.push(0x82);   // array(2)
-        b.push(0x01);   // src = 1
-        b.push(0x02);   // dst = 2
-        // quotas = [[1, 1000]]
-        b.push(0x81);   // array(1)
-        b.push(0x82);   // array(2)
-        b.push(0x01);   // node = 1
+        b.push(0x01); // version = 1
+                      // edges = [[1, 2]]
+        b.push(0x81); // array(1)
+        b.push(0x82); // array(2)
+        b.push(0x01); // src = 1
+        b.push(0x02); // dst = 2
+                      // quotas = [[1, 1000]]
+        b.push(0x81); // array(1)
+        b.push(0x82); // array(2)
+        b.push(0x01); // node = 1
         b.push(0x19);
         b.push(0x03);
         b.push(0xe8); // quota = 1000
         b
     };
     use ed25519_dalek::Signer as _;
-    let sig     = sk.sign(&payload);
+    let sig = sk.sign(&payload);
     let mut wire = sig.to_bytes().to_vec();
     wire.extend_from_slice(&payload);
     BootState::initialise(&wire, &creds).expect("boot must succeed")
@@ -152,25 +152,34 @@ fn boot_with_edge() -> BootState {
 #[test]
 fn single_node_declared_edge_commits() {
     let mut boot = boot_with_edge();
-    let ps       = PeerSet::new();
-    let mut t    = MockRaftTransport::new();
-    let mut a    = AuditLog::new();
+    let ps = PeerSet::new();
+    let mut t = MockRaftTransport::new();
+    let mut a = AuditLog::new();
 
     let result = boot.run_topology_consensus(&ps, node(1), node(2), &mut t, &mut a);
-    assert!(result.is_ok(), "declared edge 1→2 in single-node must commit");
-    assert!(t.sent_messages().is_empty(), "single-node needs no network I/O");
+    assert!(
+        result.is_ok(),
+        "declared edge 1→2 in single-node must commit"
+    );
+    assert!(
+        t.sent_messages().is_empty(),
+        "single-node needs no network I/O"
+    );
 }
 
 #[test]
 fn single_node_undeclared_edge_aborts() {
     let mut boot = boot_with_edge();
-    let ps       = PeerSet::new();
-    let mut t    = MockRaftTransport::new();
-    let mut a    = AuditLog::new();
+    let ps = PeerSet::new();
+    let mut t = MockRaftTransport::new();
+    let mut a = AuditLog::new();
 
     // Reverse edge 2→1 is not declared.
     let result = boot.run_topology_consensus(&ps, node(2), node(1), &mut t, &mut a);
-    assert!(result.is_err(), "undeclared edge 2→1 in single-node must abort");
+    assert!(
+        result.is_err(),
+        "undeclared edge 2→1 in single-node must abort"
+    );
 }
 
 // ── I1: Fail-Closed — multi-node ─────────────────────────────────────────────
@@ -179,20 +188,37 @@ fn single_node_undeclared_edge_aborts() {
 #[test]
 fn multi_node_majority_commits() {
     let mut boot = boot_with_edge();
-    let mut ps   = PeerSet::new();
+    let mut ps = PeerSet::new();
     ps.add(node(2)).unwrap();
     ps.add(node(3)).unwrap();
 
     let mut t = MockRaftTransport::new();
     // Election: 1 grant suffices (self + 1 = quorum of 2).
-    t.add_message(node(2), RaftMessage::RequestVoteReply { term: 1, vote_granted: true });
-    t.add_message(node(3), RaftMessage::RequestVoteReply { term: 1, vote_granted: false });
+    t.add_message(
+        node(2),
+        RaftMessage::RequestVoteReply {
+            term: 1,
+            vote_granted: true,
+        },
+    );
+    t.add_message(
+        node(3),
+        RaftMessage::RequestVoteReply {
+            term: 1,
+            vote_granted: false,
+        },
+    );
     // Replication: 1 ack suffices (self + 1 = quorum of 2).
-    t.add_message(node(2), RaftMessage::AppendEntriesReply {
-        term: 1, success: true, match_index: 1,
-    });
+    t.add_message(
+        node(2),
+        RaftMessage::AppendEntriesReply {
+            term: 1,
+            success: true,
+            match_index: 1,
+        },
+    );
 
-    let mut a  = AuditLog::new();
+    let mut a = AuditLog::new();
     let result = boot.run_topology_consensus(&ps, node(1), node(2), &mut t, &mut a);
     assert!(result.is_ok(), "majority must commit");
 }
@@ -201,16 +227,22 @@ fn multi_node_majority_commits() {
 #[test]
 fn multi_node_partitioned_minority_aborts() {
     let mut boot = boot_with_edge();
-    let mut ps   = PeerSet::new();
+    let mut ps = PeerSet::new();
     for i in 2..=6 {
         ps.add(node(i)).unwrap();
     }
 
     let mut t = MockRaftTransport::new();
     // Only node 2 responds; transport exhausted before quorum is reached.
-    t.add_message(node(2), RaftMessage::RequestVoteReply { term: 1, vote_granted: true });
+    t.add_message(
+        node(2),
+        RaftMessage::RequestVoteReply {
+            term: 1,
+            vote_granted: true,
+        },
+    );
 
-    let mut a  = AuditLog::new();
+    let mut a = AuditLog::new();
     let result = boot.run_topology_consensus(&ps, node(1), node(2), &mut t, &mut a);
     // self(1) + peer(1) = 2 < quorum(4) → abort
     assert!(result.is_err(), "partitioned minority must not commit");
@@ -221,20 +253,29 @@ fn multi_node_partitioned_minority_aborts() {
 #[test]
 fn local_denial_aborts_regardless_of_peer_quorum() {
     let mut boot = boot_with_edge();
-    let mut ps   = PeerSet::new();
+    let mut ps = PeerSet::new();
     ps.add(node(3)).unwrap(); // one peer; quorum = 2
 
     let mut t = MockRaftTransport::new();
     // Pre-supply a vote grant — this must never be consumed because the
     // local graph aborts before any election is attempted.
-    t.add_message(node(3), RaftMessage::RequestVoteReply { term: 1, vote_granted: true });
+    t.add_message(
+        node(3),
+        RaftMessage::RequestVoteReply {
+            term: 1,
+            vote_granted: true,
+        },
+    );
 
-    let mut a  = AuditLog::new();
+    let mut a = AuditLog::new();
     // Propose undeclared reverse edge 2→1 (not in boot manifest).
     let result = boot.run_topology_consensus(&ps, node(2), node(1), &mut t, &mut a);
     assert!(result.is_err(), "local denial must abort unconditionally");
     // No election messages should be sent when local graph aborts first.
-    assert!(t.sent_messages().is_empty(), "no messages sent after local abort");
+    assert!(
+        t.sent_messages().is_empty(),
+        "no messages sent after local abort"
+    );
 }
 
 // ── Message structure ─────────────────────────────────────────────────────────
@@ -244,25 +285,38 @@ fn local_denial_aborts_regardless_of_peer_quorum() {
 #[test]
 fn raft_messages_sent_on_success() {
     let mut boot = boot_with_edge();
-    let mut ps   = PeerSet::new();
+    let mut ps = PeerSet::new();
     ps.add(node(2)).unwrap();
 
     let mut t = MockRaftTransport::new();
-    t.add_message(node(2), RaftMessage::RequestVoteReply { term: 1, vote_granted: true });
-    t.add_message(node(2), RaftMessage::AppendEntriesReply {
-        term: 1, success: true, match_index: 1,
-    });
+    t.add_message(
+        node(2),
+        RaftMessage::RequestVoteReply {
+            term: 1,
+            vote_granted: true,
+        },
+    );
+    t.add_message(
+        node(2),
+        RaftMessage::AppendEntriesReply {
+            term: 1,
+            success: true,
+            match_index: 1,
+        },
+    );
 
     let _ = boot.run_topology_consensus(&ps, node(1), node(2), &mut t, &mut AuditLog::new());
 
     let sent = t.sent_messages();
     // Expect: RequestVote, AppendEntries
     assert!(
-        sent.iter().any(|(_, m)| matches!(m, RaftMessage::RequestVote { .. })),
+        sent.iter()
+            .any(|(_, m)| matches!(m, RaftMessage::RequestVote { .. })),
         "must send RequestVote during election"
     );
     assert!(
-        sent.iter().any(|(_, m)| matches!(m, RaftMessage::AppendEntries { .. })),
+        sent.iter()
+            .any(|(_, m)| matches!(m, RaftMessage::AppendEntries { .. })),
         "must send AppendEntries during replication"
     );
 }
@@ -272,19 +326,25 @@ fn raft_messages_sent_on_success() {
 #[test]
 fn no_append_entries_sent_when_election_fails() {
     let mut boot = boot_with_edge();
-    let mut ps   = PeerSet::new();
+    let mut ps = PeerSet::new();
     ps.add(node(2)).unwrap();
 
     let mut t = MockRaftTransport::new();
     // Peer denies the vote; transport exhausted.
-    t.add_message(node(2), RaftMessage::RequestVoteReply { term: 1, vote_granted: false });
-
-    let result = boot.run_topology_consensus(
-        &ps, node(1), node(2), &mut t, &mut AuditLog::new(),
+    t.add_message(
+        node(2),
+        RaftMessage::RequestVoteReply {
+            term: 1,
+            vote_granted: false,
+        },
     );
+
+    let result = boot.run_topology_consensus(&ps, node(1), node(2), &mut t, &mut AuditLog::new());
     assert!(result.is_err());
     assert!(
-        !t.sent_messages().iter().any(|(_, m)| matches!(m, RaftMessage::AppendEntries { .. })),
+        !t.sent_messages()
+            .iter()
+            .any(|(_, m)| matches!(m, RaftMessage::AppendEntries { .. })),
         "no AppendEntries must be sent when leader election fails"
     );
 }
@@ -294,9 +354,9 @@ fn no_append_entries_sent_when_election_fails() {
 #[test]
 fn commit_emits_audit_event_without_denial() {
     let mut boot = boot_with_edge();
-    let ps       = PeerSet::new();
-    let mut t    = MockRaftTransport::new();
-    let mut a    = AuditLog::new();
+    let ps = PeerSet::new();
+    let mut t = MockRaftTransport::new();
+    let mut a = AuditLog::new();
 
     let _ = boot.run_topology_consensus(&ps, node(1), node(2), &mut t, &mut a);
 
@@ -304,15 +364,18 @@ fn commit_emits_audit_event_without_denial() {
     let events: Vec<_> = a.events().collect();
     assert!(!events.is_empty());
     let last = events.last().unwrap();
-    assert_eq!(last.denial_class, None, "committed round must carry no denial class");
+    assert_eq!(
+        last.denial_class, None,
+        "committed round must carry no denial class"
+    );
 }
 
 #[test]
 fn abort_emits_audit_event_with_denial() {
     let mut boot = boot_with_edge();
-    let ps       = PeerSet::new();
-    let mut t    = MockRaftTransport::new();
-    let mut a    = AuditLog::new();
+    let ps = PeerSet::new();
+    let mut t = MockRaftTransport::new();
+    let mut a = AuditLog::new();
 
     // Propose undeclared edge — should abort at local graph check.
     let _ = boot.run_topology_consensus(&ps, node(2), node(1), &mut t, &mut a);

@@ -35,11 +35,11 @@ bitflags! {
 /// are non-secret routing metadata.
 #[derive(Debug)]
 pub struct Capability {
-    pub(crate) issuer:     NodeId,
-    pub(crate) target:     NodeId,
-    pub(crate) rights:     CapabilitySet,
+    pub(crate) issuer: NodeId,
+    pub(crate) target: NodeId,
+    pub(crate) rights: CapabilitySet,
     pub(crate) generation: Generation,
-    pub(crate) nonce:      u64,
+    pub(crate) nonce: u64,
 }
 
 impl Zeroize for Capability {
@@ -86,9 +86,9 @@ impl Capability {
             return None;
         }
         Some(Self {
-            issuer:     self.target,
-            target:     new_target,
-            rights:     subset,
+            issuer: self.target,
+            target: new_target,
+            rights: subset,
             generation: self.generation,
             nonce,
         })
@@ -140,7 +140,13 @@ impl Capability {
         generation: Generation,
         nonce: u64,
     ) -> Self {
-        Self { issuer, target, rights, generation, nonce }
+        Self {
+            issuer,
+            target,
+            rights,
+            generation,
+            nonce,
+        }
     }
 }
 
@@ -159,17 +165,17 @@ mod proofs {
     /// one.  A counterexample here is a P0 security finding.
     #[kani::proof]
     fn delegate_never_amplifies_rights() {
-        let rights_raw: u32  = kani::any();
-        let subset_raw: u32  = kani::any();
-        let gen_val: u64     = kani::any();
-        let nonce: u64       = kani::any();
-        let new_nonce: u64   = kani::any();
+        let rights_raw: u32 = kani::any();
+        let subset_raw: u32 = kani::any();
+        let gen_val: u64 = kani::any();
+        let nonce: u64 = kani::any();
+        let new_nonce: u64 = kani::any();
 
-        let issuer     = NonZeroU32::new(1).unwrap();
-        let target     = NonZeroU32::new(2).unwrap();
+        let issuer = NonZeroU32::new(1).unwrap();
+        let target = NonZeroU32::new(2).unwrap();
         let new_target = NonZeroU32::new(3).unwrap();
 
-        let rights          = CapabilitySet::from_bits_truncate(rights_raw);
+        let rights = CapabilitySet::from_bits_truncate(rights_raw);
         let requested_subset = CapabilitySet::from_bits_truncate(subset_raw);
 
         let cap = Capability {
@@ -194,17 +200,17 @@ mod proofs {
     fn no_delegate_right_produces_no_delegation() {
         let rights_raw: u32 = kani::any();
         let subset_raw: u32 = kani::any();
-        let gen_val: u64    = kani::any();
-        let nonce: u64      = kani::any();
-        let new_nonce: u64  = kani::any();
+        let gen_val: u64 = kani::any();
+        let nonce: u64 = kani::any();
+        let new_nonce: u64 = kani::any();
 
         // Mask out the DELEGATE bit — this token explicitly lacks it.
-        let rights = CapabilitySet::from_bits_truncate(rights_raw)
-            .difference(CapabilitySet::DELEGATE);
+        let rights =
+            CapabilitySet::from_bits_truncate(rights_raw).difference(CapabilitySet::DELEGATE);
         let subset = CapabilitySet::from_bits_truncate(subset_raw);
 
-        let issuer     = NonZeroU32::new(1).unwrap();
-        let target     = NonZeroU32::new(2).unwrap();
+        let issuer = NonZeroU32::new(1).unwrap();
+        let target = NonZeroU32::new(2).unwrap();
         let new_target = NonZeroU32::new(3).unwrap();
 
         let cap = Capability {
@@ -216,6 +222,9 @@ mod proofs {
         };
 
         let result = cap.delegate(new_target, subset, new_nonce);
-        kani::assert(result.is_none(), "INVARIANT VIOLATION: token without DELEGATE produced a delegation");
+        kani::assert(
+            result.is_none(),
+            "INVARIANT VIOLATION: token without DELEGATE produced a delegation",
+        );
     }
 }

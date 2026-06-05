@@ -12,7 +12,10 @@
 //!    [`crate::tpm::mock::SoftwareTpm`] with the expected manifest bytes, then
 //!    calls [`BootAttestation::verify`] to confirm the quote matches.
 
-use crate::{tpm::{TpmProvider, TpmQuote}, Result};
+use crate::{
+    tpm::{TpmProvider, TpmQuote},
+    Result,
+};
 
 /// A TPM-anchored boot attestation.
 ///
@@ -24,11 +27,11 @@ pub struct BootAttestation {
     /// SHA-256 of the raw manifest bytes loaded at boot.
     manifest_hash: [u8; 32],
     /// PCR index that received the manifest measurement.
-    pcr_index:     u8,
+    pcr_index: u8,
     /// Challenge nonce mixed into the quote (provided by the verifier).
-    nonce:         [u8; 32],
+    nonce: [u8; 32],
     /// TPM attestation quote binding PCR state to the nonce.
-    quote:         TpmQuote,
+    quote: TpmQuote,
 }
 
 impl BootAttestation {
@@ -40,11 +43,16 @@ impl BootAttestation {
     #[must_use]
     pub const fn new(
         manifest_hash: [u8; 32],
-        pcr_index:     u8,
-        nonce:         [u8; 32],
-        quote:         TpmQuote,
+        pcr_index: u8,
+        nonce: [u8; 32],
+        quote: TpmQuote,
     ) -> Self {
-        Self { manifest_hash, pcr_index, nonce, quote }
+        Self {
+            manifest_hash,
+            pcr_index,
+            nonce,
+            quote,
+        }
     }
 
     /// Returns the SHA-256 hash of the raw manifest bytes recorded at boot.

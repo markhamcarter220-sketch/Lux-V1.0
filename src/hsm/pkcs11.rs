@@ -33,7 +33,9 @@ impl Pkcs11HsmProvider {
     /// (e.g. `/usr/lib/libCloudhsm_pkcs11.so` for AWS `CloudHSM`).
     #[must_use]
     pub const fn new_stub(library_path: Option<std::path::PathBuf>) -> Self {
-        Self { _library_path: library_path }
+        Self {
+            _library_path: library_path,
+        }
     }
 }
 

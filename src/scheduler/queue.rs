@@ -19,9 +19,9 @@ pub struct WorkItem {
     /// `priority` first, so no `Reverse` wrapper is needed.
     pub priority: u8,
     /// The node that will execute this work item.
-    pub target:   crate::types::NodeId,
+    pub target: crate::types::NodeId,
     /// Opaque caller-defined payload associated with the work item.
-    pub payload:  u64,
+    pub payload: u64,
 }
 
 impl PartialOrd for WorkItem {
@@ -55,7 +55,9 @@ impl<const N: usize> WorkQueue<N> {
     /// Construct an empty queue.
     #[must_use]
     pub const fn new() -> Self {
-        Self { inner: BinaryHeap::new() }
+        Self {
+            inner: BinaryHeap::new(),
+        }
     }
 
     /// Attempt to enqueue `item`.
@@ -68,7 +70,9 @@ impl<const N: usize> WorkQueue<N> {
     pub fn enqueue(&mut self, item: WorkItem) -> Result<()> {
         self.inner
             .push(item)
-            .map_err(|_| Error::SchedulerInvariant { detail: "queue capacity exhausted" })
+            .map_err(|_| Error::SchedulerInvariant {
+                detail: "queue capacity exhausted",
+            })
     }
 
     /// Dequeue the highest-urgency (lowest `priority`) item, or `None`.

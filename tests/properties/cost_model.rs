@@ -7,12 +7,12 @@
 //! - Rejection atomicity:    a deduction that would underflow the balance is
 //!   rejected and the balance is unchanged (no partial write).
 
+use core::num::NonZeroU32;
 use lux_kernel::{
-    metabolism::{ledger::Ledger, quota::QuotaEnforcer},
     audit::AuditLog,
+    metabolism::{ledger::Ledger, quota::QuotaEnforcer},
     types::Quota,
 };
-use core::num::NonZeroU32;
 use proptest::prelude::*;
 
 fn node(n: u32) -> NonZeroU32 {

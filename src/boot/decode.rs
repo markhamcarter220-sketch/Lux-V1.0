@@ -69,7 +69,10 @@ impl ManifestDecoder {
     /// # Errors
     /// Returns `Err(ManifestInvalid)` if the wire format is too short, the signature is
     /// invalid, or the CBOR payload is malformed.
-    pub fn decode<H: HsmProvider>(bytes: &[u8], credentials: &BootCredentials<H>) -> Result<Manifest> {
+    pub fn decode<H: HsmProvider>(
+        bytes: &[u8],
+        credentials: &BootCredentials<H>,
+    ) -> Result<Manifest> {
         if bytes.len() < MIN_WIRE_LEN {
             return Err(Error::ManifestInvalid {
                 detail: "wire format too short (minimum 65 bytes)",
@@ -77,9 +80,9 @@ impl ManifestDecoder {
         }
 
         let (sig_slice, payload) = bytes.split_at(SIG_LEN);
-        let sig_bytes: &[u8; 64] = sig_slice
-            .try_into()
-            .map_err(|_| Error::ManifestInvalid { detail: "signature slice extraction failed" })?;
+        let sig_bytes: &[u8; 64] = sig_slice.try_into().map_err(|_| Error::ManifestInvalid {
+            detail: "signature slice extraction failed",
+        })?;
 
         // Verify BEFORE parsing — fail-closed on bad signature.
         credentials.verify(payload, sig_bytes)?;
@@ -91,9 +94,9 @@ impl ManifestDecoder {
         let mut d = Decoder::new(payload);
 
         // Outer: definite array of exactly 3 elements.
-        let outer_len = d
-            .array()
-            .map_err(|_| Error::ManifestInvalid { detail: "payload is not a CBOR array" })?;
+        let outer_len = d.array().map_err(|_| Error::ManifestInvalid {
+            detail: "payload is not a CBOR array",
+        })?;
         if outer_len != Some(3) {
             return Err(Error::ManifestInvalid {
                 detail: "expected 3-element array [version, edges, quotas]",
@@ -101,9 +104,9 @@ impl ManifestDecoder {
         }
 
         // Element 0: version.
-        let version = d
-            .u32()
-            .map_err(|_| Error::ManifestInvalid { detail: "version is not a uint32" })?;
+        let version = d.u32().map_err(|_| Error::ManifestInvalid {
+            detail: "version is not a uint32",
+        })?;
 
         // Element 1: edges.
         let edges = Self::parse_edges(&mut d)?;
@@ -111,7 +114,11 @@ impl ManifestDecoder {
         // Element 2: quotas.
         let quotas = Self::parse_quotas(&mut d)?;
 
-        Ok(Manifest { edges, quotas, version })
+        Ok(Manifest {
+            edges,
+            quotas,
+            version,
+        })
     }
 
     fn parse_edges(
@@ -119,37 +126,49 @@ impl ManifestDecoder {
     ) -> Result<heapless::Vec<EdgeDecl, { crate::types::MAX_EDGES }>> {
         let len = d
             .array()
-            .map_err(|_| Error::ManifestInvalid { detail: "edges is not a CBOR array" })?
-            .ok_or(Error::ManifestInvalid { detail: "edges array must have definite length" })?;
+            .map_err(|_| Error::ManifestInvalid {
+                detail: "edges is not a CBOR array",
+            })?
+            .ok_or(Error::ManifestInvalid {
+                detail: "edges array must have definite length",
+            })?;
 
         if len > crate::types::MAX_EDGES as u64 {
-            return Err(Error::ManifestInvalid { detail: "too many edges" });
+            return Err(Error::ManifestInvalid {
+                detail: "too many edges",
+            });
         }
 
         let mut edges = heapless::Vec::new();
         for _ in 0..len {
-            let edge_len = d
-                .array()
-                .map_err(|_| Error::ManifestInvalid { detail: "edge is not a CBOR array" })?;
+            let edge_len = d.array().map_err(|_| Error::ManifestInvalid {
+                detail: "edge is not a CBOR array",
+            })?;
             if edge_len != Some(2) {
-                return Err(Error::ManifestInvalid { detail: "each edge must be [src, dst]" });
+                return Err(Error::ManifestInvalid {
+                    detail: "each edge must be [src, dst]",
+                });
             }
 
-            let src_raw = d
-                .u32()
-                .map_err(|_| Error::ManifestInvalid { detail: "edge src is not uint32" })?;
-            let dst_raw = d
-                .u32()
-                .map_err(|_| Error::ManifestInvalid { detail: "edge dst is not uint32" })?;
+            let src_raw = d.u32().map_err(|_| Error::ManifestInvalid {
+                detail: "edge src is not uint32",
+            })?;
+            let dst_raw = d.u32().map_err(|_| Error::ManifestInvalid {
+                detail: "edge dst is not uint32",
+            })?;
 
-            let src = NonZeroU32::new(src_raw)
-                .ok_or(Error::ManifestInvalid { detail: "edge src must be non-zero" })?;
-            let dst = NonZeroU32::new(dst_raw)
-                .ok_or(Error::ManifestInvalid { detail: "edge dst must be non-zero" })?;
+            let src = NonZeroU32::new(src_raw).ok_or(Error::ManifestInvalid {
+                detail: "edge src must be non-zero",
+            })?;
+            let dst = NonZeroU32::new(dst_raw).ok_or(Error::ManifestInvalid {
+                detail: "edge dst must be non-zero",
+            })?;
 
             edges
                 .push(EdgeDecl { src, dst })
-                .map_err(|_| Error::ManifestInvalid { detail: "edge list capacity exceeded" })?;
+                .map_err(|_| Error::ManifestInvalid {
+                    detail: "edge list capacity exceeded",
+                })?;
         }
 
         Ok(edges)
@@ -160,37 +179,49 @@ impl ManifestDecoder {
     ) -> Result<heapless::Vec<QuotaDecl, { crate::types::MAX_NODES }>> {
         let len = d
             .array()
-            .map_err(|_| Error::ManifestInvalid { detail: "quotas is not a CBOR array" })?
-            .ok_or(Error::ManifestInvalid { detail: "quotas array must have definite length" })?;
+            .map_err(|_| Error::ManifestInvalid {
+                detail: "quotas is not a CBOR array",
+            })?
+            .ok_or(Error::ManifestInvalid {
+                detail: "quotas array must have definite length",
+            })?;
 
         if len > crate::types::MAX_NODES as u64 {
-            return Err(Error::ManifestInvalid { detail: "too many quota entries" });
+            return Err(Error::ManifestInvalid {
+                detail: "too many quota entries",
+            });
         }
 
         let mut quotas = heapless::Vec::new();
         for _ in 0..len {
-            let q_len = d
-                .array()
-                .map_err(|_| Error::ManifestInvalid { detail: "quota entry is not a CBOR array" })?;
+            let q_len = d.array().map_err(|_| Error::ManifestInvalid {
+                detail: "quota entry is not a CBOR array",
+            })?;
             if q_len != Some(2) {
                 return Err(Error::ManifestInvalid {
                     detail: "each quota must be [node, ceiling]",
                 });
             }
 
-            let node_raw = d
-                .u32()
-                .map_err(|_| Error::ManifestInvalid { detail: "quota node is not uint32" })?;
-            let ceiling_raw = d
-                .u64()
-                .map_err(|_| Error::ManifestInvalid { detail: "quota ceiling is not uint64" })?;
+            let node_raw = d.u32().map_err(|_| Error::ManifestInvalid {
+                detail: "quota node is not uint32",
+            })?;
+            let ceiling_raw = d.u64().map_err(|_| Error::ManifestInvalid {
+                detail: "quota ceiling is not uint64",
+            })?;
 
-            let node = NonZeroU32::new(node_raw)
-                .ok_or(Error::ManifestInvalid { detail: "quota node must be non-zero" })?;
+            let node = NonZeroU32::new(node_raw).ok_or(Error::ManifestInvalid {
+                detail: "quota node must be non-zero",
+            })?;
 
             quotas
-                .push(QuotaDecl { node, ceiling: Quota::new(ceiling_raw) })
-                .map_err(|_| Error::ManifestInvalid { detail: "quota list capacity exceeded" })?;
+                .push(QuotaDecl {
+                    node,
+                    ceiling: Quota::new(ceiling_raw),
+                })
+                .map_err(|_| Error::ManifestInvalid {
+                    detail: "quota list capacity exceeded",
+                })?;
         }
 
         Ok(quotas)

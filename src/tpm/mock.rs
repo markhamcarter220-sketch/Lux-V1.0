@@ -16,7 +16,11 @@
 
 use sha2::{Digest, Sha256};
 
-use crate::{error::Error, tpm::{TpmProvider, TpmQuote}, Result};
+use crate::{
+    error::Error,
+    tpm::{TpmProvider, TpmQuote},
+    Result,
+};
 
 /// Number of PCR registers in the simulated bank.
 const PCR_COUNT: usize = 24;
@@ -31,7 +35,9 @@ impl SoftwareTpm {
     /// Construct a fresh TPM with all PCRs initialised to zero.
     #[must_use]
     pub const fn new() -> Self {
-        Self { pcrs: [[0u8; 32]; PCR_COUNT] }
+        Self {
+            pcrs: [[0u8; 32]; PCR_COUNT],
+        }
     }
 
     /// Return the current value of PCR `index`, or `None` if out of range.
@@ -51,7 +57,9 @@ impl TpmProvider for SoftwareTpm {
     fn extend_pcr(&mut self, pcr_index: u8, data: &[u8]) -> Result<()> {
         let idx = pcr_index as usize;
         if idx >= PCR_COUNT {
-            return Err(Error::ManifestInvalid { detail: "TPM PCR index out of range" });
+            return Err(Error::ManifestInvalid {
+                detail: "TPM PCR index out of range",
+            });
         }
         let mut h = Sha256::new();
         h.update(self.pcrs[idx]);
@@ -63,7 +71,9 @@ impl TpmProvider for SoftwareTpm {
     fn quote(&self, pcr_index: u8, nonce: &[u8; 32]) -> Result<TpmQuote> {
         let idx = pcr_index as usize;
         if idx >= PCR_COUNT {
-            return Err(Error::ManifestInvalid { detail: "TPM PCR index out of range" });
+            return Err(Error::ManifestInvalid {
+                detail: "TPM PCR index out of range",
+            });
         }
         let pcr_value = self.pcrs[idx];
 
@@ -82,7 +92,9 @@ impl TpmProvider for SoftwareTpm {
     fn read_pcr(&self, pcr_index: u8) -> Result<[u8; 32]> {
         let idx = pcr_index as usize;
         if idx >= PCR_COUNT {
-            return Err(Error::ManifestInvalid { detail: "TPM PCR index out of range" });
+            return Err(Error::ManifestInvalid {
+                detail: "TPM PCR index out of range",
+            });
         }
         Ok(self.pcrs[idx])
     }
@@ -90,7 +102,9 @@ impl TpmProvider for SoftwareTpm {
     fn verify_quote(&self, pcr_index: u8, nonce: &[u8; 32], quote: &TpmQuote) -> Result<()> {
         let idx = pcr_index as usize;
         if idx >= PCR_COUNT {
-            return Err(Error::ManifestInvalid { detail: "TPM PCR index out of range" });
+            return Err(Error::ManifestInvalid {
+                detail: "TPM PCR index out of range",
+            });
         }
         let pcr_value = self.pcrs[idx];
 

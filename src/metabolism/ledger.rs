@@ -18,7 +18,9 @@ impl Ledger {
     /// Constructs an empty ledger.
     #[must_use]
     pub const fn new() -> Self {
-        Self { balances: LinearMap::new() }
+        Self {
+            balances: LinearMap::new(),
+        }
     }
 
     /// Seed the ledger with `node`'s initial quota from the manifest.
@@ -62,7 +64,7 @@ mod proofs {
     #[kani::proof]
     fn failed_deduction_leaves_balance_unchanged() {
         let ceiling: u64 = kani::any();
-        let amount: u64  = kani::any();
+        let amount: u64 = kani::any();
 
         let node = NonZeroU32::new(1).unwrap();
         let mut ledger = Ledger::default();
@@ -85,15 +87,15 @@ mod proofs {
     #[kani::proof]
     fn successful_deduction_is_exact() {
         let ceiling: u64 = kani::any();
-        let amount: u64  = kani::any();
+        let amount: u64 = kani::any();
         kani::assume(amount <= ceiling);
 
         let node = NonZeroU32::new(1).unwrap();
         let mut ledger = Ledger::default();
         ledger.seed(node, Quota::new(ceiling));
 
-        let before   = ledger.balance(node).unwrap();
-        let new_bal  = ledger.deduct(node, amount);
+        let before = ledger.balance(node).unwrap();
+        let new_bal = ledger.deduct(node, amount);
 
         kani::assert(new_bal.is_some(), "deduction within quota must succeed");
         kani::assert(

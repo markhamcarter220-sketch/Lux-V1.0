@@ -30,8 +30,13 @@ impl QuotaEnforcer {
         resource: &'static str,
         audit: &mut AuditLog,
     ) -> Result<u64> {
-        let result = ledger.deduct(node, amount).ok_or(Error::QuotaExceeded { resource });
-        let denial = result.as_ref().err().map(|e| (e.denial_class(), e.denial_reason_str()));
+        let result = ledger
+            .deduct(node, amount)
+            .ok_or(Error::QuotaExceeded { resource });
+        let denial = result
+            .as_ref()
+            .err()
+            .map(|e| (e.denial_class(), e.denial_reason_str()));
         audit.append(EventKind::ResourceDeduction, node.get(), 0, denial);
         result
     }

@@ -47,12 +47,12 @@ use crate::{
 /// when [`BootState::initialise`] is called with [`NullTpm`].
 #[derive(Debug)]
 pub struct BootState {
-    pub(crate) graph:       OperationalGraph,
-    pub(crate) ledger:      Ledger,
-    pub(crate) policy:      Policy,
-    attestation:            TpmQuote,
-    manifest_hash:          [u8; 32],
-    local_id:               NodeId,
+    pub(crate) graph: OperationalGraph,
+    pub(crate) ledger: Ledger,
+    pub(crate) policy: Policy,
+    attestation: TpmQuote,
+    manifest_hash: [u8; 32],
+    local_id: NodeId,
 }
 
 impl BootState {
@@ -160,16 +160,19 @@ impl BootState {
     /// denied by the local graph or consensus fails to reach quorum.
     pub fn run_topology_consensus<T: RaftTransport>(
         &mut self,
-        peer_set:  &PeerSet,
-        src:       NodeId,
-        dst:       NodeId,
+        peer_set: &PeerSet,
+        src: NodeId,
+        dst: NodeId,
         transport: &mut T,
-        audit:     &mut AuditLog,
+        audit: &mut AuditLog,
     ) -> Result<()> {
         // I4: local sealed graph is the authoritative gate (fail-closed).
         let local_ok = self.graph.traverse(src, dst, audit).is_ok();
         if !local_ok {
-            return Err(Error::TopologyViolation { src: src.get(), dst: dst.get() });
+            return Err(Error::TopologyViolation {
+                src: src.get(),
+                dst: dst.get(),
+            });
         }
 
         let mut node = RaftNode::new(self.local_id, peer_set);
@@ -191,7 +194,10 @@ impl BootState {
                 0,
                 Some((DenialClass::Halt, "topology consensus not reached")),
             );
-            return Err(Error::TopologyViolation { src: src.get(), dst: dst.get() });
+            return Err(Error::TopologyViolation {
+                src: src.get(),
+                dst: dst.get(),
+            });
         }
 
         node.propose(src, dst, transport)?;
@@ -206,14 +212,16 @@ impl BootState {
             }
         }
 
-        let denial = (!committed)
-            .then_some((DenialClass::Halt, "topology consensus not reached"));
+        let denial = (!committed).then_some((DenialClass::Halt, "topology consensus not reached"));
         audit.append(EventKind::TopologyChange, src.get(), 0, denial);
 
         if committed {
             Ok(())
         } else {
-            Err(Error::TopologyViolation { src: src.get(), dst: dst.get() })
+            Err(Error::TopologyViolation {
+                src: src.get(),
+                dst: dst.get(),
+            })
         }
     }
 
@@ -267,7 +275,7 @@ impl BootState {
         let manifest = ManifestDecoder::decode(raw_manifest, credentials)?;
 
         let mut booting = BootingGraph::new();
-        let mut ledger  = Ledger::new();
+        let mut ledger = Ledger::new();
 
         for edge in &manifest.edges {
             booting.activate(edge.src)?;
@@ -289,6 +297,13 @@ impl BootState {
 
         let policy = Policy::new(Generation(0));
 
-        Ok(Self { graph, ledger, policy, attestation, manifest_hash, local_id: NodeId::MIN })
+        Ok(Self {
+            graph,
+            ledger,
+            policy,
+            attestation,
+            manifest_hash,
+            local_id: NodeId::MIN,
+        })
     }
 }

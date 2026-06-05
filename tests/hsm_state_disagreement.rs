@@ -61,16 +61,22 @@ struct MockDelayedHsm {
 impl HsmProvider for MockDelayedHsm {
     fn generate_capability_seed(&self) -> Result<[u8; 32]> {
         std::thread::sleep(Duration::from_millis(self.delay_ms));
-        Err(Error::UndefinedState { context: "hsm: key not found" })
+        Err(Error::UndefinedState {
+            context: "hsm: key not found",
+        })
     }
 
     fn sign(&self, _payload: &[u8]) -> Result<[u8; 64]> {
         std::thread::sleep(Duration::from_millis(self.delay_ms));
-        Err(Error::UndefinedState { context: "hsm: key not found" })
+        Err(Error::UndefinedState {
+            context: "hsm: key not found",
+        })
     }
 
     fn verify(&self, _payload: &[u8], _sig: &[u8; 64]) -> Result<()> {
-        Err(Error::UndefinedState { context: "hsm: key not found" })
+        Err(Error::UndefinedState {
+            context: "hsm: key not found",
+        })
     }
 }
 
@@ -102,7 +108,7 @@ impl HsmProvider for MockDelayedHsm {
 #[test]
 fn scenario_a_revocation_during_hsm_call() {
     let mut policy = Policy::new(Generation(0));
-    let mut audit  = AuditLog::new();
+    let mut audit = AuditLog::new();
     let nonce: u64 = 0;
 
     // Pre-call verification: nonce is clean before the HSM call begins.
@@ -178,11 +184,14 @@ fn scenario_a_revocation_during_hsm_call() {
 #[test]
 fn scenario_b_hsm_key_divergence() {
     let mut policy = Policy::new(Generation(0));
-    let mut audit  = AuditLog::new();
+    let mut audit = AuditLog::new();
     let nonce: u64 = 7;
 
     // Baseline: nonce is clean; audit log is empty.
-    assert!(!policy.is_revoked(nonce), "nonce must be clean before HSM attempt");
+    assert!(
+        !policy.is_revoked(nonce),
+        "nonce must be clean before HSM attempt"
+    );
     assert!(audit.is_empty(), "audit log must be empty before attempt");
 
     // HSM with 20 ms latency that models a deleted key slot.
@@ -266,7 +275,7 @@ fn scenario_c_revocation_ledger_crash_recovery() {
     let revoked_nonce: u64 = 42;
 
     let mut pre_crash_policy = Policy::new(Generation(0));
-    let mut audit            = AuditLog::new();
+    let mut audit = AuditLog::new();
 
     // Revoke the nonce.  Policy::revoke_capability does not auto-persist to the
     // audit log — callers must do this explicitly.

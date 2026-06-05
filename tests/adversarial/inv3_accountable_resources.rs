@@ -3,13 +3,15 @@
 //! 12 attack vectors proving that every allocation is charged and over-quota
 //! requests are hard-rejected with no partial grants.
 
+use core::num::NonZeroU32;
 use lux_kernel::{
     metabolism::ledger::Ledger,
     types::{Quota, MAX_NODES},
 };
-use core::num::NonZeroU32;
 
-fn nz(n: u32) -> NonZeroU32 { NonZeroU32::new(n).unwrap() }
+fn nz(n: u32) -> NonZeroU32 {
+    NonZeroU32::new(n).unwrap()
+}
 
 // ── Attack 3.1 ────────────────────────────────────────────────────────────────
 // Over-quota hard reject: deduct more than balance → None, balance unchanged.
@@ -20,10 +22,20 @@ fn attack_3_1_over_quota_hard_reject_balance_preserved() {
     let n = nz(1);
     ledger.seed(n, Quota::new(100));
 
-    assert!(ledger.deduct(n, 101).is_none(), "deduct 101 from 100 must fail");
-    assert_eq!(ledger.balance(n), Some(100), "balance unchanged after reject");
+    assert!(
+        ledger.deduct(n, 101).is_none(),
+        "deduct 101 from 100 must fail"
+    );
+    assert_eq!(
+        ledger.balance(n),
+        Some(100),
+        "balance unchanged after reject"
+    );
 
-    assert!(ledger.deduct(n, u64::MAX).is_none(), "u64::MAX deduction must fail");
+    assert!(
+        ledger.deduct(n, u64::MAX).is_none(),
+        "u64::MAX deduction must fail"
+    );
     assert_eq!(ledger.balance(n), Some(100));
 
     // Exactly 100 succeeds.
@@ -44,7 +56,11 @@ fn attack_3_2_zero_deduction_does_not_drain_balance() {
     // Deducting 0 is a no-op: 50 - 0 = 50. Returns Some(50).
     let result = ledger.deduct(n, 0);
     assert!(result.is_some());
-    assert_eq!(ledger.balance(n), Some(50), "deduct 0 must not change balance");
+    assert_eq!(
+        ledger.balance(n),
+        Some(50),
+        "deduct 0 must not change balance"
+    );
 }
 
 // ── Attack 3.3 ────────────────────────────────────────────────────────────────
@@ -60,14 +76,25 @@ fn attack_3_3_sequential_deductions_exhaust_to_zero_no_wrap() {
         let result = ledger.deduct(n, 10);
         assert!(result.is_some(), "deduction {i} must succeed");
         let expected = 100 - (i + 1) * 10;
-        assert_eq!(ledger.balance(n), Some(expected), "balance after deduction {i}");
+        assert_eq!(
+            ledger.balance(n),
+            Some(expected),
+            "balance after deduction {i}"
+        );
     }
 
     assert_eq!(ledger.balance(n), Some(0));
 
     // One more — must fail, not wrap.
-    assert!(ledger.deduct(n, 1).is_none(), "post-exhaustion deduction must fail");
-    assert_eq!(ledger.balance(n), Some(0), "balance must stay 0, not wrap to u64::MAX");
+    assert!(
+        ledger.deduct(n, 1).is_none(),
+        "post-exhaustion deduction must fail"
+    );
+    assert_eq!(
+        ledger.balance(n),
+        Some(0),
+        "balance must stay 0, not wrap to u64::MAX"
+    );
 }
 
 // ── Attack 3.4 ────────────────────────────────────────────────────────────────
@@ -84,8 +111,15 @@ fn attack_3_4_double_charge_second_is_rejected() {
     assert_eq!(ledger.balance(n), Some(40));
 
     // Second charge of 60 fails (only 40 remain).
-    assert!(ledger.deduct(n, 60).is_none(), "second deduction of same amount must fail");
-    assert_eq!(ledger.balance(n), Some(40), "balance unchanged after failed double-charge");
+    assert!(
+        ledger.deduct(n, 60).is_none(),
+        "second deduction of same amount must fail"
+    );
+    assert_eq!(
+        ledger.balance(n),
+        Some(40),
+        "balance unchanged after failed double-charge"
+    );
 }
 
 // ── Attack 3.5 ────────────────────────────────────────────────────────────────
@@ -108,8 +142,14 @@ fn attack_3_5_concurrent_pressure_cannot_exceed_quota() {
         }
     }
 
-    assert!(successes <= 6, "at most 6 of 10 actors can deduct 15 (total ≤ 100)");
-    assert!(total_deducted <= 100, "total deducted must not exceed quota");
+    assert!(
+        successes <= 6,
+        "at most 6 of 10 actors can deduct 15 (total ≤ 100)"
+    );
+    assert!(
+        total_deducted <= 100,
+        "total deducted must not exceed quota"
+    );
     assert_eq!(ledger.balance(n), Some(100 - total_deducted));
 }
 
@@ -128,7 +168,11 @@ fn attack_3_6_failed_deduction_is_completely_atomic() {
     // 20 requested, only 10 available — must fail atomically.
     let fail = ledger.deduct(n, 20);
     assert!(fail.is_none());
-    assert_eq!(ledger.balance(n), Some(10), "failed deduction must leave balance exactly 10");
+    assert_eq!(
+        ledger.balance(n),
+        Some(10),
+        "failed deduction must leave balance exactly 10"
+    );
 }
 
 // ── Attack 3.7 ────────────────────────────────────────────────────────────────
@@ -147,7 +191,10 @@ fn attack_3_7_integer_arithmetic_prevents_rounding_exploitation() {
     assert_eq!(ledger.balance(n), Some(0));
 
     // 11th: no rounding grants a free unit.
-    assert!(ledger.deduct(n, 1).is_none(), "11th deduction from 0 must fail");
+    assert!(
+        ledger.deduct(n, 1).is_none(),
+        "11th deduction from 0 must fail"
+    );
 }
 
 // ── Attack 3.8 ────────────────────────────────────────────────────────────────
@@ -167,7 +214,10 @@ fn attack_3_8_quota_is_node_bound_no_lateral_transfer() {
 
     // B has no balance regardless of A's state.
     assert_eq!(ledger.balance(b), None, "unseeded node has no balance");
-    assert!(ledger.deduct(b, 1).is_none(), "deduct from unseeded node must fail");
+    assert!(
+        ledger.deduct(b, 1).is_none(),
+        "deduct from unseeded node must fail"
+    );
 
     // A's balance unaffected by B's failed deduction.
     assert_eq!(ledger.balance(a), Some(50));
@@ -208,7 +258,7 @@ fn attack_3_10_quota_exhaustion_under_sustained_load() {
     for _ in 0..1500 {
         match ledger.deduct(n, 1) {
             Some(_) => succeeded += 1,
-            None    => denied += 1,
+            None => denied += 1,
         }
     }
 
@@ -229,12 +279,18 @@ fn attack_3_11_quota_exhaustion_does_not_cascade_to_other_nodes() {
     ledger.seed(b, Quota::new(100));
 
     // Exhaust A.
-    for _ in 0..10 { assert!(ledger.deduct(a, 1).is_some()); }
+    for _ in 0..10 {
+        assert!(ledger.deduct(a, 1).is_some());
+    }
     assert_eq!(ledger.balance(a), Some(0));
     assert!(ledger.deduct(a, 1).is_none()); // A exhausted
 
     // B completely unaffected.
-    assert_eq!(ledger.balance(b), Some(100), "B must not be affected by A's exhaustion");
+    assert_eq!(
+        ledger.balance(b),
+        Some(100),
+        "B must not be affected by A's exhaustion"
+    );
     assert!(ledger.deduct(b, 50).is_some());
 }
 
@@ -253,7 +309,10 @@ fn attack_3_12_full_ledger_capacity_all_nodes_independent() {
     // Every node can independently deduct.
     for i in 1u32..=(MAX_NODES as u32) {
         let n = nz(i);
-        assert!(ledger.deduct(n, 50).is_some(), "node {i} must deduct successfully");
+        assert!(
+            ledger.deduct(n, 50).is_some(),
+            "node {i} must deduct successfully"
+        );
         assert_eq!(ledger.balance(n), Some(50));
     }
 }

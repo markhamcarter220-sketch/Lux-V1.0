@@ -1,5 +1,7 @@
 //! Integration tests: capability lifecycle — minting, delegation, rotation.
 
+use core::num::NonZeroU32;
+use lux_kernel::audit::AuditLog;
 use lux_kernel::{
     auth::{
         capability::{Capability, CapabilitySet},
@@ -8,8 +10,6 @@ use lux_kernel::{
     error::Error,
     types::Generation,
 };
-use lux_kernel::audit::AuditLog;
-use core::num::NonZeroU32;
 
 fn node(n: u32) -> NonZeroU32 {
     NonZeroU32::new(n).expect("test node id must be non-zero")
@@ -20,7 +20,9 @@ fn valid_capability_passes_policy_check() {
     let gen = Generation(0);
     let mut policy = Policy::new(gen);
     let cap = Capability::new_for_test(node(1), node(2), CapabilitySet::SCHEDULE, gen, 1);
-    assert!(policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
+    assert!(policy
+        .check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+        .is_ok());
 }
 
 #[test]
@@ -47,7 +49,10 @@ fn delegation_cannot_amplify_rights() {
     );
     // Attempt to delegate ALLOC_RESOURCE which the token does not hold.
     let delegated = cap.delegate(node(3), CapabilitySet::ALLOC_RESOURCE, 42);
-    assert!(delegated.is_none(), "privilege amplification must be blocked");
+    assert!(
+        delegated.is_none(),
+        "privilege amplification must be blocked"
+    );
 }
 
 #[test]
@@ -65,5 +70,7 @@ fn delegation_within_rights_succeeds() {
     let delegated = delegated.unwrap();
 
     let mut policy = Policy::new(gen);
-    assert!(policy.check(&delegated, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
+    assert!(policy
+        .check(&delegated, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+        .is_ok());
 }

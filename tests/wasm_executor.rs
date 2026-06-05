@@ -59,7 +59,10 @@ fn make_cap() -> Capability {
 fn executor_policy_check_permitted() -> lux_kernel::Result<()> {
     let shim = make_shim();
     let mut exec = WasmExecutor::new(shim)?;
-    let handle = exec.shim_mut().register_cap(make_cap()).expect("table not full");
+    let handle = exec
+        .shim_mut()
+        .register_cap(make_cap())
+        .expect("table not full");
     assert_eq!(handle, 0, "first registered cap must get handle 0");
 
     let right_bits = CapabilitySet::ALLOC_RESOURCE.bits();
@@ -133,7 +136,10 @@ fn executor_ledger_deduct_quota_exceeded() -> lux_kernel::Result<()> {
   )
 )"#;
     let result = exec.call_nullary(wat, "run")?;
-    assert_eq!(result, 2, "over-quota deduction must return 2 (RC_QUOTA_EXCEEDED)");
+    assert_eq!(
+        result, 2,
+        "over-quota deduction must return 2 (RC_QUOTA_EXCEEDED)"
+    );
     Ok(())
 }
 
@@ -154,7 +160,10 @@ fn executor_ledger_deduct_unknown_node() -> lux_kernel::Result<()> {
 )"#;
     // Unknown nodes have no quota ≡ zero balance → quota exceeded (2).
     let result = exec.call_nullary(wat, "run")?;
-    assert_eq!(result, 2, "unknown node (no quota) must return 2 (RC_QUOTA_EXCEEDED)");
+    assert_eq!(
+        result, 2,
+        "unknown node (no quota) must return 2 (RC_QUOTA_EXCEEDED)"
+    );
     Ok(())
 }
 
@@ -194,7 +203,10 @@ fn executor_topology_traverse_denied() -> lux_kernel::Result<()> {
   )
 )"#;
     let result = exec.call_nullary(wat, "run")?;
-    assert_eq!(result, 3, "undeclared reverse edge 2→1 must return 3 (RC_TOPO_VIOLATION)");
+    assert_eq!(
+        result, 3,
+        "undeclared reverse edge 2→1 must return 3 (RC_TOPO_VIOLATION)"
+    );
     Ok(())
 }
 
@@ -213,7 +225,10 @@ fn executor_topology_invalid_node() -> lux_kernel::Result<()> {
   )
 )"#;
     let result = exec.call_nullary(wat, "run")?;
-    assert_eq!(result, -1, "node ID 0 is invalid (NonZeroU32 sentinel) → must return -1");
+    assert_eq!(
+        result, -1,
+        "node ID 0 is invalid (NonZeroU32 sentinel) → must return -1"
+    );
     Ok(())
 }
 
@@ -245,7 +260,10 @@ fn executor_state_persists_across_calls() -> lux_kernel::Result<()> {
     assert_eq!(r2, 0, "second call (500→0) must succeed");
 
     let r3 = exec.call_nullary(wat, "run")?;
-    assert_eq!(r3, 2, "third call (0−500 underflow) must return 2 (quota exceeded)");
+    assert_eq!(
+        r3, 2,
+        "third call (0−500 underflow) must return 2 (quota exceeded)"
+    );
     Ok(())
 }
 

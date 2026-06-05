@@ -27,7 +27,7 @@ use crate::types::MAX_REVOCATIONS;
 pub struct RevocationLedger {
     revoked: FnvIndexSet<u64, MAX_REVOCATIONS>,
     /// Count of successful revocations in this generation.
-    epoch:   u64,
+    epoch: u64,
 }
 
 impl RevocationLedger {
@@ -36,7 +36,7 @@ impl RevocationLedger {
     pub const fn new() -> Self {
         Self {
             revoked: FnvIndexSet::new(),
-            epoch:   0,
+            epoch: 0,
         }
     }
 

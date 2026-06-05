@@ -29,7 +29,9 @@ impl<const N: usize> RaftLog<N> {
     /// Construct an empty log.
     #[must_use]
     pub const fn new() -> Self {
-        Self { entries: heapless::Vec::new() }
+        Self {
+            entries: heapless::Vec::new(),
+        }
     }
 
     /// Append `entry`. Returns `false` if the log is at capacity.

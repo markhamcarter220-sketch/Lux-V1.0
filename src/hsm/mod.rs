@@ -219,7 +219,11 @@ impl HsmSignedCapability {
     ) -> Result<Self> {
         let payload = Self::cap_payload(&cap);
         let signature = hsm.sign_capability(handle, &payload)?;
-        Ok(Self { inner: cap, key_handle: *handle, signature })
+        Ok(Self {
+            inner: cap,
+            key_handle: *handle,
+            signature,
+        })
     }
 
     /// Verify the HSM signature on this capability.

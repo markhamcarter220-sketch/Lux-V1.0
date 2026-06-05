@@ -4,18 +4,20 @@
 //! inputs: majority-forged capabilities, timing invariants, cache-free
 //! revocation, audit tampering, and bulk-revocation consistency.
 
+use core::num::NonZeroU32;
 use lux_kernel::{
+    audit::{AuditLog, EventKind},
     auth::{
         capability::{Capability, CapabilitySet},
         policy::Policy,
     },
-    audit::{AuditLog, EventKind},
     topology::BootingGraph,
     types::{Generation, MAX_NODES},
 };
-use core::num::NonZeroU32;
 
-fn nz(n: u32) -> NonZeroU32 { NonZeroU32::new(n).unwrap() }
+fn nz(n: u32) -> NonZeroU32 {
+    NonZeroU32::new(n).unwrap()
+}
 
 const ALL_RIGHTS: [CapabilitySet; 5] = [
     CapabilitySet::READ_TOPOLOGY,
@@ -40,16 +42,26 @@ fn attack_6_1_majority_malicious_capabilities_individually_denied() {
 
     // 100 capabilities: nonces 1000-1099. Invalid caps have empty rights.
     for i in 0u64..100 {
-        let rights = if i < 60 { CapabilitySet::empty() } else { CapabilitySet::SCHEDULE };
+        let rights = if i < 60 {
+            CapabilitySet::empty()
+        } else {
+            CapabilitySet::SCHEDULE
+        };
         let cap = Capability::new_for_test(nz(1), nz(2), rights, gen, 1000 + i);
         match policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()) {
-            Ok(_)  => permitted += 1,
+            Ok(_) => permitted += 1,
             Err(_) => denied += 1,
         }
     }
 
-    assert_eq!(denied, 60, "all 60 malicious capabilities must be individually denied");
-    assert_eq!(permitted, 40, "exactly 40 valid capabilities must be permitted");
+    assert_eq!(
+        denied, 60,
+        "all 60 malicious capabilities must be individually denied"
+    );
+    assert_eq!(
+        permitted, 40,
+        "exactly 40 valid capabilities must be permitted"
+    );
 }
 
 // ── Attack 6.2 ────────────────────────────────────────────────────────────────
@@ -59,7 +71,9 @@ fn attack_6_1_majority_malicious_capabilities_individually_denied() {
 #[test]
 fn attack_6_2_o1_traversal_completes_for_all_node_pairs() {
     let mut g = BootingGraph::new();
-    for i in 1u32..=(MAX_NODES as u32) { g.activate(nz(i)).unwrap(); }
+    for i in 1u32..=(MAX_NODES as u32) {
+        g.activate(nz(i)).unwrap();
+    }
     // Sparse topology: only one edge.
     g.permit_edge(nz(1), nz(2)).unwrap();
     let op = g.seal();
@@ -91,14 +105,18 @@ fn attack_6_3_revocation_is_immediate_no_cached_decision() {
     // Immediate check must fail.
     let cap1 = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, nonce);
     assert!(
-        policy.check(&cap1, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err(),
+        policy
+            .check(&cap1, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+            .is_err(),
         "immediately-revoked cap must be denied"
     );
 
     // Second and third checks also fail (no "cached valid" from before revocation).
     for _ in 0..5 {
         let cap_n = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, nonce);
-        assert!(policy.check(&cap_n, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err());
+        assert!(policy
+            .check(&cap_n, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+            .is_err());
     }
 }
 
@@ -109,10 +127,20 @@ fn attack_6_3_revocation_is_immediate_no_cached_decision() {
 #[test]
 fn attack_6_4_audit_log_hash_chain_detects_any_mutation() {
     let mut log = AuditLog::new();
-    log.append(EventKind::CapabilityCheck,   1, 0, None);
+    log.append(EventKind::CapabilityCheck, 1, 0, None);
     log.append(EventKind::ResourceDeduction, 2, 0, None);
-    log.append(EventKind::CapabilityRevoked, 3, 0, Some((lux_kernel::audit::DenialClass::Halt,    "revoked")));
-    log.append(EventKind::TopologyTraverse,  4, 0, Some((lux_kernel::audit::DenialClass::Halt,    "undeclared edge")));
+    log.append(
+        EventKind::CapabilityRevoked,
+        3,
+        0,
+        Some((lux_kernel::audit::DenialClass::Halt, "revoked")),
+    );
+    log.append(
+        EventKind::TopologyTraverse,
+        4,
+        0,
+        Some((lux_kernel::audit::DenialClass::Halt, "undeclared edge")),
+    );
 
     // Intact chain must verify.
     assert!(log.verify_chain(), "intact chain must verify");
@@ -142,14 +170,19 @@ fn attack_6_5_bulk_revocation_all_revoked_denied_others_unaffected() {
 
     // Revoke nonces 0-49.
     for nonce in 0u64..50 {
-        assert!(policy.revoke_capability(nonce), "revocation {nonce} must succeed");
+        assert!(
+            policy.revoke_capability(nonce),
+            "revocation {nonce} must succeed"
+        );
     }
 
     // All 50 denied.
     for nonce in 0u64..50 {
         let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::READ_TOPOLOGY, gen, nonce);
         assert!(
-            policy.check(&cap, CapabilitySet::READ_TOPOLOGY, &mut AuditLog::new()).is_err(),
+            policy
+                .check(&cap, CapabilitySet::READ_TOPOLOGY, &mut AuditLog::new())
+                .is_err(),
             "revoked nonce {nonce} must be denied"
         );
     }
@@ -158,7 +191,9 @@ fn attack_6_5_bulk_revocation_all_revoked_denied_others_unaffected() {
     for nonce in 100u64..110 {
         let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::READ_TOPOLOGY, gen, nonce);
         assert!(
-            policy.check(&cap, CapabilitySet::READ_TOPOLOGY, &mut AuditLog::new()).is_ok(),
+            policy
+                .check(&cap, CapabilitySet::READ_TOPOLOGY, &mut AuditLog::new())
+                .is_ok(),
             "non-revoked nonce {nonce} must be permitted"
         );
     }
@@ -179,7 +214,9 @@ fn attack_6_6_revoke_rotate_old_gen_stale_new_gen_clean() {
 
     // Valid use in gen 0.
     let good = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SHUTDOWN, gen0, 300);
-    assert!(policy.check(&good, CapabilitySet::SHUTDOWN, &mut AuditLog::new()).is_ok());
+    assert!(policy
+        .check(&good, CapabilitySet::SHUTDOWN, &mut AuditLog::new())
+        .is_ok());
 
     // Rotate → gen 1.
     policy.rotate_generation();
@@ -188,12 +225,19 @@ fn attack_6_6_revoke_rotate_old_gen_stale_new_gen_clean() {
 
     // Old-gen caps stale (generation check fails, not revocation check).
     let stale = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SHUTDOWN, gen0, 100);
-    assert!(policy.check(&stale, CapabilitySet::SHUTDOWN, &mut AuditLog::new()).is_err());
+    assert!(policy
+        .check(&stale, CapabilitySet::SHUTDOWN, &mut AuditLog::new())
+        .is_err());
 
     // Revocation cleared — nonce 100 is reusable in gen 1.
     assert!(!policy.is_revoked(100));
     let fresh = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SHUTDOWN, gen1, 100);
-    assert!(policy.check(&fresh, CapabilitySet::SHUTDOWN, &mut AuditLog::new()).is_ok(), "nonce reusable after rotation");
+    assert!(
+        policy
+            .check(&fresh, CapabilitySet::SHUTDOWN, &mut AuditLog::new())
+            .is_ok(),
+        "nonce reusable after rotation"
+    );
 }
 
 // ── Attack 6.7 ────────────────────────────────────────────────────────────────
@@ -207,17 +251,26 @@ fn attack_6_7_zero_bits_capability_denied_for_all_rights_and_combinations() {
 
     // Every individual right.
     for &right in &ALL_RIGHTS {
-        assert!(!empty.authorises(right, gen), "empty cap must not authorise {right:?}");
+        assert!(
+            !empty.authorises(right, gen),
+            "empty cap must not authorise {right:?}"
+        );
     }
 
     // Full combined rights.
-    assert!(!empty.authorises(CapabilitySet::all(), gen), "empty cap must not authorise all()");
+    assert!(
+        !empty.authorises(CapabilitySet::all(), gen),
+        "empty cap must not authorise all()"
+    );
 
     // Paired combinations.
     for i in 0..ALL_RIGHTS.len() {
-        for j in (i+1)..ALL_RIGHTS.len() {
+        for j in (i + 1)..ALL_RIGHTS.len() {
             let combo = ALL_RIGHTS[i] | ALL_RIGHTS[j];
-            assert!(!empty.authorises(combo, gen), "empty cap must not authorise {combo:?}");
+            assert!(
+                !empty.authorises(combo, gen),
+                "empty cap must not authorise {combo:?}"
+            );
         }
     }
 }

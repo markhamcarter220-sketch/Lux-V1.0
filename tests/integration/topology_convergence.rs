@@ -4,12 +4,12 @@
 //! constructed, seeded, and sealed into an `OperationalGraph`.  They verify
 //! that the adjacency-matrix traversal correctly enforces the declared edges.
 
+use core::num::NonZeroU32;
 use lux_kernel::{
     audit::AuditLog,
     error::Error,
     topology::{BootingGraph, OperationalGraph},
 };
-use core::num::NonZeroU32;
 
 fn node(n: u32) -> NonZeroU32 {
     NonZeroU32::new(n).unwrap()
@@ -37,7 +37,12 @@ fn declared_edge_between_active_nodes_is_permitted() {
     booting.permit_edge(node(1), node(2)).unwrap();
     let graph = booting.seal();
 
-    assert!(graph.traverse(node(1), node(2), &mut AuditLog::new()).is_ok(), "declared edge must be permitted");
+    assert!(
+        graph
+            .traverse(node(1), node(2), &mut AuditLog::new())
+            .is_ok(),
+        "declared edge must be permitted"
+    );
 }
 
 #[test]
@@ -49,7 +54,9 @@ fn reverse_edge_is_denied_when_undeclared() {
     let graph = booting.seal();
 
     assert!(
-        graph.traverse(node(2), node(1), &mut AuditLog::new()).is_err(),
+        graph
+            .traverse(node(2), node(1), &mut AuditLog::new())
+            .is_err(),
         "undeclared reverse edge must be denied"
     );
 }
@@ -67,7 +74,9 @@ fn inactive_node_blocks_traversal() {
     let graph = booting.seal();
 
     assert!(
-        graph.traverse(node(1), node(2), &mut AuditLog::new()).is_err(),
+        graph
+            .traverse(node(1), node(2), &mut AuditLog::new())
+            .is_err(),
         "inactive destination must block traversal after seal"
     );
 }
@@ -79,5 +88,8 @@ fn activate_is_unreachable_on_operational_graph() {
     //   graph.activate(node(1));
     // We assert the structural property here as documentation.
     let graph = BootingGraph::new().seal();
-    assert!(!graph.is_active(node(1)), "freshly-sealed graph has no active nodes");
+    assert!(
+        !graph.is_active(node(1)),
+        "freshly-sealed graph has no active nodes"
+    );
 }

@@ -57,21 +57,21 @@ pub enum RaftRole {
 /// argument count of [`RaftNode::on_append_entries`].
 #[derive(Debug)]
 struct AeParams {
-    term:           u64,
+    term: u64,
     prev_log_index: u64,
-    prev_log_term:  u64,
-    entries:        Vec<LogEntry, 16>,
-    leader_commit:  u64,
+    prev_log_term: u64,
+    entries: Vec<LogEntry, 16>,
+    leader_commit: u64,
 }
 
 /// Bundled parameters for a `RequestVote` RPC, kept internal to reduce the
 /// argument count of [`RaftNode::on_request_vote`].
 #[derive(Debug, Clone, Copy)]
 struct RvParams {
-    term:           u64,
-    candidate_id:   NodeId,
+    term: u64,
+    candidate_id: NodeId,
     last_log_index: u64,
-    last_log_term:  u64,
+    last_log_term: u64,
 }
 
 /// Raft consensus state machine for distributed topology validation.
@@ -79,16 +79,16 @@ struct RvParams {
 /// See the [module documentation](self) for the caller contract.
 #[derive(Debug)]
 pub struct RaftNode {
-    id:           NodeId,
-    role:         RaftRole,
+    id: NodeId,
+    role: RaftRole,
     current_term: u64,
-    voted_for:    Option<NodeId>,
-    log:          RaftLog,
+    voted_for: Option<NodeId>,
+    log: RaftLog,
     commit_index: u64,
     votes_granted: usize,
-    peers:        Vec<NodeId, MAX_PEERS>,
-    next_index:   [u64; MAX_PEERS],
-    match_index:  [u64; MAX_PEERS],
+    peers: Vec<NodeId, MAX_PEERS>,
+    next_index: [u64; MAX_PEERS],
+    match_index: [u64; MAX_PEERS],
 }
 
 impl RaftNode {
@@ -103,15 +103,15 @@ impl RaftNode {
         }
         Self {
             id,
-            role:          RaftRole::Follower,
-            current_term:  0,
-            voted_for:     None,
-            log:           RaftLog::new(),
-            commit_index:  0,
+            role: RaftRole::Follower,
+            current_term: 0,
+            voted_for: None,
+            log: RaftLog::new(),
+            commit_index: 0,
             votes_granted: 0,
             peers,
-            next_index:    [1u64; MAX_PEERS],
-            match_index:   [0u64; MAX_PEERS],
+            next_index: [1u64; MAX_PEERS],
+            match_index: [0u64; MAX_PEERS],
         }
     }
 
@@ -155,10 +155,10 @@ impl RaftNode {
         }
 
         let msg = RaftMessage::RequestVote {
-            term:           self.current_term,
-            candidate_id:   self.id,
+            term: self.current_term,
+            candidate_id: self.id,
             last_log_index: self.log.last_index(),
-            last_log_term:  self.log.last_term(),
+            last_log_term: self.log.last_term(),
         };
         for &peer in &self.peers {
             transport.send(peer, msg.clone());
@@ -181,11 +181,19 @@ impl RaftNode {
         transport: &mut impl RaftTransport,
     ) -> Result<()> {
         if self.role != RaftRole::Leader {
-            return Err(Error::UndefinedState { context: "raft: cannot propose — not leader" });
+            return Err(Error::UndefinedState {
+                context: "raft: cannot propose — not leader",
+            });
         }
-        let entry = LogEntry { term: self.current_term, src, dst };
+        let entry = LogEntry {
+            term: self.current_term,
+            src,
+            dst,
+        };
         if !self.log.append(entry) {
-            return Err(Error::QuotaExceeded { resource: "raft log at capacity" });
+            return Err(Error::QuotaExceeded {
+                resource: "raft log at capacity",
+            });
         }
         let entry_index = self.log.last_index();
         if self.peers.is_empty() {
@@ -218,7 +226,12 @@ impl RaftNode {
             } => {
                 self.on_request_vote(
                     from,
-                    RvParams { term, candidate_id, last_log_index, last_log_term },
+                    RvParams {
+                        term,
+                        candidate_id,
+                        last_log_index,
+                        last_log_term,
+                    },
                     transport,
                 );
                 None
@@ -236,14 +249,22 @@ impl RaftNode {
             } => {
                 self.on_append_entries(
                     from,
-                    &AeParams { term, prev_log_index, prev_log_term, entries, leader_commit },
+                    &AeParams {
+                        term,
+                        prev_log_index,
+                        prev_log_term,
+                        entries,
+                        leader_commit,
+                    },
                     transport,
                 );
                 None
             }
-            RaftMessage::AppendEntriesReply { term, success, match_index } => {
-                self.on_ae_reply(from, term, success, match_index)
-            }
+            RaftMessage::AppendEntriesReply {
+                term,
+                success,
+                match_index,
+            } => self.on_ae_reply(from, term, success, match_index),
         }
     }
 
@@ -274,18 +295,17 @@ impl RaftNode {
 
     fn log_up_to_date_for(&self, last_log_index: u64, last_log_term: u64) -> bool {
         last_log_term > self.log.last_term()
-            || (last_log_term == self.log.last_term()
-                && last_log_index >= self.log.last_index())
+            || (last_log_term == self.log.last_term() && last_log_index >= self.log.last_index())
     }
 
     fn send_ae_to(&self, peer_idx: usize, transport: &mut impl RaftTransport) {
         if peer_idx >= self.peers.len() {
             return;
         }
-        let peer       = self.peers[peer_idx];
-        let next       = self.next_index[peer_idx];
+        let peer = self.peers[peer_idx];
+        let next = self.next_index[peer_idx];
         let prev_index = next.saturating_sub(1);
-        let prev_term  = if prev_index == 0 {
+        let prev_term = if prev_index == 0 {
             0
         } else {
             self.log.term_at(prev_index).unwrap_or(0)
@@ -303,26 +323,21 @@ impl RaftNode {
         transport.send(
             peer,
             RaftMessage::AppendEntries {
-                term:           self.current_term,
-                leader_id:      self.id,
+                term: self.current_term,
+                leader_id: self.id,
                 prev_log_index: prev_index,
-                prev_log_term:  prev_term,
+                prev_log_term: prev_term,
                 entries,
-                leader_commit:  self.commit_index,
+                leader_commit: self.commit_index,
             },
         );
     }
 
-    fn on_request_vote(
-        &mut self,
-        from: NodeId,
-        rv: RvParams,
-        transport: &mut impl RaftTransport,
-    ) {
+    fn on_request_vote(&mut self, from: NodeId, rv: RvParams, transport: &mut impl RaftTransport) {
         if rv.term > self.current_term {
             self.step_down(rv.term);
         }
-        let log_ok   = self.log_up_to_date_for(rv.last_log_index, rv.last_log_term);
+        let log_ok = self.log_up_to_date_for(rv.last_log_index, rv.last_log_term);
         let can_vote = self.voted_for.map_or(true, |v| v == rv.candidate_id);
         let vote_granted = rv.term >= self.current_term && log_ok && can_vote;
         if vote_granted {
@@ -330,7 +345,10 @@ impl RaftNode {
         }
         transport.send(
             from,
-            RaftMessage::RequestVoteReply { term: self.current_term, vote_granted },
+            RaftMessage::RequestVoteReply {
+                term: self.current_term,
+                vote_granted,
+            },
         );
     }
 
@@ -378,8 +396,8 @@ impl RaftNode {
         } else {
             self.role = RaftRole::Follower;
         }
-        let prev_ok = ae.prev_log_index == 0
-            || self.log.term_at(ae.prev_log_index) == Some(ae.prev_log_term);
+        let prev_ok =
+            ae.prev_log_index == 0 || self.log.term_at(ae.prev_log_index) == Some(ae.prev_log_term);
         if !prev_ok {
             transport.send(
                 from,
@@ -437,7 +455,7 @@ impl RaftNode {
         }
         let peer_idx = self.peer_index(from)?;
         if success {
-            self.next_index[peer_idx]  = match_index + 1;
+            self.next_index[peer_idx] = match_index + 1;
             self.match_index[peer_idx] = match_index;
         } else if self.next_index[peer_idx] > 1 {
             self.next_index[peer_idx] -= 1;
@@ -449,18 +467,17 @@ impl RaftNode {
     }
 
     fn advance_commit_index(&mut self) -> bool {
-        let old     = self.commit_index;
+        let old = self.commit_index;
         let n_peers = self.peers.len();
         let log_len = self.log.last_index();
         for n in (self.commit_index + 1..=log_len).rev() {
             if self.log.term_at(n) != Some(self.current_term) {
                 continue;
             }
-            let acked = 1
-                + self.match_index[..n_peers]
-                    .iter()
-                    .filter(|&&m| m >= n)
-                    .count();
+            let acked = 1 + self.match_index[..n_peers]
+                .iter()
+                .filter(|&&m| m >= n)
+                .count();
             if acked >= self.quorum() {
                 self.commit_index = n;
                 break;

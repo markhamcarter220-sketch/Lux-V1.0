@@ -25,7 +25,9 @@ impl PeerSet {
     /// Construct an empty peer set (single-node deployment).
     #[must_use]
     pub const fn new() -> Self {
-        Self { peers: heapless::Vec::new() }
+        Self {
+            peers: heapless::Vec::new(),
+        }
     }
 
     /// Add a peer to the set.
@@ -36,9 +38,9 @@ impl PeerSet {
     /// # Errors
     /// Returns `Err(ManifestInvalid)` if the peer set is already at capacity (16 peers).
     pub fn add(&mut self, peer: NodeId) -> Result<()> {
-        self.peers
-            .push(peer)
-            .map_err(|_| Error::ManifestInvalid { detail: "consensus peer set is full (max 16)" })
+        self.peers.push(peer).map_err(|_| Error::ManifestInvalid {
+            detail: "consensus peer set is full (max 16)",
+        })
     }
 
     /// Returns the declared peers (not including the local node).

@@ -7,19 +7,19 @@ use crate::error::DenialClass;
 #[repr(u8)]
 pub enum EventKind {
     /// A capability was presented and checked by `Policy::check`.
-    CapabilityCheck   = 0,
+    CapabilityCheck = 0,
     /// A capability token was explicitly revoked.
     CapabilityRevoked = 1,
     /// A resource deduction was attempted via the metabolism ledger.
     ResourceDeduction = 2,
     /// A topology edge traversal was attempted.
-    TopologyTraverse  = 3,
+    TopologyTraverse = 3,
     /// A distributed consensus round was run to validate a topology change.
-    TopologyChange    = 4,
+    TopologyChange = 4,
     /// A hiring decision was made by a governed AI model.
-    HiringDecision    = 5,
+    HiringDecision = 5,
     /// A policy gate check was performed before a governed operation.
-    PolicyGateCheck   = 6,
+    PolicyGateCheck = 6,
 }
 
 /// Result of the audited operation.
@@ -29,7 +29,7 @@ pub enum Outcome {
     /// The operation was permitted.
     Permitted = 0,
     /// The operation was denied.
-    Denied    = 1,
+    Denied = 1,
 }
 
 /// A single immutable entry in the audit log.
@@ -50,22 +50,22 @@ pub enum Outcome {
 #[derive(Debug, Clone)]
 pub struct AuditEvent {
     /// Classification of the audited operation.
-    pub kind:          EventKind,
+    pub kind: EventKind,
     /// Raw node ID of the actor that initiated the operation.
-    pub actor:         u32,
+    pub actor: u32,
     /// Monotonic sequence number (incremented per event, resets to 0 at startup).
-    pub seq:           u64,
+    pub seq: u64,
     /// Caller-provided monotonic timestamp (hardware tick, not wall time).
-    pub timestamp:     u64,
+    pub timestamp: u64,
     /// Whether the operation was permitted or denied.
-    pub outcome:       Outcome,
+    pub outcome: Outcome,
     /// HALT or FAILURE classification for denied events; `None` for permitted.
-    pub denial_class:  Option<DenialClass>,
+    pub denial_class: Option<DenialClass>,
     /// Static reason string for denied events; `None` for permitted.
     pub denial_reason: Option<&'static str>,
     /// SHA-256 of the chain input for this event (see `AuditLog` for wire format).
     /// For the genesis event, `prev_hash` is `[0u8; 32]`.
-    pub hash:          [u8; 32],
+    pub hash: [u8; 32],
 }
 
 impl AuditEvent {
@@ -73,13 +73,13 @@ impl AuditEvent {
     #[must_use]
     pub const fn kind_str(&self) -> &'static str {
         match self.kind {
-            EventKind::CapabilityCheck   => "cap_check",
+            EventKind::CapabilityCheck => "cap_check",
             EventKind::CapabilityRevoked => "cap_revoked",
             EventKind::ResourceDeduction => "resource_deduct",
-            EventKind::TopologyTraverse  => "topo_traverse",
-            EventKind::TopologyChange    => "topo_change",
-            EventKind::HiringDecision    => "hiring_decision",
-            EventKind::PolicyGateCheck   => "policy_gate_check",
+            EventKind::TopologyTraverse => "topo_traverse",
+            EventKind::TopologyChange => "topo_change",
+            EventKind::HiringDecision => "hiring_decision",
+            EventKind::PolicyGateCheck => "policy_gate_check",
         }
     }
 
@@ -88,9 +88,9 @@ impl AuditEvent {
     #[must_use]
     pub const fn denial_class_str(&self) -> Option<&'static str> {
         match self.denial_class {
-            Some(DenialClass::Halt)    => Some("halt"),
+            Some(DenialClass::Halt) => Some("halt"),
             Some(DenialClass::Failure) => Some("failure"),
-            None                       => None,
+            None => None,
         }
     }
 }

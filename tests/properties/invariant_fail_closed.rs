@@ -4,15 +4,20 @@
 //! ∀ expired-generation capability, `Policy::check` returns `Err`.
 //! ∀ revoked capability nonce, `Policy::check` returns `Err`.
 
+use core::num::NonZeroU32;
+use lux_kernel::audit::AuditLog;
 use lux_kernel::{
-    auth::{capability::{Capability, CapabilitySet}, policy::Policy},
+    auth::{
+        capability::{Capability, CapabilitySet},
+        policy::Policy,
+    },
     types::Generation,
 };
-use lux_kernel::audit::AuditLog;
-use core::num::NonZeroU32;
 use proptest::prelude::*;
 
-fn node(n: u32) -> NonZeroU32 { NonZeroU32::new(n.max(1)).unwrap() }
+fn node(n: u32) -> NonZeroU32 {
+    NonZeroU32::new(n.max(1)).unwrap()
+}
 
 prop_compose! {
     fn arb_rights()(bits in 0u32..=0x1fu32) -> CapabilitySet {

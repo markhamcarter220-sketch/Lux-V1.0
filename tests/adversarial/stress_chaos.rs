@@ -3,23 +3,27 @@
 //! 10 attack vectors verifying Lux Kernel survives realistic load and
 //! failure conditions: sustained operations, saturation, and recovery.
 
+use core::num::NonZeroU32;
+use ed25519_dalek::{Signer, SigningKey};
 use lux_kernel::{
+    audit::{AuditLog, EventKind},
     auth::{
         capability::{Capability, CapabilitySet},
         policy::Policy,
     },
-    audit::{AuditLog, EventKind},
     boot::{BootCredentials, BootState, ManifestDecoder},
     error::Error,
     metabolism::ledger::Ledger,
     types::{Generation, Quota, MAX_AUDIT_EVENTS, MAX_REVOCATIONS, NONCE_WINDOW},
 };
-use core::num::NonZeroU32;
-use ed25519_dalek::{SigningKey, Signer};
 
-fn nz(n: u32) -> NonZeroU32 { NonZeroU32::new(n).unwrap() }
+fn nz(n: u32) -> NonZeroU32 {
+    NonZeroU32::new(n).unwrap()
+}
 
-fn test_key() -> SigningKey { SigningKey::from_bytes(&[0u8; 32]) }
+fn test_key() -> SigningKey {
+    SigningKey::from_bytes(&[0u8; 32])
+}
 
 fn minimal_cbor_payload() -> Vec<u8> {
     vec![0x83, 0x01, 0x80, 0x80] // CBOR [1, [], []]
@@ -72,7 +76,10 @@ fn attack_5_2_quota_saturation_produces_clean_denial() {
 
     // Post-exhaustion: 100 consecutive denials, no panic.
     for _ in 0..100 {
-        assert!(ledger.deduct(nz(1), 1).is_none(), "post-exhaustion deduction must fail");
+        assert!(
+            ledger.deduct(nz(1), 1).is_none(),
+            "post-exhaustion deduction must fail"
+        );
     }
 }
 
@@ -87,14 +94,21 @@ fn attack_5_3_nonce_window_fill_then_rotate_recovers_capacity() {
     // Fill all NONCE_WINDOW slots.
     for i in 0u64..NONCE_WINDOW as u64 {
         let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, i);
-        assert!(policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok(), "slot {i}");
+        assert!(
+            policy
+                .check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+                .is_ok(),
+            "slot {i}"
+        );
     }
 
     // Window exhausted.
     let overflow = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, 99_999);
     assert!(matches!(
         policy.check(&overflow, CapabilitySet::SCHEDULE, &mut AuditLog::new()),
-        Err(Error::CapabilityDenied { reason: "nonce window exhausted; rotate generation" })
+        Err(Error::CapabilityDenied {
+            reason: "nonce window exhausted; rotate generation"
+        })
     ));
 
     // Rotate — fresh window and fresh generation.
@@ -104,7 +118,9 @@ fn attack_5_3_nonce_window_fill_then_rotate_recovers_capacity() {
 
     // Nonce 0 is usable again.
     let fresh = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, new_gen, 0);
-    assert!(policy.check(&fresh, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
+    assert!(policy
+        .check(&fresh, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+        .is_ok());
 }
 
 // ── Attack 5.4 ────────────────────────────────────────────────────────────────
@@ -117,10 +133,14 @@ fn attack_5_4_rotation_clears_revocations_and_nonce_window_atomically() {
     let mut policy = Policy::new(gen);
 
     // Revoke some, use some.
-    for nonce in [10u64, 20, 30] { policy.revoke_capability(nonce); }
+    for nonce in [10u64, 20, 30] {
+        policy.revoke_capability(nonce);
+    }
     for nonce in [100u64, 200, 300] {
         let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, nonce);
-        assert!(policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
+        assert!(policy
+            .check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+            .is_ok());
     }
     assert!(policy.is_revoked(10));
 
@@ -129,15 +149,22 @@ fn attack_5_4_rotation_clears_revocations_and_nonce_window_atomically() {
     let new_gen = policy.generation();
 
     // Revocations cleared.
-    assert!(!policy.is_revoked(10), "revocation must be cleared after rotation");
+    assert!(
+        !policy.is_revoked(10),
+        "revocation must be cleared after rotation"
+    );
 
     // Old-gen cap stale.
     let stale = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, 999);
-    assert!(policy.check(&stale, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err());
+    assert!(policy
+        .check(&stale, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+        .is_err());
 
     // New-gen cap with a previously-revoked nonce now works.
     let fresh = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, new_gen, 10);
-    assert!(policy.check(&fresh, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
+    assert!(policy
+        .check(&fresh, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+        .is_ok());
 }
 
 // ── Attack 5.5 ────────────────────────────────────────────────────────────────
@@ -153,16 +180,22 @@ fn attack_5_5_failed_boot_leaves_no_partial_state_recovery_succeeds() {
     for bad in [
         vec![],
         vec![0xffu8; 64],
-        vec![0u8; 63],                    // 1 byte short of minimum
+        vec![0u8; 63], // 1 byte short of minimum
         b"not cbor at all".to_vec(),
     ] {
-        assert!(BootState::initialise(&bad, &creds).is_err(), "bad manifest must fail");
+        assert!(
+            BootState::initialise(&bad, &creds).is_err(),
+            "bad manifest must fail"
+        );
     }
 
     // Valid manifest succeeds after all failures.
     let payload = minimal_cbor_payload();
     let wire = signed_wire(&payload, &sk);
-    assert!(BootState::initialise(&wire, &creds).is_ok(), "valid manifest must succeed");
+    assert!(
+        BootState::initialise(&wire, &creds).is_ok(),
+        "valid manifest must succeed"
+    );
 }
 
 // ── Attack 5.6 ────────────────────────────────────────────────────────────────
@@ -175,12 +208,16 @@ fn attack_5_6_quota_exhaustion_does_not_cascade_to_peer_nodes() {
     ledger.seed(nz(2), Quota::new(10));
 
     // Exhaust node 1.
-    for _ in 0..10 { assert!(ledger.deduct(nz(1), 1).is_some()); }
+    for _ in 0..10 {
+        assert!(ledger.deduct(nz(1), 1).is_some());
+    }
     assert!(ledger.deduct(nz(1), 1).is_none());
 
     // Node 2 completely isolated.
     assert_eq!(ledger.balance(nz(2)), Some(10));
-    for _ in 0..10 { assert!(ledger.deduct(nz(2), 1).is_some()); }
+    for _ in 0..10 {
+        assert!(ledger.deduct(nz(2), 1).is_some());
+    }
     assert_eq!(ledger.balance(nz(2)), Some(0));
 }
 
@@ -195,7 +232,9 @@ fn attack_5_7_revocation_ledger_at_max_capacity_no_panic() {
     // Fill revocation ledger.
     let mut filled = 0usize;
     for i in 0u64..MAX_REVOCATIONS as u64 {
-        if policy.revoke_capability(i) { filled += 1; }
+        if policy.revoke_capability(i) {
+            filled += 1;
+        }
     }
     assert_eq!(filled, MAX_REVOCATIONS);
 
@@ -206,7 +245,9 @@ fn attack_5_7_revocation_ledger_at_max_capacity_no_panic() {
     for nonce in 0u64..10 {
         let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, nonce);
         assert!(
-            policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err(),
+            policy
+                .check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+                .is_err(),
             "revoked nonce {nonce} must remain denied"
         );
     }
@@ -227,9 +268,20 @@ fn attack_5_8_audit_log_at_capacity_no_overwrite_chain_intact() {
     assert_eq!(log.len(), MAX_AUDIT_EVENTS);
 
     // Overflow: must return false, not panic.
-    assert!(!log.append(EventKind::CapabilityRevoked, 9999, 0, Some((lux_kernel::audit::DenialClass::Halt, "revoked"))),
-        "overflow append must return false");
-    assert_eq!(log.len(), MAX_AUDIT_EVENTS, "length must not exceed capacity");
+    assert!(
+        !log.append(
+            EventKind::CapabilityRevoked,
+            9999,
+            0,
+            Some((lux_kernel::audit::DenialClass::Halt, "revoked"))
+        ),
+        "overflow append must return false"
+    );
+    assert_eq!(
+        log.len(),
+        MAX_AUDIT_EVENTS,
+        "length must not exceed capacity"
+    );
 
     // Chain must still be valid.
     assert!(log.verify_chain(), "hash chain must be valid at capacity");
@@ -237,7 +289,10 @@ fn attack_5_8_audit_log_at_capacity_no_overwrite_chain_intact() {
     // Events preserved in insertion order.
     let events: Vec<_> = log.events().collect();
     assert_eq!(events[0].actor, 0);
-    assert_eq!(events[MAX_AUDIT_EVENTS - 1].actor, (MAX_AUDIT_EVENTS - 1) as u32);
+    assert_eq!(
+        events[MAX_AUDIT_EVENTS - 1].actor,
+        (MAX_AUDIT_EVENTS - 1) as u32
+    );
 }
 
 // ── Attack 5.9 ────────────────────────────────────────────────────────────────
@@ -278,11 +333,17 @@ fn attack_5_10_kernel_recovers_from_repeated_failed_boots() {
         b"\x83\x01\x80\x80", // valid CBOR but no signature prefix
     ];
     for bad in bad_manifests {
-        assert!(BootState::initialise(bad, &creds).is_err(), "bad manifest must fail: {bad:02x?}");
+        assert!(
+            BootState::initialise(bad, &creds).is_err(),
+            "bad manifest must fail: {bad:02x?}"
+        );
     }
 
     // Valid boot after all failures.
     let payload = minimal_cbor_payload();
     let wire = signed_wire(&payload, &sk);
-    assert!(BootState::initialise(&wire, &creds).is_ok(), "valid boot must succeed after failures");
+    assert!(
+        BootState::initialise(&wire, &creds).is_ok(),
+        "valid boot must succeed after failures"
+    );
 }

@@ -85,7 +85,9 @@ impl SoftwareKeyStore {
     /// Returns the verifying key bytes for the primary signing key, if any.
     #[must_use]
     pub fn verifying_key_bytes(&self) -> Option<[u8; 32]> {
-        self.primary.as_ref().map(|sk| sk.verifying_key().to_bytes())
+        self.primary
+            .as_ref()
+            .map(|sk| sk.verifying_key().to_bytes())
     }
 }
 
@@ -130,7 +132,9 @@ impl HsmProvider for SoftwareKeyStore {
         )?;
         let sig = Signature::from_bytes(sig);
         vk.verify_strict(payload, &sig)
-            .map_err(|_| Error::ManifestInvalid { detail: "Ed25519 signature verification failed" })
+            .map_err(|_| Error::ManifestInvalid {
+                detail: "Ed25519 signature verification failed",
+            })
     }
 }
 
@@ -146,9 +150,12 @@ impl KeyManagement for SoftwareKeyStore {
             h.finalize().into()
         };
         let handle = KeyHandle(handle_bytes);
-        self.keys.lock().map_err(|_| Error::CapabilityDenied {
-            reason: "SoftwareKeyStore: key store mutex poisoned",
-        })?.insert(handle_bytes, ZeroizingSigningKey(signing_key));
+        self.keys
+            .lock()
+            .map_err(|_| Error::CapabilityDenied {
+                reason: "SoftwareKeyStore: key store mutex poisoned",
+            })?
+            .insert(handle_bytes, ZeroizingSigningKey(signing_key));
         seed.zeroize();
         Ok(handle)
     }
@@ -159,7 +166,9 @@ impl KeyManagement for SoftwareKeyStore {
             reason: "SoftwareKeyStore: key store mutex poisoned",
         })?;
         guard.get(&handle.0).map_or(
-            Err(Error::CapabilityDenied { reason: "SoftwareKeyStore: key handle not found" }),
+            Err(Error::CapabilityDenied {
+                reason: "SoftwareKeyStore: key handle not found",
+            }),
             |zk| Ok(zk.0.sign(payload).to_bytes()),
         )
     }
@@ -183,9 +192,10 @@ impl KeyManagement for SoftwareKeyStore {
             .0
             .verifying_key();
         let signature = Signature::from_bytes(sig);
-        vk.verify_strict(payload, &signature).map_err(|_| Error::ManifestInvalid {
-            detail: "HSM capability signature verification failed",
-        })
+        vk.verify_strict(payload, &signature)
+            .map_err(|_| Error::ManifestInvalid {
+                detail: "HSM capability signature verification failed",
+            })
     }
 
     fn list_keys(&self) -> Result<Vec<KeyHandle>> {

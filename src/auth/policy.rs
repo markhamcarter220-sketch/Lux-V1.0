@@ -65,7 +65,10 @@ impl Policy {
     ) -> Result<()> {
         let actor = cap.target.get();
         let result = self.check_inner(cap, required_right);
-        let denial = result.as_ref().err().map(|e| (e.denial_class(), e.denial_reason_str()));
+        let denial = result
+            .as_ref()
+            .err()
+            .map(|e| (e.denial_class(), e.denial_reason_str()));
         audit.append(EventKind::CapabilityCheck, actor, 0, denial);
         result
     }
@@ -80,12 +83,16 @@ impl Policy {
 
         // Step 2: revocation check (pre-use denial).
         if self.revocation.is_revoked(cap.nonce) {
-            return Err(Error::CapabilityDenied { reason: "capability revoked" });
+            return Err(Error::CapabilityDenied {
+                reason: "capability revoked",
+            });
         }
 
         // Step 3: nonce replay.
         if self.used_nonces.contains(&cap.nonce) {
-            return Err(Error::CapabilityDenied { reason: "nonce replayed" });
+            return Err(Error::CapabilityDenied {
+                reason: "nonce replayed",
+            });
         }
 
         // Step 4: record nonce — fail-closed on window exhaustion.

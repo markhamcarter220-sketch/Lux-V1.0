@@ -9,10 +9,8 @@ use std::num::NonZeroU32;
 use lux_kernel::{
     auth::capability::{Capability, CapabilitySet},
     hsm::{
-        mock::SoftwareHsm,
-        pkcs11::Pkcs11HsmProvider,
-        yubihsm::YubiHsmProvider,
-        HsmProvider, HsmSignedCapability, KeyManagement, SoftwareKeyStore,
+        mock::SoftwareHsm, pkcs11::Pkcs11HsmProvider, yubihsm::YubiHsmProvider, HsmProvider,
+        HsmSignedCapability, KeyManagement, SoftwareKeyStore,
     },
     types::Generation,
 };
@@ -56,7 +54,9 @@ fn software_hsm_verify_only_rejects_sign() {
     let full = SoftwareHsm::from_signing_key(seed);
     let vk_bytes = full.verifying_key_bytes();
     let verify_only = SoftwareHsm::from_verifying_key(vk_bytes).expect("valid verifying key");
-    let err = verify_only.sign(b"payload").expect_err("sign should fail on verify-only");
+    let err = verify_only
+        .sign(b"payload")
+        .expect_err("sign should fail on verify-only");
     assert!(
         matches!(err, lux_kernel::Error::CapabilityDenied { .. }),
         "expected CapabilityDenied, got {err:?}"
@@ -103,7 +103,9 @@ fn key_store_sign_and_verify_capability() {
     let handle = store.generate_keypair().expect("generate keypair");
     let payload = b"capability signing payload";
     let sig = store.sign_capability(&handle, payload).expect("sign");
-    store.verify_capability_signature(&handle, payload, &sig).expect("verify");
+    store
+        .verify_capability_signature(&handle, payload, &sig)
+        .expect("verify");
 }
 
 // ── Test 7: tampered payload fails verify ────────────────────────────────────
@@ -112,7 +114,9 @@ fn key_store_sign_and_verify_capability() {
 fn key_store_verify_with_wrong_payload_fails() {
     let store = SoftwareKeyStore::new();
     let handle = store.generate_keypair().expect("generate keypair");
-    let sig = store.sign_capability(&handle, b"original payload").expect("sign");
+    let sig = store
+        .sign_capability(&handle, b"original payload")
+        .expect("sign");
     let err = store
         .verify_capability_signature(&handle, b"tampered payload", &sig)
         .expect_err("verify with wrong payload should fail");
@@ -148,7 +152,10 @@ fn key_store_list_keys_includes_generated() {
     let store = SoftwareKeyStore::new();
     let handle = store.generate_keypair().expect("generate keypair");
     let keys = store.list_keys().expect("list_keys");
-    assert!(keys.contains(&handle), "list_keys should include newly-generated handle");
+    assert!(
+        keys.contains(&handle),
+        "list_keys should include newly-generated handle"
+    );
 }
 
 // ── Test 10: rotate_key returns a different handle ───────────────────────────
@@ -158,7 +165,10 @@ fn key_store_rotate_key_returns_new_handle() {
     let store = SoftwareKeyStore::new();
     let old_handle = store.generate_keypair().expect("generate keypair");
     let new_handle = store.rotate_key(&old_handle).expect("rotate key");
-    assert_ne!(old_handle, new_handle, "rotated handle should differ from old handle");
+    assert_ne!(
+        old_handle, new_handle,
+        "rotated handle should differ from old handle"
+    );
 }
 
 // ── Test 11: old handle invalid after rotation ───────────────────────────────
@@ -213,7 +223,9 @@ fn hsm_signed_capability_tampered_payload_rejected() {
     let mut signed = HsmSignedCapability::sign(cap, &handle, &store).expect("sign capability");
     // Corrupt one byte of the signature.
     signed.signature[0] ^= 0x01;
-    let err = signed.verify(&store).expect_err("verify with tampered sig should fail");
+    let err = signed
+        .verify(&store)
+        .expect_err("verify with tampered sig should fail");
     assert!(
         matches!(err, lux_kernel::Error::ManifestInvalid { .. }),
         "expected ManifestInvalid, got {err:?}"
@@ -226,18 +238,35 @@ fn hsm_signed_capability_tampered_payload_rejected() {
 fn yubihsm_stub_returns_error() {
     let provider = YubiHsmProvider::new_stub();
 
-    assert!(provider.generate_capability_seed().is_err(), "seed should fail");
-    assert!(provider.sign(b"test").is_err(), "sign should fail");
-    assert!(provider.verify(b"test", &[0u8; 64]).is_err(), "verify should fail");
-    assert!(provider.generate_keypair().is_err(), "generate_keypair should fail");
-    let fake_handle = lux_kernel::hsm::KeyHandle([0u8; 32]);
-    assert!(provider.sign_capability(&fake_handle, b"test").is_err(), "sign_capability should fail");
     assert!(
-        provider.verify_capability_signature(&fake_handle, b"test", &[0u8; 64]).is_err(),
+        provider.generate_capability_seed().is_err(),
+        "seed should fail"
+    );
+    assert!(provider.sign(b"test").is_err(), "sign should fail");
+    assert!(
+        provider.verify(b"test", &[0u8; 64]).is_err(),
+        "verify should fail"
+    );
+    assert!(
+        provider.generate_keypair().is_err(),
+        "generate_keypair should fail"
+    );
+    let fake_handle = lux_kernel::hsm::KeyHandle([0u8; 32]);
+    assert!(
+        provider.sign_capability(&fake_handle, b"test").is_err(),
+        "sign_capability should fail"
+    );
+    assert!(
+        provider
+            .verify_capability_signature(&fake_handle, b"test", &[0u8; 64])
+            .is_err(),
         "verify_capability_signature should fail"
     );
     assert!(provider.list_keys().is_err(), "list_keys should fail");
-    assert!(provider.rotate_key(&fake_handle).is_err(), "rotate_key should fail");
+    assert!(
+        provider.rotate_key(&fake_handle).is_err(),
+        "rotate_key should fail"
+    );
 }
 
 // ── Test 16: Pkcs11HsmProvider stub returns error ────────────────────────────
@@ -246,16 +275,33 @@ fn yubihsm_stub_returns_error() {
 fn pkcs11_stub_returns_error() {
     let provider = Pkcs11HsmProvider::new_stub(None);
 
-    assert!(provider.generate_capability_seed().is_err(), "seed should fail");
-    assert!(provider.sign(b"test").is_err(), "sign should fail");
-    assert!(provider.verify(b"test", &[0u8; 64]).is_err(), "verify should fail");
-    assert!(provider.generate_keypair().is_err(), "generate_keypair should fail");
-    let fake_handle = lux_kernel::hsm::KeyHandle([0u8; 32]);
-    assert!(provider.sign_capability(&fake_handle, b"test").is_err(), "sign_capability should fail");
     assert!(
-        provider.verify_capability_signature(&fake_handle, b"test", &[0u8; 64]).is_err(),
+        provider.generate_capability_seed().is_err(),
+        "seed should fail"
+    );
+    assert!(provider.sign(b"test").is_err(), "sign should fail");
+    assert!(
+        provider.verify(b"test", &[0u8; 64]).is_err(),
+        "verify should fail"
+    );
+    assert!(
+        provider.generate_keypair().is_err(),
+        "generate_keypair should fail"
+    );
+    let fake_handle = lux_kernel::hsm::KeyHandle([0u8; 32]);
+    assert!(
+        provider.sign_capability(&fake_handle, b"test").is_err(),
+        "sign_capability should fail"
+    );
+    assert!(
+        provider
+            .verify_capability_signature(&fake_handle, b"test", &[0u8; 64])
+            .is_err(),
         "verify_capability_signature should fail"
     );
     assert!(provider.list_keys().is_err(), "list_keys should fail");
-    assert!(provider.rotate_key(&fake_handle).is_err(), "rotate_key should fail");
+    assert!(
+        provider.rotate_key(&fake_handle).is_err(),
+        "rotate_key should fail"
+    );
 }

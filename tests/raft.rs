@@ -23,7 +23,9 @@ struct MockTransport {
 
 impl MockTransport {
     fn new() -> Self {
-        Self { sent: heapless::Vec::new() }
+        Self {
+            sent: heapless::Vec::new(),
+        }
     }
 
     fn sent(&self) -> &[(NodeId, RaftMessage)] {
@@ -60,7 +62,10 @@ fn single_node_election_becomes_leader_immediately() {
     let mut t = MockTransport::new();
     n.start_election(&mut t);
     assert!(n.is_leader(), "single-node must become leader immediately");
-    assert!(t.sent().is_empty(), "no messages needed for single-node election");
+    assert!(
+        t.sent().is_empty(),
+        "no messages needed for single-node election"
+    );
 }
 
 #[test]
@@ -93,11 +98,24 @@ fn two_node_election_with_grant_becomes_leader() {
     let mut t = MockTransport::new();
 
     n.start_election(&mut t);
-    assert!(!n.is_leader(), "must wait for vote before claiming leadership");
+    assert!(
+        !n.is_leader(),
+        "must wait for vote before claiming leadership"
+    );
 
     // Peer grants vote.
-    let _ = n.step(node(2), RaftMessage::RequestVoteReply { term: 1, vote_granted: true }, &mut t);
-    assert!(n.is_leader(), "must become leader after receiving quorum votes");
+    let _ = n.step(
+        node(2),
+        RaftMessage::RequestVoteReply {
+            term: 1,
+            vote_granted: true,
+        },
+        &mut t,
+    );
+    assert!(
+        n.is_leader(),
+        "must become leader after receiving quorum votes"
+    );
 }
 
 #[test]
@@ -108,7 +126,14 @@ fn two_node_election_with_denial_stays_candidate() {
     let mut t = MockTransport::new();
 
     n.start_election(&mut t);
-    let _ = n.step(node(2), RaftMessage::RequestVoteReply { term: 1, vote_granted: false }, &mut t);
+    let _ = n.step(
+        node(2),
+        RaftMessage::RequestVoteReply {
+            term: 1,
+            vote_granted: false,
+        },
+        &mut t,
+    );
     assert!(!n.is_leader(), "denied vote must not produce leader");
     assert_eq!(n.role(), RaftRole::Candidate);
 }
@@ -122,8 +147,19 @@ fn higher_term_vote_reply_reverts_to_follower() {
 
     n.start_election(&mut t);
     // Peer reports a higher term.
-    let _ = n.step(node(2), RaftMessage::RequestVoteReply { term: 99, vote_granted: false }, &mut t);
-    assert_eq!(n.role(), RaftRole::Follower, "higher term must revert to follower");
+    let _ = n.step(
+        node(2),
+        RaftMessage::RequestVoteReply {
+            term: 99,
+            vote_granted: false,
+        },
+        &mut t,
+    );
+    assert_eq!(
+        n.role(),
+        RaftRole::Follower,
+        "higher term must revert to follower"
+    );
 }
 
 // ── Three-node elections (N=3, quorum=2) ──────────────────────────────────────
@@ -138,8 +174,18 @@ fn three_node_one_grant_suffices_for_leadership() {
     let mut t = MockTransport::new();
 
     n.start_election(&mut t);
-    let _ = n.step(node(2), RaftMessage::RequestVoteReply { term: 1, vote_granted: true }, &mut t);
-    assert!(n.is_leader(), "one peer grant + self = quorum of 2 → leader");
+    let _ = n.step(
+        node(2),
+        RaftMessage::RequestVoteReply {
+            term: 1,
+            vote_granted: true,
+        },
+        &mut t,
+    );
+    assert!(
+        n.is_leader(),
+        "one peer grant + self = quorum of 2 → leader"
+    );
 }
 
 #[test]
@@ -151,8 +197,22 @@ fn three_node_no_grants_stays_candidate() {
     let mut t = MockTransport::new();
 
     n.start_election(&mut t);
-    let _ = n.step(node(2), RaftMessage::RequestVoteReply { term: 1, vote_granted: false }, &mut t);
-    let _ = n.step(node(3), RaftMessage::RequestVoteReply { term: 1, vote_granted: false }, &mut t);
+    let _ = n.step(
+        node(2),
+        RaftMessage::RequestVoteReply {
+            term: 1,
+            vote_granted: false,
+        },
+        &mut t,
+    );
+    let _ = n.step(
+        node(3),
+        RaftMessage::RequestVoteReply {
+            term: 1,
+            vote_granted: false,
+        },
+        &mut t,
+    );
     assert!(!n.is_leader(), "zero grants must not produce leader");
 }
 
@@ -167,14 +227,25 @@ fn two_node_commit_after_peer_ack() {
     let mut t = MockTransport::new();
 
     n.start_election(&mut t);
-    let _ = n.step(node(2), RaftMessage::RequestVoteReply { term: 1, vote_granted: true }, &mut t);
+    let _ = n.step(
+        node(2),
+        RaftMessage::RequestVoteReply {
+            term: 1,
+            vote_granted: true,
+        },
+        &mut t,
+    );
     n.propose(node(1), node(2), &mut t).unwrap();
 
     assert_eq!(n.commit_index(), 0, "not yet committed before ack");
 
     let committed = n.step(
         node(2),
-        RaftMessage::AppendEntriesReply { term: 1, success: true, match_index: 1 },
+        RaftMessage::AppendEntriesReply {
+            term: 1,
+            success: true,
+            match_index: 1,
+        },
         &mut t,
     );
     assert!(committed.is_some(), "ack from quorum must commit");
@@ -189,7 +260,14 @@ fn two_node_no_commit_without_ack() {
     let mut t = MockTransport::new();
 
     n.start_election(&mut t);
-    let _ = n.step(node(2), RaftMessage::RequestVoteReply { term: 1, vote_granted: true }, &mut t);
+    let _ = n.step(
+        node(2),
+        RaftMessage::RequestVoteReply {
+            term: 1,
+            vote_granted: true,
+        },
+        &mut t,
+    );
     n.propose(node(1), node(2), &mut t).unwrap();
 
     assert_eq!(n.commit_index(), 0, "must not commit without ack");
@@ -205,15 +283,29 @@ fn three_node_commit_after_one_ack() {
     let mut t = MockTransport::new();
 
     n.start_election(&mut t);
-    let _ = n.step(node(2), RaftMessage::RequestVoteReply { term: 1, vote_granted: true }, &mut t);
+    let _ = n.step(
+        node(2),
+        RaftMessage::RequestVoteReply {
+            term: 1,
+            vote_granted: true,
+        },
+        &mut t,
+    );
     n.propose(node(1), node(2), &mut t).unwrap();
 
     let committed = n.step(
         node(2),
-        RaftMessage::AppendEntriesReply { term: 1, success: true, match_index: 1 },
+        RaftMessage::AppendEntriesReply {
+            term: 1,
+            success: true,
+            match_index: 1,
+        },
         &mut t,
     );
-    assert!(committed.is_some(), "one peer ack achieves quorum of 2 in N=3 cluster");
+    assert!(
+        committed.is_some(),
+        "one peer ack achieves quorum of 2 in N=3 cluster"
+    );
 }
 
 #[test]
@@ -234,7 +326,11 @@ fn follower_accepts_valid_append_entries() {
     let mut t = MockTransport::new();
 
     let mut entries: heapless::Vec<LogEntry, 16> = heapless::Vec::new();
-    let _ = entries.push(LogEntry { term: 1, src: node(1), dst: node(2) });
+    let _ = entries.push(LogEntry {
+        term: 1,
+        src: node(1),
+        dst: node(2),
+    });
 
     let _ = n.step(
         node(2),
@@ -252,7 +348,14 @@ fn follower_accepts_valid_append_entries() {
     let sent = t.sent();
     assert_eq!(sent.len(), 1);
     assert!(
-        matches!(sent[0].1, RaftMessage::AppendEntriesReply { success: true, match_index: 1, .. }),
+        matches!(
+            sent[0].1,
+            RaftMessage::AppendEntriesReply {
+                success: true,
+                match_index: 1,
+                ..
+            }
+        ),
         "valid AppendEntries must be accepted"
     );
     assert_eq!(n.log_len(), 1, "entry must have been appended");
@@ -262,16 +365,19 @@ fn follower_accepts_valid_append_entries() {
 fn follower_rejects_stale_term_append_entries() {
     let mut ps = PeerSet::new();
     ps.add(node(2)).unwrap();
-    let mut n  = RaftNode::new(node(1), &ps);
-    let mut t  = MockTransport::new();
+    let mut n = RaftNode::new(node(1), &ps);
+    let mut t = MockTransport::new();
 
     // Advance term to 5 via a high-term AppendEntries.
     let _ = n.step(
         node(2),
         RaftMessage::AppendEntries {
-            term: 5, leader_id: node(2),
-            prev_log_index: 0, prev_log_term: 0,
-            entries: heapless::Vec::new(), leader_commit: 0,
+            term: 5,
+            leader_id: node(2),
+            prev_log_index: 0,
+            prev_log_term: 0,
+            entries: heapless::Vec::new(),
+            leader_commit: 0,
         },
         &mut t,
     );
@@ -281,16 +387,22 @@ fn follower_rejects_stale_term_append_entries() {
     let _ = n.step(
         node(2),
         RaftMessage::AppendEntries {
-            term: 2, leader_id: node(2),
-            prev_log_index: 0, prev_log_term: 0,
-            entries: heapless::Vec::new(), leader_commit: 0,
+            term: 2,
+            leader_id: node(2),
+            prev_log_index: 0,
+            prev_log_term: 0,
+            entries: heapless::Vec::new(),
+            leader_commit: 0,
         },
         &mut t,
     );
 
     let latest = &t.sent()[sent_before];
     assert!(
-        matches!(latest.1, RaftMessage::AppendEntriesReply { success: false, .. }),
+        matches!(
+            latest.1,
+            RaftMessage::AppendEntriesReply { success: false, .. }
+        ),
         "stale-term AppendEntries must be rejected"
     );
 }
@@ -301,20 +413,30 @@ fn follower_updates_commit_index_from_leader() {
     let mut t = MockTransport::new();
 
     let mut entries: heapless::Vec<LogEntry, 16> = heapless::Vec::new();
-    let _ = entries.push(LogEntry { term: 1, src: node(1), dst: node(2) });
+    let _ = entries.push(LogEntry {
+        term: 1,
+        src: node(1),
+        dst: node(2),
+    });
 
     let _ = n.step(
         node(2),
         RaftMessage::AppendEntries {
-            term: 1, leader_id: node(2),
-            prev_log_index: 0, prev_log_term: 0,
+            term: 1,
+            leader_id: node(2),
+            prev_log_index: 0,
+            prev_log_term: 0,
             entries,
             leader_commit: 1,
         },
         &mut t,
     );
 
-    assert_eq!(n.commit_index(), 1, "follower must advance commit_index from leader_commit");
+    assert_eq!(
+        n.commit_index(),
+        1,
+        "follower must advance commit_index from leader_commit"
+    );
 }
 
 // ── Follower vote granting ────────────────────────────────────────────────────
@@ -327,13 +449,22 @@ fn follower_grants_vote_to_up_to_date_candidate() {
     let _ = n.step(
         node(2),
         RaftMessage::RequestVote {
-            term: 1, candidate_id: node(2), last_log_index: 0, last_log_term: 0,
+            term: 1,
+            candidate_id: node(2),
+            last_log_index: 0,
+            last_log_term: 0,
         },
         &mut t,
     );
 
     assert!(
-        matches!(t.sent()[0].1, RaftMessage::RequestVoteReply { vote_granted: true, .. }),
+        matches!(
+            t.sent()[0].1,
+            RaftMessage::RequestVoteReply {
+                vote_granted: true,
+                ..
+            }
+        ),
         "must grant vote to first valid candidate"
     );
 }
@@ -342,16 +473,19 @@ fn follower_grants_vote_to_up_to_date_candidate() {
 fn follower_denies_vote_for_stale_term() {
     let mut ps = PeerSet::new();
     ps.add(node(2)).unwrap();
-    let mut n  = RaftNode::new(node(1), &ps);
-    let mut t  = MockTransport::new();
+    let mut n = RaftNode::new(node(1), &ps);
+    let mut t = MockTransport::new();
 
     // Advance to term 5 via AppendEntries.
     let _ = n.step(
         node(2),
         RaftMessage::AppendEntries {
-            term: 5, leader_id: node(2),
-            prev_log_index: 0, prev_log_term: 0,
-            entries: heapless::Vec::new(), leader_commit: 0,
+            term: 5,
+            leader_id: node(2),
+            prev_log_index: 0,
+            prev_log_term: 0,
+            entries: heapless::Vec::new(),
+            leader_commit: 0,
         },
         &mut t,
     );
@@ -360,14 +494,23 @@ fn follower_denies_vote_for_stale_term() {
     let _ = n.step(
         node(3),
         RaftMessage::RequestVote {
-            term: 2, candidate_id: node(3), last_log_index: 0, last_log_term: 0,
+            term: 2,
+            candidate_id: node(3),
+            last_log_index: 0,
+            last_log_term: 0,
         },
         &mut t,
     );
 
     let last = t.sent().last().unwrap();
     assert!(
-        matches!(last.1, RaftMessage::RequestVoteReply { vote_granted: false, .. }),
+        matches!(
+            last.1,
+            RaftMessage::RequestVoteReply {
+                vote_granted: false,
+                ..
+            }
+        ),
         "stale-term RequestVote must be denied"
     );
 }
@@ -381,22 +524,40 @@ fn follower_denies_second_vote_in_same_term() {
     let _ = n.step(
         node(2),
         RaftMessage::RequestVote {
-            term: 1, candidate_id: node(2), last_log_index: 0, last_log_term: 0,
+            term: 1,
+            candidate_id: node(2),
+            last_log_index: 0,
+            last_log_term: 0,
         },
         &mut t,
     );
-    assert!(matches!(t.sent()[0].1, RaftMessage::RequestVoteReply { vote_granted: true, .. }));
+    assert!(matches!(
+        t.sent()[0].1,
+        RaftMessage::RequestVoteReply {
+            vote_granted: true,
+            ..
+        }
+    ));
 
     // Different candidate in the same term — must be denied.
     let _ = n.step(
         node(3),
         RaftMessage::RequestVote {
-            term: 1, candidate_id: node(3), last_log_index: 0, last_log_term: 0,
+            term: 1,
+            candidate_id: node(3),
+            last_log_index: 0,
+            last_log_term: 0,
         },
         &mut t,
     );
     assert!(
-        matches!(t.sent()[1].1, RaftMessage::RequestVoteReply { vote_granted: false, .. }),
+        matches!(
+            t.sent()[1].1,
+            RaftMessage::RequestVoteReply {
+                vote_granted: false,
+                ..
+            }
+        ),
         "already-voted term must not grant a second vote"
     );
 }
@@ -407,8 +568,8 @@ fn follower_denies_second_vote_in_same_term() {
 fn candidate_reverts_to_follower_on_higher_term_ae() {
     let mut ps = PeerSet::new();
     ps.add(node(2)).unwrap();
-    let mut n  = RaftNode::new(node(1), &ps);
-    let mut t  = MockTransport::new();
+    let mut n = RaftNode::new(node(1), &ps);
+    let mut t = MockTransport::new();
 
     n.start_election(&mut t); // now Candidate in term 1
 
@@ -416,33 +577,55 @@ fn candidate_reverts_to_follower_on_higher_term_ae() {
     let _ = n.step(
         node(2),
         RaftMessage::AppendEntries {
-            term: 3, leader_id: node(2),
-            prev_log_index: 0, prev_log_term: 0,
-            entries: heapless::Vec::new(), leader_commit: 0,
+            term: 3,
+            leader_id: node(2),
+            prev_log_index: 0,
+            prev_log_term: 0,
+            entries: heapless::Vec::new(),
+            leader_commit: 0,
         },
         &mut t,
     );
 
-    assert_eq!(n.role(), RaftRole::Follower, "higher-term AE must revert candidate to follower");
+    assert_eq!(
+        n.role(),
+        RaftRole::Follower,
+        "higher-term AE must revert candidate to follower"
+    );
 }
 
 #[test]
 fn leader_reverts_to_follower_on_higher_term_ae_reply() {
     let mut ps = PeerSet::new();
     ps.add(node(2)).unwrap();
-    let mut n  = RaftNode::new(node(1), &ps);
-    let mut t  = MockTransport::new();
+    let mut n = RaftNode::new(node(1), &ps);
+    let mut t = MockTransport::new();
 
     // Elect as leader.
     n.start_election(&mut t);
-    let _ = n.step(node(2), RaftMessage::RequestVoteReply { term: 1, vote_granted: true }, &mut t);
+    let _ = n.step(
+        node(2),
+        RaftMessage::RequestVoteReply {
+            term: 1,
+            vote_granted: true,
+        },
+        &mut t,
+    );
     assert!(n.is_leader());
 
     // Receive AppendEntriesReply with higher term.
     let _ = n.step(
         node(2),
-        RaftMessage::AppendEntriesReply { term: 9, success: false, match_index: 0 },
+        RaftMessage::AppendEntriesReply {
+            term: 9,
+            success: false,
+            match_index: 0,
+        },
         &mut t,
     );
-    assert_eq!(n.role(), RaftRole::Follower, "higher-term reply must demote leader");
+    assert_eq!(
+        n.role(),
+        RaftRole::Follower,
+        "higher-term reply must demote leader"
+    );
 }

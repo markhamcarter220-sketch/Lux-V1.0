@@ -7,7 +7,7 @@
 //! Test signing uses a deterministic key derived from a fixed 32-byte seed so
 //! that tests are reproducible without `OsRng`.
 
-use ed25519_dalek::{SigningKey, Signer};
+use ed25519_dalek::{Signer, SigningKey};
 use lux_kernel::boot::{BootCredentials, ManifestDecoder};
 use lux_kernel::error::Error;
 
@@ -96,21 +96,23 @@ fn other_key() -> SigningKey {
 fn valid_minimal_manifest_empty_edges_and_quotas() {
     let (sk, creds) = test_key();
     let payload = encode_payload(1, &[], &[]);
-    let wire    = make_wire(&payload, &sk);
+    let wire = make_wire(&payload, &sk);
 
     let m = ManifestDecoder::decode(&wire, &creds).unwrap();
     assert_eq!(m.version(), 1);
-    assert!(m.permits_edge(
-        core::num::NonZeroU32::new(1).unwrap(),
-        core::num::NonZeroU32::new(2).unwrap()
-    ) == false);
+    assert!(
+        m.permits_edge(
+            core::num::NonZeroU32::new(1).unwrap(),
+            core::num::NonZeroU32::new(2).unwrap()
+        ) == false
+    );
 }
 
 #[test]
 fn valid_single_edge_single_quota() {
     let (sk, creds) = test_key();
     let payload = encode_payload(2, &[(1, 2)], &[(1, 1000)]);
-    let wire    = make_wire(&payload, &sk);
+    let wire = make_wire(&payload, &sk);
 
     let m = ManifestDecoder::decode(&wire, &creds).unwrap();
     assert_eq!(m.version(), 2);
@@ -123,10 +125,10 @@ fn valid_single_edge_single_quota() {
 #[test]
 fn valid_multi_edge_multi_quota() {
     let (sk, creds) = test_key();
-    let edges  = &[(1, 2), (1, 3), (2, 3)];
+    let edges = &[(1, 2), (1, 3), (2, 3)];
     let quotas = &[(1, 500), (2, 250), (3, 750)];
     let payload = encode_payload(3, edges, quotas);
-    let wire    = make_wire(&payload, &sk);
+    let wire = make_wire(&payload, &sk);
 
     let m = ManifestDecoder::decode(&wire, &creds).unwrap();
     assert_eq!(m.version(), 3);
@@ -140,7 +142,7 @@ fn valid_multi_edge_multi_quota() {
 fn valid_large_quota_u64_max() {
     let (sk, creds) = test_key();
     let payload = encode_payload(1, &[], &[(1, u64::MAX)]);
-    let wire    = make_wire(&payload, &sk);
+    let wire = make_wire(&payload, &sk);
 
     let m = ManifestDecoder::decode(&wire, &creds).unwrap();
     let n1 = core::num::NonZeroU32::new(1).unwrap();
@@ -151,7 +153,7 @@ fn valid_large_quota_u64_max() {
 fn valid_version_zero_accepted() {
     let (sk, creds) = test_key();
     let payload = encode_payload(0, &[(1, 2)], &[]);
-    let wire    = make_wire(&payload, &sk);
+    let wire = make_wire(&payload, &sk);
 
     assert!(ManifestDecoder::decode(&wire, &creds).is_ok());
 }
@@ -193,22 +195,24 @@ fn adversarial_valid_sig_garbage_payload_rejected() {
 #[test]
 fn adversarial_wrong_signing_key_rejected() {
     let (_, creds) = test_key();
-    let other_sk   = other_key();
-    let payload    = encode_payload(1, &[(1, 2)], &[]);
+    let other_sk = other_key();
+    let payload = encode_payload(1, &[(1, 2)], &[]);
     // Signed with `other_sk` but verified against `test_key` public key.
     let wire = make_wire(&payload, &other_sk);
 
     assert!(matches!(
         ManifestDecoder::decode(&wire, &creds),
-        Err(Error::ManifestInvalid { detail: "Ed25519 signature verification failed" })
+        Err(Error::ManifestInvalid {
+            detail: "Ed25519 signature verification failed"
+        })
     ));
 }
 
 #[test]
 fn adversarial_tampered_payload_rejected() {
     let (sk, creds) = test_key();
-    let payload     = encode_payload(1, &[(1, 2)], &[]);
-    let mut wire    = make_wire(&payload, &sk);
+    let payload = encode_payload(1, &[(1, 2)], &[]);
+    let mut wire = make_wire(&payload, &sk);
     // Flip one bit in the payload.
     let last = wire.len() - 1;
     wire[last] ^= 0x01;
@@ -222,8 +226,8 @@ fn adversarial_tampered_payload_rejected() {
 #[test]
 fn adversarial_truncated_after_signature_rejected() {
     let (sk, creds) = test_key();
-    let payload     = encode_payload(1, &[(1, 2)], &[]);
-    let wire        = make_wire(&payload, &sk);
+    let payload = encode_payload(1, &[(1, 2)], &[]);
+    let wire = make_wire(&payload, &sk);
     // Keep only the 64-byte signature, no payload.
     let truncated = &wire[..64];
 
@@ -249,7 +253,9 @@ fn adversarial_zero_node_id_in_edge_rejected() {
     let wire = make_wire(&payload, &sk);
     assert!(matches!(
         ManifestDecoder::decode(&wire, &creds),
-        Err(Error::ManifestInvalid { detail: "edge src must be non-zero" })
+        Err(Error::ManifestInvalid {
+            detail: "edge src must be non-zero"
+        })
     ));
 }
 
@@ -268,7 +274,9 @@ fn adversarial_zero_node_id_in_quota_rejected() {
     let wire = make_wire(&payload, &sk);
     assert!(matches!(
         ManifestDecoder::decode(&wire, &creds),
-        Err(Error::ManifestInvalid { detail: "quota node must be non-zero" })
+        Err(Error::ManifestInvalid {
+            detail: "quota node must be non-zero"
+        })
     ));
 }
 
@@ -305,15 +313,17 @@ fn adversarial_edge_with_wrong_inner_len_rejected() {
     let wire = make_wire(&payload, &sk);
     assert!(matches!(
         ManifestDecoder::decode(&wire, &creds),
-        Err(Error::ManifestInvalid { detail: "each edge must be [src, dst]" })
+        Err(Error::ManifestInvalid {
+            detail: "each edge must be [src, dst]"
+        })
     ));
 }
 
 #[test]
 fn adversarial_modified_signature_bytes_rejected() {
     let (sk, creds) = test_key();
-    let payload     = encode_payload(1, &[(1, 2)], &[]);
-    let mut wire    = make_wire(&payload, &sk);
+    let payload = encode_payload(1, &[(1, 2)], &[]);
+    let mut wire = make_wire(&payload, &sk);
     // Corrupt the 32nd byte of the signature.
     wire[31] ^= 0xff;
 

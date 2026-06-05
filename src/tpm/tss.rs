@@ -15,7 +15,11 @@
 //! 6. `verify_quote` → verify the `TPMS_ATTEST` structure signature with the
 //!    Attestation Key (AK) public key via `tss_esapi::structures::Attest`.
 
-use crate::{error::Error, tpm::{TpmProvider, TpmQuote}, Result};
+use crate::{
+    error::Error,
+    tpm::{TpmProvider, TpmQuote},
+    Result,
+};
 
 /// TPM 2.0 hardware provider backed by the `tss-esapi` / `tpm2-tss` stack.
 ///

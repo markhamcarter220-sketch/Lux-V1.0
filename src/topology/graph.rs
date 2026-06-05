@@ -42,7 +42,7 @@ impl BootingGraph {
     pub const fn new() -> Self {
         Self {
             active_nodes: 0,
-            edge_matrix:  [0u64; MAX_NODES],
+            edge_matrix: [0u64; MAX_NODES],
         }
     }
 
@@ -72,10 +72,16 @@ impl BootingGraph {
         let di = node_idx(dst)?;
         // Both endpoints must be active before an edge between them is recorded.
         if (self.active_nodes >> si) & 1 == 0 {
-            return Err(Error::TopologyViolation { src: src.get(), dst: dst.get() });
+            return Err(Error::TopologyViolation {
+                src: src.get(),
+                dst: dst.get(),
+            });
         }
         if (self.active_nodes >> di) & 1 == 0 {
-            return Err(Error::TopologyViolation { src: src.get(), dst: dst.get() });
+            return Err(Error::TopologyViolation {
+                src: src.get(),
+                dst: dst.get(),
+            });
         }
         self.edge_matrix[si] |= 1u64 << di;
         Ok(())
@@ -88,7 +94,7 @@ impl BootingGraph {
     pub const fn seal(self) -> OperationalGraph {
         OperationalGraph {
             active_nodes: self.active_nodes,
-            edge_matrix:  self.edge_matrix,
+            edge_matrix: self.edge_matrix,
         }
     }
 }
@@ -106,7 +112,7 @@ impl Default for BootingGraph {
 #[derive(Debug)]
 pub struct OperationalGraph {
     active_nodes: u64,
-    edge_matrix:  [u64; MAX_NODES],
+    edge_matrix: [u64; MAX_NODES],
 }
 
 impl OperationalGraph {
@@ -126,7 +132,10 @@ impl OperationalGraph {
     pub fn traverse(&self, src: NodeId, dst: NodeId, audit: &mut AuditLog) -> Result<()> {
         let actor = src.get();
         let result = self.traverse_inner(src, dst);
-        let denial = result.as_ref().err().map(|e| (e.denial_class(), e.denial_reason_str()));
+        let denial = result
+            .as_ref()
+            .err()
+            .map(|e| (e.denial_class(), e.denial_reason_str()));
         audit.append(EventKind::TopologyTraverse, actor, 0, denial);
         result
     }
@@ -138,12 +147,18 @@ impl OperationalGraph {
         let src_active = (self.active_nodes >> si) & 1 == 1;
         let dst_active = (self.active_nodes >> di) & 1 == 1;
         if !src_active || !dst_active {
-            return Err(Error::TopologyViolation { src: src.get(), dst: dst.get() });
+            return Err(Error::TopologyViolation {
+                src: src.get(),
+                dst: dst.get(),
+            });
         }
 
         let edge_present = (self.edge_matrix[si] >> di) & 1 == 1;
         if !edge_present {
-            return Err(Error::TopologyViolation { src: src.get(), dst: dst.get() });
+            return Err(Error::TopologyViolation {
+                src: src.get(),
+                dst: dst.get(),
+            });
         }
 
         Ok(())
@@ -164,7 +179,10 @@ impl OperationalGraph {
 const fn node_idx(id: NodeId) -> Result<usize> {
     let idx = (id.get() as usize).saturating_sub(1);
     if idx >= MAX_NODES {
-        Err(Error::TopologyViolation { src: id.get(), dst: 0 })
+        Err(Error::TopologyViolation {
+            src: id.get(),
+            dst: 0,
+        })
     } else {
         Ok(idx)
     }
@@ -249,7 +267,10 @@ mod tests {
         }
         let op = g.seal();
         for i in 1u32..=(MAX_NODES as u32) {
-            assert!(op.is_active(nz(i)), "node {i} must be active after full activation");
+            assert!(
+                op.is_active(nz(i)),
+                "node {i} must be active after full activation"
+            );
         }
     }
 
@@ -365,7 +386,9 @@ mod tests {
 
     #[test]
     fn traverse_declared_active_edge_is_permitted() {
-        assert!(single_edge(1, 2).traverse(nz(1), nz(2), &mut AuditLog::new()).is_ok());
+        assert!(single_edge(1, 2)
+            .traverse(nz(1), nz(2), &mut AuditLog::new())
+            .is_ok());
     }
 
     #[test]
@@ -489,7 +512,18 @@ mod tests {
         assert!(op.traverse(nz(1), nz(2), &mut AuditLog::new()).is_ok());
         assert!(op.traverse(nz(3), nz(4), &mut AuditLog::new()).is_ok());
         // All other pairs among {1,2,3,4} must be denied.
-        for (s, d) in [(1, 3), (1, 4), (2, 1), (2, 3), (2, 4), (3, 1), (3, 2), (4, 1), (4, 2), (4, 3)] {
+        for (s, d) in [
+            (1, 3),
+            (1, 4),
+            (2, 1),
+            (2, 3),
+            (2, 4),
+            (3, 1),
+            (3, 2),
+            (4, 1),
+            (4, 2),
+            (4, 3),
+        ] {
             assert!(
                 op.traverse(nz(s), nz(d), &mut AuditLog::new()).is_err(),
                 "undeclared edge ({s} → {d}) must be denied"
@@ -500,7 +534,9 @@ mod tests {
     #[test]
     fn traverse_error_fields_carry_exact_src_and_dst() {
         let op = BootingGraph::new().seal();
-        let err = op.traverse(nz(11), nz(22), &mut AuditLog::new()).unwrap_err();
+        let err = op
+            .traverse(nz(11), nz(22), &mut AuditLog::new())
+            .unwrap_err();
         assert_eq!(err, Error::TopologyViolation { src: 11, dst: 22 });
     }
 

@@ -4,15 +4,20 @@
 //! ∀ generation mismatch: token denied.
 //! ∀ nonce reuse within a generation: second presentation denied.
 
+use core::num::NonZeroU32;
+use lux_kernel::audit::AuditLog;
 use lux_kernel::{
-    auth::{capability::{Capability, CapabilitySet}, policy::Policy},
+    auth::{
+        capability::{Capability, CapabilitySet},
+        policy::Policy,
+    },
     types::Generation,
 };
-use lux_kernel::audit::AuditLog;
-use core::num::NonZeroU32;
 use proptest::prelude::*;
 
-fn node(n: u32) -> NonZeroU32 { NonZeroU32::new(n.max(1)).unwrap() }
+fn node(n: u32) -> NonZeroU32 {
+    NonZeroU32::new(n.max(1)).unwrap()
+}
 
 proptest! {
     #![proptest_config(ProptestConfig { cases: 1024, ..Default::default() })]

@@ -17,8 +17,8 @@
 use ed25519_dalek::Signer as _;
 use ed25519_dalek::SigningKey;
 use lux_kernel::{
-    auth::capability::{Capability, CapabilitySet},
     audit::AuditLog,
+    auth::capability::{Capability, CapabilitySet},
     boot::{BootCredentials, BootState},
     error::Error,
     types::Generation,
@@ -46,12 +46,12 @@ fn build_signed_manifest(sk: &SigningKey) -> Vec<u8> {
     //       0x01      uint(1)             -- node = 1
     //       0x1a 0x000f 0x4240            -- uint(1_000_000)
     let payload: Vec<u8> = vec![
-        0x83,                         // array(3)
-        0x01,                         // version = 1
-        0x81,                         // edges: array(1)
-          0x82, 0x01, 0x02,           //   [src=1, dst=2]
-        0x81,                         // quotas: array(1)
-          0x82, 0x01, 0x1a, 0x00, 0x0f, 0x42, 0x40, // [node=1, ceiling=1_000_000]
+        0x83, // array(3)
+        0x01, // version = 1
+        0x81, // edges: array(1)
+        0x82, 0x01, 0x02, //   [src=1, dst=2]
+        0x81, // quotas: array(1)
+        0x82, 0x01, 0x1a, 0x00, 0x0f, 0x42, 0x40, // [node=1, ceiling=1_000_000]
     ];
 
     let sig = sk.sign(&payload);
@@ -72,11 +72,14 @@ fn main() {
     let creds = BootCredentials::from_key_bytes(signing_key.verifying_key().to_bytes())
         .expect("valid public key");
 
-    let mut boot_state = BootState::initialise(&wire, &creds)
-        .expect("manifest must decode and verify");
+    let mut boot_state =
+        BootState::initialise(&wire, &creds).expect("manifest must decode and verify");
 
     println!("[Step 1] Boot manifest decoded and verified.");
-    println!("         Attestation quote (null TPM): {:?}", boot_state.attestation_quote().is_null());
+    println!(
+        "         Attestation quote (null TPM): {:?}",
+        boot_state.attestation_quote().is_null()
+    );
 
     // ── Step 2: Mint a root capability for the boot principal (node 1) ────────
 
@@ -117,7 +120,10 @@ fn main() {
     // ── Step 5: Revoke the delegated capability (by nonce) ───────────────────
 
     let revoked = boot_state.policy_mut().revoke_capability(42_u64);
-    assert!(revoked, "revocation must succeed (nonce window not exhausted)");
+    assert!(
+        revoked,
+        "revocation must succeed (nonce window not exhausted)"
+    );
     println!("[Step 5] Nonce 42 revoked.");
 
     // ── Step 6: A second presentation of the same token is denied ────────────

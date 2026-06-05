@@ -3,6 +3,8 @@
 //! 12 attack vectors proving that no operation proceeds without a valid,
 //! scoped, generation-bounded token.
 
+use core::num::NonZeroU32;
+use lux_kernel::audit::AuditLog;
 use lux_kernel::{
     auth::{
         capability::{Capability, CapabilitySet},
@@ -12,10 +14,10 @@ use lux_kernel::{
     metabolism::ledger::Ledger,
     types::{Generation, Quota, NONCE_WINDOW},
 };
-use lux_kernel::audit::AuditLog;
-use core::num::NonZeroU32;
 
-fn nz(n: u32) -> NonZeroU32 { NonZeroU32::new(n).unwrap() }
+fn nz(n: u32) -> NonZeroU32 {
+    NonZeroU32::new(n).unwrap()
+}
 
 const ALL_RIGHTS: [CapabilitySet; 5] = [
     CapabilitySet::READ_TOPOLOGY,
@@ -50,7 +52,10 @@ fn attack_2_2_each_right_independently_enforced_no_cross_contamination() {
     for &held in &ALL_RIGHTS {
         let cap = Capability::new_for_test(nz(1), nz(2), held, gen, 0);
         // The held right itself is granted.
-        assert!(cap.authorises(held, gen), "cap must authorise its own right {held:?}");
+        assert!(
+            cap.authorises(held, gen),
+            "cap must authorise its own right {held:?}"
+        );
         // Every OTHER right is denied.
         for &other in ALL_RIGHTS.iter().filter(|&&r| r != held) {
             assert!(
@@ -70,15 +75,27 @@ fn attack_2_3_out_of_scope_operation_denied() {
     let mut policy = Policy::new(gen);
 
     let read_cap = Capability::new_for_test(
-        nz(1), nz(2), CapabilitySet::READ_TOPOLOGY | CapabilitySet::ALLOC_RESOURCE, gen, 10
+        nz(1),
+        nz(2),
+        CapabilitySet::READ_TOPOLOGY | CapabilitySet::ALLOC_RESOURCE,
+        gen,
+        10,
     );
     // SCHEDULE and SHUTDOWN are outside the granted scope.
-    assert!(policy.check(&read_cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err());
+    assert!(policy
+        .check(&read_cap, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+        .is_err());
     // (Note: failed check doesn't consume nonce, so same nonce can be re-tested.)
     let cap2 = Capability::new_for_test(
-        nz(1), nz(2), CapabilitySet::READ_TOPOLOGY | CapabilitySet::ALLOC_RESOURCE, gen, 11
+        nz(1),
+        nz(2),
+        CapabilitySet::READ_TOPOLOGY | CapabilitySet::ALLOC_RESOURCE,
+        gen,
+        11,
     );
-    assert!(policy.check(&cap2, CapabilitySet::SHUTDOWN, &mut AuditLog::new()).is_err());
+    assert!(policy
+        .check(&cap2, CapabilitySet::SHUTDOWN, &mut AuditLog::new())
+        .is_err());
 }
 
 // ── Attack 2.4 ────────────────────────────────────────────────────────────────
@@ -88,7 +105,11 @@ fn attack_2_3_out_of_scope_operation_denied() {
 fn attack_2_4_delegation_requires_delegate_right() {
     let gen = Generation(0);
 
-    for (i, &right) in ALL_RIGHTS.iter().filter(|&&r| r != CapabilitySet::DELEGATE).enumerate() {
+    for (i, &right) in ALL_RIGHTS
+        .iter()
+        .filter(|&&r| r != CapabilitySet::DELEGATE)
+        .enumerate()
+    {
         let cap = Capability::new_for_test(nz(1), nz(2), right, gen, i as u64);
         assert!(
             cap.delegate(nz(3), right, 999).is_none(),
@@ -111,7 +132,11 @@ fn attack_2_5_delegation_cannot_escalate_privileges() {
     assert!(cap.delegate(nz(3), CapabilitySet::all(), 2).is_none());
 
     // Each right not in parent individually blocked.
-    for right in [CapabilitySet::ALLOC_RESOURCE, CapabilitySet::SCHEDULE, CapabilitySet::SHUTDOWN] {
+    for right in [
+        CapabilitySet::ALLOC_RESOURCE,
+        CapabilitySet::SCHEDULE,
+        CapabilitySet::SHUTDOWN,
+    ] {
         assert!(
             cap.delegate(nz(3), right, 3).is_none(),
             "delegating {right:?} not held by parent must be None"
@@ -119,7 +144,8 @@ fn attack_2_5_delegation_cannot_escalate_privileges() {
     }
 
     // A strict subset (READ_TOPOLOGY only) succeeds and produces no escalation.
-    let delegated = cap.delegate(nz(3), CapabilitySet::READ_TOPOLOGY, 4)
+    let delegated = cap
+        .delegate(nz(3), CapabilitySet::READ_TOPOLOGY, 4)
         .expect("strict subset delegation must succeed");
     // The delegated token must not have acquired DELEGATE or any other right.
     assert!(!delegated.authorises(CapabilitySet::DELEGATE, gen));
@@ -140,16 +166,23 @@ fn attack_2_6_expired_generation_denied_after_multiple_rotations() {
     let stale0 = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, Generation(0), 42);
     assert!(matches!(
         policy.check(&stale0, CapabilitySet::SCHEDULE, &mut AuditLog::new()),
-        Err(Error::CapabilityDenied { reason: "token expired, insufficient rights, or wrong generation" })
+        Err(Error::CapabilityDenied {
+            reason: "token expired, insufficient rights, or wrong generation"
+        })
     ));
 
     // Cap at gen 1: also stale.
     let stale1 = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, Generation(1), 43);
-    assert!(policy.check(&stale1, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err());
+    assert!(policy
+        .check(&stale1, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+        .is_err());
 
     // Cap at gen 2 (current): valid.
-    let current = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, Generation(2), 44);
-    assert!(policy.check(&current, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
+    let current =
+        Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, Generation(2), 44);
+    assert!(policy
+        .check(&current, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+        .is_ok());
 }
 
 // ── Attack 2.7 ────────────────────────────────────────────────────────────────
@@ -166,12 +199,20 @@ fn attack_2_7_pre_rotation_capability_is_invalid_post_rotation() {
 
     // At gen 0 it works.
     let demo = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SHUTDOWN, gen, 78);
-    assert!(policy.check(&demo, CapabilitySet::SHUTDOWN, &mut AuditLog::new()).is_ok());
+    assert!(policy
+        .check(&demo, CapabilitySet::SHUTDOWN, &mut AuditLog::new())
+        .is_ok());
 
     // After rotation, the "forged" gen-0 cap is invalid.
     policy.rotate_generation();
     assert!(
-        policy.check(&pre_rotation_cap, CapabilitySet::SHUTDOWN, &mut AuditLog::new()).is_err(),
+        policy
+            .check(
+                &pre_rotation_cap,
+                CapabilitySet::SHUTDOWN,
+                &mut AuditLog::new()
+            )
+            .is_err(),
         "gen-0 cap must be denied after rotation"
     );
 }
@@ -187,19 +228,26 @@ fn attack_2_8_same_nonce_can_only_be_used_once_per_generation() {
     let nonce = 12345u64;
 
     let cap1 = Capability::new_for_test(nz(1), nz(2), CapabilitySet::ALLOC_RESOURCE, gen, nonce);
-    assert!(policy.check(&cap1, CapabilitySet::ALLOC_RESOURCE, &mut AuditLog::new()).is_ok());
+    assert!(policy
+        .check(&cap1, CapabilitySet::ALLOC_RESOURCE, &mut AuditLog::new())
+        .is_ok());
 
     let cap2 = Capability::new_for_test(nz(1), nz(2), CapabilitySet::ALLOC_RESOURCE, gen, nonce);
     assert!(matches!(
         policy.check(&cap2, CapabilitySet::ALLOC_RESOURCE, &mut AuditLog::new()),
-        Err(Error::CapabilityDenied { reason: "nonce replayed" })
+        Err(Error::CapabilityDenied {
+            reason: "nonce replayed"
+        })
     ));
 
     // After rotation, same nonce valid again.
     policy.rotate_generation();
     let new_gen = policy.generation();
-    let cap3 = Capability::new_for_test(nz(1), nz(2), CapabilitySet::ALLOC_RESOURCE, new_gen, nonce);
-    assert!(policy.check(&cap3, CapabilitySet::ALLOC_RESOURCE, &mut AuditLog::new()).is_ok());
+    let cap3 =
+        Capability::new_for_test(nz(1), nz(2), CapabilitySet::ALLOC_RESOURCE, new_gen, nonce);
+    assert!(policy
+        .check(&cap3, CapabilitySet::ALLOC_RESOURCE, &mut AuditLog::new())
+        .is_ok());
 }
 
 // ── Attack 2.9 ────────────────────────────────────────────────────────────────
@@ -211,13 +259,23 @@ fn attack_2_9_zero_balance_denies_any_deduction() {
     let n = nz(10);
     ledger.seed(n, Quota::new(0));
 
-    assert!(ledger.deduct(n, 1).is_none(), "deduct 1 from zero-balance must fail");
+    assert!(
+        ledger.deduct(n, 1).is_none(),
+        "deduct 1 from zero-balance must fail"
+    );
     assert_eq!(ledger.balance(n), Some(0), "balance must remain 0");
 
     // Unseeded node.
     let unseeded = nz(11);
-    assert!(ledger.deduct(unseeded, 1).is_none(), "deduct from unseeded node must fail");
-    assert_eq!(ledger.balance(unseeded), None, "unseeded node has no balance");
+    assert!(
+        ledger.deduct(unseeded, 1).is_none(),
+        "deduct from unseeded node must fail"
+    );
+    assert_eq!(
+        ledger.balance(unseeded),
+        None,
+        "unseeded node has no balance"
+    );
 }
 
 // ── Attack 2.10 ───────────────────────────────────────────────────────────────
@@ -232,7 +290,8 @@ fn attack_2_10_no_ambient_authority_path_exists() {
     // The only way to call check() is to provide a Capability.
     // An empty-rights cap is the minimum possible token and must be denied.
     for (i, &right) in ALL_RIGHTS.iter().enumerate() {
-        let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::empty(), gen, 500 + i as u64);
+        let cap =
+            Capability::new_for_test(nz(1), nz(2), CapabilitySet::empty(), gen, 500 + i as u64);
         assert!(
             policy.check(&cap, right, &mut AuditLog::new()).is_err(),
             "no ambient grant: empty cap must be denied for {right:?}"
@@ -252,14 +311,19 @@ fn attack_2_11_delegation_chain_preserves_subset_invariant() {
 
     // A gets READ_TOPOLOGY | DELEGATE.
     let a_rights = CapabilitySet::READ_TOPOLOGY | CapabilitySet::DELEGATE;
-    let cap_a = root.delegate(nz(3), a_rights, 2).expect("subset delegation must succeed");
+    let cap_a = root
+        .delegate(nz(3), a_rights, 2)
+        .expect("subset delegation must succeed");
 
     // B gets READ_TOPOLOGY only.
-    let cap_b = cap_a.delegate(nz(4), CapabilitySet::READ_TOPOLOGY, 3)
+    let cap_b = cap_a
+        .delegate(nz(4), CapabilitySet::READ_TOPOLOGY, 3)
         .expect("strict subset must succeed");
 
     // B cannot redelegate (no DELEGATE right).
-    assert!(cap_b.delegate(nz(5), CapabilitySet::READ_TOPOLOGY, 4).is_none());
+    assert!(cap_b
+        .delegate(nz(5), CapabilitySet::READ_TOPOLOGY, 4)
+        .is_none());
 
     // B definitely cannot escalate to rights above the chain.
     assert!(cap_b.delegate(nz(5), CapabilitySet::SHUTDOWN, 5).is_none());
@@ -284,13 +348,20 @@ fn attack_2_12_nonce_window_exhaustion_fails_closed() {
     // Fill all NONCE_WINDOW (256) slots.
     for i in 0u64..NONCE_WINDOW as u64 {
         let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, i);
-        assert!(policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok(), "slot {i} must succeed");
+        assert!(
+            policy
+                .check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new())
+                .is_ok(),
+            "slot {i} must succeed"
+        );
     }
 
     // 257th attempt with a brand-new nonce — window is full.
     let overflow = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, 99_999);
     assert!(matches!(
         policy.check(&overflow, CapabilitySet::SCHEDULE, &mut AuditLog::new()),
-        Err(Error::CapabilityDenied { reason: "nonce window exhausted; rotate generation" })
+        Err(Error::CapabilityDenied {
+            reason: "nonce window exhausted; rotate generation"
+        })
     ));
 }
