@@ -39,6 +39,14 @@ rand         = { version = "0.8", features = ["getrandom"] }
 default     = []
 serde       = ["dep:serde"]
 std         = []
+# HSM integration: exposes the HsmProvider trait for real HSM driver backends.
+# When disabled (default), only SoftwareHsm is available.
+hsm         = []
+# TPM integration: exposes TpmProvider for real TPM 2.0 driver backends.
+# When disabled (default), only SoftwareTpm and NullTpm are available.
+tpm         = []
+# WASM execution substrate: compiles Lux's enforcement points as wasm32 exports.
+wasm        = []
 
 [profile.release]
 opt-level   = 3

@@ -10,3 +10,8 @@ mod manifest_decode;
 mod revocation;
 #[path = "integration/audit_log.rs"]
 mod audit_log;
+#[cfg(feature = "wasm")]
+#[path = "integration/wasm_host.rs"]
+mod wasm_host;
+#[path = "integration/consensus.rs"]
+mod consensus;

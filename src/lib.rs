@@ -24,10 +24,15 @@
 pub mod audit;
 pub mod auth;
 pub mod boot;
+pub mod consensus;
 pub mod error;
+pub mod hsm;
 pub mod metabolism;
 pub mod scheduler;
 pub mod topology;
+pub mod tpm;
 pub mod types;
+#[cfg(feature = "wasm")]
+pub mod wasm;
 
 pub use error::{Error, Result};

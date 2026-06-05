@@ -14,6 +14,8 @@ pub enum EventKind {
     ResourceDeduction = 2,
     /// A topology edge traversal was attempted.
     TopologyTraverse  = 3,
+    /// A distributed consensus round was run to validate a topology change.
+    TopologyChange    = 4,
 }
 
 /// Result of the audited operation.
@@ -71,6 +73,7 @@ impl AuditEvent {
             EventKind::CapabilityRevoked => "cap_revoked",
             EventKind::ResourceDeduction => "resource_deduct",
             EventKind::TopologyTraverse  => "topo_traverse",
+            EventKind::TopologyChange    => "topo_change",
         }
     }
 

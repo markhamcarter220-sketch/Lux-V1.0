@@ -38,6 +38,7 @@ use crate::{
         manifest::{EdgeDecl, Manifest, QuotaDecl},
     },
     error::Error,
+    hsm::HsmProvider,
     types::Quota,
     Result,
 };
@@ -54,13 +55,17 @@ pub struct ManifestDecoder;
 impl ManifestDecoder {
     /// Decode and verify a manifest from its wire-format bytes.
     ///
+    /// Generic over `H: HsmProvider`.  Callers passing `&BootCredentials`
+    /// (i.e. `&BootCredentials<SoftwareHsm>`) do not need an explicit type
+    /// annotation — Rust infers `H = SoftwareHsm`.
+    ///
     /// Steps (all-or-nothing):
     /// 1. Split signature (first 64 bytes) from CBOR payload.
     /// 2. Verify Ed25519 signature over the payload using `credentials`.
     /// 3. Decode CBOR payload into `Manifest`.
     ///
     /// Any failure at any step returns `Err(ManifestInvalid { detail })`.
-    pub fn decode(bytes: &[u8], credentials: &BootCredentials) -> Result<Manifest> {
+    pub fn decode<H: HsmProvider>(bytes: &[u8], credentials: &BootCredentials<H>) -> Result<Manifest> {
         if bytes.len() < MIN_WIRE_LEN {
             return Err(Error::ManifestInvalid {
                 detail: "wire format too short (minimum 65 bytes)",

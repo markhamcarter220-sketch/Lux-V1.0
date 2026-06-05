@@ -6,3 +6,5 @@ mod invariant_capability;
 mod invariant_resources;
 #[path = "properties/invariant_topology.rs"]
 mod invariant_topology;
+#[path = "properties/cost_model.rs"]
+mod cost_model;
