@@ -2,8 +2,9 @@
   "audit_log": {
     "total_entries": 100,
     "chain_valid": true,
-    "head_hash": "9dc0d2fe93429487ad0e85e84efbe4ce4064346290f2713f5d8887c1f6c2dbd1",
-    "max_capacity": 512
+    "head_hash": "b1ea7c5581a8920e66cb2bfafddcb458a2bab9f57640da2f2d055d09a71c9010",
+    "max_capacity": 512,
+    "hash_format": "SHA-256/Lux-kernel-canonical"
   },
   "entries": [
     {
@@ -12,11 +13,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841201926945,
-      "timestamp_iso": "2026-06-04T14:20:41.201927+00:00",
-      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-      "entry_hash": "05c0986e493bc9b2f1953a2c4d4459f47c36484adc20bc3066e083b188f3110c"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176092285404,
+      "timestamp_iso": "2026-06-05T01:16:16.092285+00:00",
+      "entry_hash": "b23520ba1624d029328c3cf03d6351aca610f198ea5432e4578d660d1a81f721"
     },
     {
       "seq": 2,
@@ -24,11 +24,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202215180,
-      "timestamp_iso": "2026-06-04T14:20:41.202215+00:00",
-      "prev_hash": "05c0986e493bc9b2f1953a2c4d4459f47c36484adc20bc3066e083b188f3110c",
-      "entry_hash": "2dc2dc56377d238853f686659e02c67429a54e73024e9b8544ee8d28fb395fdf"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176092423560,
+      "timestamp_iso": "2026-06-05T01:16:16.092424+00:00",
+      "entry_hash": "8ef1914163d0ccf8fac8d141b59c9cf2a06ca3e2f734e98b48a6fc97b654a666"
     },
     {
       "seq": 3,
@@ -36,11 +35,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202237442,
-      "timestamp_iso": "2026-06-04T14:20:41.202237+00:00",
-      "prev_hash": "2dc2dc56377d238853f686659e02c67429a54e73024e9b8544ee8d28fb395fdf",
-      "entry_hash": "217182c36c56faac9a3ffd3ed53289614c3a50b9390100737afb21ad4e4f2e3b"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176092470242,
+      "timestamp_iso": "2026-06-05T01:16:16.092470+00:00",
+      "entry_hash": "7069ff74459c8d347104188402bc6e811d090ed3fff22c57173e82f02de0511d"
     },
     {
       "seq": 4,
@@ -48,11 +46,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202253531,
-      "timestamp_iso": "2026-06-04T14:20:41.202254+00:00",
-      "prev_hash": "217182c36c56faac9a3ffd3ed53289614c3a50b9390100737afb21ad4e4f2e3b",
-      "entry_hash": "8a0153637acfd8c64760aa3feeb898d980cfc4f6d08ff0ac492712352ebbb52d"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176092508484,
+      "timestamp_iso": "2026-06-05T01:16:16.092508+00:00",
+      "entry_hash": "a3e6f7fb588d9ada0ce37b8b56dd45243cb2efd299a5786ea83250451e7538fc"
     },
     {
       "seq": 5,
@@ -60,11 +57,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202267482,
-      "timestamp_iso": "2026-06-04T14:20:41.202267+00:00",
-      "prev_hash": "8a0153637acfd8c64760aa3feeb898d980cfc4f6d08ff0ac492712352ebbb52d",
-      "entry_hash": "8d04f305f15e9768ce8f89dfdf832c9425d023b44464f82415906ad179d3ead8"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176092554108,
+      "timestamp_iso": "2026-06-05T01:16:16.092554+00:00",
+      "entry_hash": "0d70c48425244d12bfa00b3895fff4f878a10b15b54e63bc0b8877e36d65d232"
     },
     {
       "seq": 6,
@@ -72,11 +68,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202280972,
-      "timestamp_iso": "2026-06-04T14:20:41.202281+00:00",
-      "prev_hash": "8d04f305f15e9768ce8f89dfdf832c9425d023b44464f82415906ad179d3ead8",
-      "entry_hash": "d01d6ac144af5bf07e3e81159bbb47b6ec0949a44e737bdee69358dcd7e5200d"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176092595631,
+      "timestamp_iso": "2026-06-05T01:16:16.092596+00:00",
+      "entry_hash": "caeba5a7ae35a4372f5e8fade2a86b4d0c96ba897e053c810ef7296e58472499"
     },
     {
       "seq": 7,
@@ -84,11 +79,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202294353,
-      "timestamp_iso": "2026-06-04T14:20:41.202294+00:00",
-      "prev_hash": "d01d6ac144af5bf07e3e81159bbb47b6ec0949a44e737bdee69358dcd7e5200d",
-      "entry_hash": "5a7503f7adc2d8a63f448ed0a1259e62c66bbf1f149f3733e55df4728fade128"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176092655483,
+      "timestamp_iso": "2026-06-05T01:16:16.092655+00:00",
+      "entry_hash": "48f85ce7bb8a012989a83d0da7df6a42f7c3a7e5a12c47d073c5bc21c5b7cf1e"
     },
     {
       "seq": 8,
@@ -96,11 +90,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202319389,
-      "timestamp_iso": "2026-06-04T14:20:41.202319+00:00",
-      "prev_hash": "5a7503f7adc2d8a63f448ed0a1259e62c66bbf1f149f3733e55df4728fade128",
-      "entry_hash": "a19112b4e1d33f691f7f12b24d03a5cf763692b45937f65b55629237554e8809"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176092716085,
+      "timestamp_iso": "2026-06-05T01:16:16.092716+00:00",
+      "entry_hash": "536a4966ebad2f70382ea940d2ac13c30c54d75128bea9d85ae1e254a896b65a"
     },
     {
       "seq": 9,
@@ -108,11 +101,10 @@
       "decision": "HIRE",
       "confidence": 0.6667,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202338553,
-      "timestamp_iso": "2026-06-04T14:20:41.202338+00:00",
-      "prev_hash": "a19112b4e1d33f691f7f12b24d03a5cf763692b45937f65b55629237554e8809",
-      "entry_hash": "7ad782ec3d1d6d26d760a21b7595814f3a2823ea28a03564b475e16e6e0a0e8f"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176092782208,
+      "timestamp_iso": "2026-06-05T01:16:16.092782+00:00",
+      "entry_hash": "fbc129236dfbae95a3cdf9180322179948d7993e3e3d2d8bbbcb96093c96962d"
     },
     {
       "seq": 10,
@@ -120,11 +112,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202353293,
-      "timestamp_iso": "2026-06-04T14:20:41.202353+00:00",
-      "prev_hash": "7ad782ec3d1d6d26d760a21b7595814f3a2823ea28a03564b475e16e6e0a0e8f",
-      "entry_hash": "2c47d7c5461d23a88d64e4b04255c5c983c5e4ffbf98d17a0f4ed2a8e5ef062f"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176092827680,
+      "timestamp_iso": "2026-06-05T01:16:16.092828+00:00",
+      "entry_hash": "05dc1cd344555c77d47e6c654fd9c5d3738c366ac69239067f3251721f794ed0"
     },
     {
       "seq": 11,
@@ -132,11 +123,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202393109,
-      "timestamp_iso": "2026-06-04T14:20:41.202393+00:00",
-      "prev_hash": "2c47d7c5461d23a88d64e4b04255c5c983c5e4ffbf98d17a0f4ed2a8e5ef062f",
-      "entry_hash": "25f21c3cfdae3a586c7791bdc6591095cf12a4dd7ac9b557d138e8fa9ff6466b"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176092900230,
+      "timestamp_iso": "2026-06-05T01:16:16.092900+00:00",
+      "entry_hash": "2cb9d9d2cc4f9c30fd3fdf272497a885ea09c1f4ec4755fbb72e75e2cd6ccd21"
     },
     {
       "seq": 12,
@@ -144,11 +134,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202412841,
-      "timestamp_iso": "2026-06-04T14:20:41.202413+00:00",
-      "prev_hash": "25f21c3cfdae3a586c7791bdc6591095cf12a4dd7ac9b557d138e8fa9ff6466b",
-      "entry_hash": "5cc3b6ca44c9f9b2cdc28de3ca98920813923e39f50fe4878df4cb4fba3fd372"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176092971930,
+      "timestamp_iso": "2026-06-05T01:16:16.092972+00:00",
+      "entry_hash": "fb6f558a0a452f1a7437023f769a7e9710ccf7d4eff58342f2f8d9260046ecf4"
     },
     {
       "seq": 13,
@@ -156,11 +145,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202464221,
-      "timestamp_iso": "2026-06-04T14:20:41.202464+00:00",
-      "prev_hash": "5cc3b6ca44c9f9b2cdc28de3ca98920813923e39f50fe4878df4cb4fba3fd372",
-      "entry_hash": "e4888e9c89ee92d2fd1b03f262e9b827e4211dcc31c6849fd7287283a6cd4242"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176093042922,
+      "timestamp_iso": "2026-06-05T01:16:16.093043+00:00",
+      "entry_hash": "339429b0559e32595e3028fd7952ea5621c7ddf9c7c67a0b5efc4eea86e20996"
     },
     {
       "seq": 14,
@@ -168,11 +156,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202481724,
-      "timestamp_iso": "2026-06-04T14:20:41.202482+00:00",
-      "prev_hash": "e4888e9c89ee92d2fd1b03f262e9b827e4211dcc31c6849fd7287283a6cd4242",
-      "entry_hash": "7bd8912364539990efb2c77da2ef6628c0cf4ff34f11471d59c2efe1c4b77038"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176093086064,
+      "timestamp_iso": "2026-06-05T01:16:16.093086+00:00",
+      "entry_hash": "323dc4eaf90679f76728feba40e561814303813f3cd51641da1187d98f6e0bd4"
     },
     {
       "seq": 15,
@@ -180,11 +167,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202494412,
-      "timestamp_iso": "2026-06-04T14:20:41.202494+00:00",
-      "prev_hash": "7bd8912364539990efb2c77da2ef6628c0cf4ff34f11471d59c2efe1c4b77038",
-      "entry_hash": "3da5b21b003ad3447b44f6b3b9b4b2339c9e62d5e029c950207209ff12169344"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176093129424,
+      "timestamp_iso": "2026-06-05T01:16:16.093129+00:00",
+      "entry_hash": "3eea865093b95c84b33a98fa2c50973e7925b274e90eb01975e520c784e3b271"
     },
     {
       "seq": 16,
@@ -192,11 +178,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202505563,
-      "timestamp_iso": "2026-06-04T14:20:41.202506+00:00",
-      "prev_hash": "3da5b21b003ad3447b44f6b3b9b4b2339c9e62d5e029c950207209ff12169344",
-      "entry_hash": "dccb253007cf3406d53c853edf310e62b508af80920139b587460baea53eddce"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176093173914,
+      "timestamp_iso": "2026-06-05T01:16:16.093174+00:00",
+      "entry_hash": "59ae4a069f9d81150b03c7fe792d5d887d67000b2e9d25050a17a136c9024d19"
     },
     {
       "seq": 17,
@@ -204,11 +189,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202516754,
-      "timestamp_iso": "2026-06-04T14:20:41.202517+00:00",
-      "prev_hash": "dccb253007cf3406d53c853edf310e62b508af80920139b587460baea53eddce",
-      "entry_hash": "33e6c1223e88f95f4e0739ad28ad5d1204c7288ed4be2b7fa8bd6635b89390d7"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176093219629,
+      "timestamp_iso": "2026-06-05T01:16:16.093220+00:00",
+      "entry_hash": "1cd0dbcf7bddb64074c9d151b87eb076a49bd73fb4755de02a35786440a439d7"
     },
     {
       "seq": 18,
@@ -216,11 +200,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202528771,
-      "timestamp_iso": "2026-06-04T14:20:41.202529+00:00",
-      "prev_hash": "33e6c1223e88f95f4e0739ad28ad5d1204c7288ed4be2b7fa8bd6635b89390d7",
-      "entry_hash": "3bc63132613c426b2bf209acbb7a07e65011386063076568df89a7b6f43f101c"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176094481619,
+      "timestamp_iso": "2026-06-05T01:16:16.094482+00:00",
+      "entry_hash": "07b1f6880ffddf03567e6b80beb68821b7f2a87dae741ab5e099488bd27c1d66"
     },
     {
       "seq": 19,
@@ -228,11 +211,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202539890,
-      "timestamp_iso": "2026-06-04T14:20:41.202540+00:00",
-      "prev_hash": "3bc63132613c426b2bf209acbb7a07e65011386063076568df89a7b6f43f101c",
-      "entry_hash": "83613fd7fec79e187ad9a968d66fd00aefb1eefb0f7ce7d67ad05016bd17cab1"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176094564852,
+      "timestamp_iso": "2026-06-05T01:16:16.094565+00:00",
+      "entry_hash": "82c18346544bb53022a809d2eaa273b819a427723a60ef7838f5e490365cee63"
     },
     {
       "seq": 20,
@@ -240,11 +222,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202551472,
-      "timestamp_iso": "2026-06-04T14:20:41.202552+00:00",
-      "prev_hash": "83613fd7fec79e187ad9a968d66fd00aefb1eefb0f7ce7d67ad05016bd17cab1",
-      "entry_hash": "261f5f3c202833005bac138dc3f6f7aa0e919b90f44f41835ffe7946a5f0f844"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176094622953,
+      "timestamp_iso": "2026-06-05T01:16:16.094623+00:00",
+      "entry_hash": "4564e296227182a44869e2d45cd7b28b0055167f38388ee4ccae5d7aa3fd93e6"
     },
     {
       "seq": 21,
@@ -252,11 +233,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202600056,
-      "timestamp_iso": "2026-06-04T14:20:41.202600+00:00",
-      "prev_hash": "261f5f3c202833005bac138dc3f6f7aa0e919b90f44f41835ffe7946a5f0f844",
-      "entry_hash": "2608f93a174c13161f84f8e68776621741eb515e63e34f84611b1ecfd60cb84a"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176094692675,
+      "timestamp_iso": "2026-06-05T01:16:16.094693+00:00",
+      "entry_hash": "8563fec14d0c8d1ee1b7114523ea574596b160ae5cc1bf0eb48d05897fb7e39d"
     },
     {
       "seq": 22,
@@ -264,11 +244,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202616220,
-      "timestamp_iso": "2026-06-04T14:20:41.202616+00:00",
-      "prev_hash": "2608f93a174c13161f84f8e68776621741eb515e63e34f84611b1ecfd60cb84a",
-      "entry_hash": "c7d289c698da589757536dd2c413a823e96cc9f135d80ca3cc97247bbc9a8280"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176094758925,
+      "timestamp_iso": "2026-06-05T01:16:16.094759+00:00",
+      "entry_hash": "349844aa2299f5d130a36771a214f45ba60b21acd7fd7555c738263cd29a2068"
     },
     {
       "seq": 23,
@@ -276,11 +255,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202629053,
-      "timestamp_iso": "2026-06-04T14:20:41.202629+00:00",
-      "prev_hash": "c7d289c698da589757536dd2c413a823e96cc9f135d80ca3cc97247bbc9a8280",
-      "entry_hash": "b9be54b5a6ef8a939bf67d9cc979926624ddd8d0ef44406cc5326486b2c994ec"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176094820820,
+      "timestamp_iso": "2026-06-05T01:16:16.094821+00:00",
+      "entry_hash": "37bca3112c72e7a231c7ec79b541835798299f342982e9f80f9fbed87b392828"
     },
     {
       "seq": 24,
@@ -288,11 +266,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202666028,
-      "timestamp_iso": "2026-06-04T14:20:41.202666+00:00",
-      "prev_hash": "b9be54b5a6ef8a939bf67d9cc979926624ddd8d0ef44406cc5326486b2c994ec",
-      "entry_hash": "8ca78cefbfd2b56bf1529db8d90b53eb39b616cde625f3d3698c10ced04ce068"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176094886527,
+      "timestamp_iso": "2026-06-05T01:16:16.094886+00:00",
+      "entry_hash": "a6156887fc1f4bb3a805261527912e6c90cc087265d482779bfae547e96689bd"
     },
     {
       "seq": 25,
@@ -300,11 +277,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202692736,
-      "timestamp_iso": "2026-06-04T14:20:41.202693+00:00",
-      "prev_hash": "8ca78cefbfd2b56bf1529db8d90b53eb39b616cde625f3d3698c10ced04ce068",
-      "entry_hash": "36a3e863f8b9f70dc92b369e7bb978afef68f537a9ee8706f675c66087012415"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176094956991,
+      "timestamp_iso": "2026-06-05T01:16:16.094957+00:00",
+      "entry_hash": "5641df220feba1ca5866e73f6c530348ca0d648a446e017d86100dae9f2e5659"
     },
     {
       "seq": 26,
@@ -312,11 +288,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202705482,
-      "timestamp_iso": "2026-06-04T14:20:41.202705+00:00",
-      "prev_hash": "36a3e863f8b9f70dc92b369e7bb978afef68f537a9ee8706f675c66087012415",
-      "entry_hash": "5956f9d71f7310a91cd849026204e8c3cae911e97327b7bea79dd1cbccf2baac"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176095022285,
+      "timestamp_iso": "2026-06-05T01:16:16.095022+00:00",
+      "entry_hash": "f35280e037fa662299ce3edc0d73ce8ad95f8f6e350481b6b938cf18f7ea52ff"
     },
     {
       "seq": 27,
@@ -324,11 +299,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202716497,
-      "timestamp_iso": "2026-06-04T14:20:41.202716+00:00",
-      "prev_hash": "5956f9d71f7310a91cd849026204e8c3cae911e97327b7bea79dd1cbccf2baac",
-      "entry_hash": "ae93cefe5797f803aa22db29bbe925dfcdd5e10422b2f3252be2d392be5e2163"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176095100231,
+      "timestamp_iso": "2026-06-05T01:16:16.095100+00:00",
+      "entry_hash": "a5e7e1c43a56f3414edc87a7b384bc380498de139b4cf0cd8b8ebdf993bb99ed"
     },
     {
       "seq": 28,
@@ -336,11 +310,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202727459,
-      "timestamp_iso": "2026-06-04T14:20:41.202727+00:00",
-      "prev_hash": "ae93cefe5797f803aa22db29bbe925dfcdd5e10422b2f3252be2d392be5e2163",
-      "entry_hash": "add13ecd848eeb971cf7d8d05ca62953a0c1d410d56caae107a3aaa473df6e2f"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176095175244,
+      "timestamp_iso": "2026-06-05T01:16:16.095175+00:00",
+      "entry_hash": "2c465bdcdd179e6dbb14511f0870c585c06e911ff8b860bf38690223696e6231"
     },
     {
       "seq": 29,
@@ -348,11 +321,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202737819,
-      "timestamp_iso": "2026-06-04T14:20:41.202738+00:00",
-      "prev_hash": "add13ecd848eeb971cf7d8d05ca62953a0c1d410d56caae107a3aaa473df6e2f",
-      "entry_hash": "2b20888b20b0e4c3da996f0027a194b5bca284567ac6b05e8228921adae0b0dc"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176095256939,
+      "timestamp_iso": "2026-06-05T01:16:16.095257+00:00",
+      "entry_hash": "7ca52746b19c5c26e121bd18b43b0f8dc61d1485c4b495d2beebc0a7d3427312"
     },
     {
       "seq": 30,
@@ -360,11 +332,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202747873,
-      "timestamp_iso": "2026-06-04T14:20:41.202748+00:00",
-      "prev_hash": "2b20888b20b0e4c3da996f0027a194b5bca284567ac6b05e8228921adae0b0dc",
-      "entry_hash": "b0e491bd361d3c2f0a0a085fa50bfdd1b71f855cd797dcf25f76519a154ac60b"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176095331309,
+      "timestamp_iso": "2026-06-05T01:16:16.095331+00:00",
+      "entry_hash": "ddafc31560c739235656f03a935329f11f4dfa3808ee52acbfcbf6414d59dbed"
     },
     {
       "seq": 31,
@@ -372,11 +343,10 @@
       "decision": "HIRE",
       "confidence": 0.6667,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202758735,
-      "timestamp_iso": "2026-06-04T14:20:41.202759+00:00",
-      "prev_hash": "b0e491bd361d3c2f0a0a085fa50bfdd1b71f855cd797dcf25f76519a154ac60b",
-      "entry_hash": "f6b3d3e9c56cad5a51e1975265ba212119a0fb0f572acded9676981c8425f60c"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176095443604,
+      "timestamp_iso": "2026-06-05T01:16:16.095444+00:00",
+      "entry_hash": "6504c2969317e78ad9c874125d2d5e97edb31e623bff53b7b7c76dc0a0ba58b6"
     },
     {
       "seq": 32,
@@ -384,11 +354,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202769223,
-      "timestamp_iso": "2026-06-04T14:20:41.202769+00:00",
-      "prev_hash": "f6b3d3e9c56cad5a51e1975265ba212119a0fb0f572acded9676981c8425f60c",
-      "entry_hash": "e1fbf014c1d8d3b79df46f7d134de246ac3c49f837b368c79f1cf145faf44f0e"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176095522594,
+      "timestamp_iso": "2026-06-05T01:16:16.095523+00:00",
+      "entry_hash": "2d94563067db695a6492d1868c0fcfd384f3c3542dcedc30b267ded536c5f2f9"
     },
     {
       "seq": 33,
@@ -396,11 +365,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202780451,
-      "timestamp_iso": "2026-06-04T14:20:41.202780+00:00",
-      "prev_hash": "e1fbf014c1d8d3b79df46f7d134de246ac3c49f837b368c79f1cf145faf44f0e",
-      "entry_hash": "beb2515cf5528b8abb8e195434c0e08ecb3a4cbfbc82741d8c41eebc32588e31"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176095602520,
+      "timestamp_iso": "2026-06-05T01:16:16.095603+00:00",
+      "entry_hash": "79f38c1b5efd83b773331f53bb073453b99b9a75484510e4ebedfada620d552f"
     },
     {
       "seq": 34,
@@ -408,11 +376,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202791431,
-      "timestamp_iso": "2026-06-04T14:20:41.202791+00:00",
-      "prev_hash": "beb2515cf5528b8abb8e195434c0e08ecb3a4cbfbc82741d8c41eebc32588e31",
-      "entry_hash": "78fae102a30395b60c5cd63256e4ded6847d5f47bbcc55df6b595dc396cba0f1"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176095683995,
+      "timestamp_iso": "2026-06-05T01:16:16.095684+00:00",
+      "entry_hash": "d6f017fd9092ffb43cc8a430c76530fce225c3a7201077b549b39955c6531cd8"
     },
     {
       "seq": 35,
@@ -420,11 +387,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202802260,
-      "timestamp_iso": "2026-06-04T14:20:41.202802+00:00",
-      "prev_hash": "78fae102a30395b60c5cd63256e4ded6847d5f47bbcc55df6b595dc396cba0f1",
-      "entry_hash": "52b13d8cc9f6fa7fd7440cb9196e956cfe61bf291e5f187b99692f0e013f3e50"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176095777521,
+      "timestamp_iso": "2026-06-05T01:16:16.095778+00:00",
+      "entry_hash": "c0e2ecfcfa8b69730e81ad7bd899d27350a1fe8f41287ae7bdf33c220bfadc97"
     },
     {
       "seq": 36,
@@ -432,11 +398,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202813217,
-      "timestamp_iso": "2026-06-04T14:20:41.202813+00:00",
-      "prev_hash": "52b13d8cc9f6fa7fd7440cb9196e956cfe61bf291e5f187b99692f0e013f3e50",
-      "entry_hash": "39a77eb039d098fa417493b8c8f83d82242de78a5674727f5a0168ddccc23c87"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176095867552,
+      "timestamp_iso": "2026-06-05T01:16:16.095868+00:00",
+      "entry_hash": "d2bc5a74eaf0e25c5858d8f4328ac007f6714dab5a1e3b08c4fc4716deaf5a24"
     },
     {
       "seq": 37,
@@ -444,11 +409,10 @@
       "decision": "HIRE",
       "confidence": 0.6667,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202823992,
-      "timestamp_iso": "2026-06-04T14:20:41.202824+00:00",
-      "prev_hash": "39a77eb039d098fa417493b8c8f83d82242de78a5674727f5a0168ddccc23c87",
-      "entry_hash": "ebca41b18f088780047a65b92f626973e5fdf56ad0cc42c8241c1e8433bbc08b"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176095960337,
+      "timestamp_iso": "2026-06-05T01:16:16.095960+00:00",
+      "entry_hash": "3ef69eb0c31cb33ce6cc11380d682f1dce565646fe98d4409a0b286e32c362fe"
     },
     {
       "seq": 38,
@@ -456,11 +420,10 @@
       "decision": "HIRE",
       "confidence": 0.6667,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202834940,
-      "timestamp_iso": "2026-06-04T14:20:41.202835+00:00",
-      "prev_hash": "ebca41b18f088780047a65b92f626973e5fdf56ad0cc42c8241c1e8433bbc08b",
-      "entry_hash": "fb71626d0fb4a48c6abefb9d3e0bced71d104feef96fc40653cbf295255ef014"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176096049998,
+      "timestamp_iso": "2026-06-05T01:16:16.096050+00:00",
+      "entry_hash": "a2999fe90219e24ec11ba94d86fab75f9e4c0d3d49850e4c97c5153c3b542c1f"
     },
     {
       "seq": 39,
@@ -468,11 +431,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202846164,
-      "timestamp_iso": "2026-06-04T14:20:41.202846+00:00",
-      "prev_hash": "fb71626d0fb4a48c6abefb9d3e0bced71d104feef96fc40653cbf295255ef014",
-      "entry_hash": "133386f634f06d60960be4a624a4d72949bb12513a6e016914198dfbf75b17f1"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176096150451,
+      "timestamp_iso": "2026-06-05T01:16:16.096151+00:00",
+      "entry_hash": "ada20dfe5b3c504c5d9d0c0d1f4a14d6e066a5046e4ef64706529c1dee94ccdc"
     },
     {
       "seq": 40,
@@ -480,11 +442,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202856879,
-      "timestamp_iso": "2026-06-04T14:20:41.202857+00:00",
-      "prev_hash": "133386f634f06d60960be4a624a4d72949bb12513a6e016914198dfbf75b17f1",
-      "entry_hash": "03ebace0c1683cc2370878238ef78694a999bc774e89909e8dd4e2d32a2ddebe"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176096262230,
+      "timestamp_iso": "2026-06-05T01:16:16.096262+00:00",
+      "entry_hash": "5f46feddf19446425753421fee373f141db2f2bd098b85af4682aee44499a361"
     },
     {
       "seq": 41,
@@ -492,11 +453,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202868074,
-      "timestamp_iso": "2026-06-04T14:20:41.202868+00:00",
-      "prev_hash": "03ebace0c1683cc2370878238ef78694a999bc774e89909e8dd4e2d32a2ddebe",
-      "entry_hash": "48952ce0adfd66d83a806f906efc98f07f7b172f351ad9c0f195398cc7492a66"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176096397306,
+      "timestamp_iso": "2026-06-05T01:16:16.096397+00:00",
+      "entry_hash": "3d1f6f63b5775f0bedc1fac7693606d4d6dca77a7139e4de5929c8474c27edce"
     },
     {
       "seq": 42,
@@ -504,11 +464,10 @@
       "decision": "HIRE",
       "confidence": 0.6667,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202878211,
-      "timestamp_iso": "2026-06-04T14:20:41.202878+00:00",
-      "prev_hash": "48952ce0adfd66d83a806f906efc98f07f7b172f351ad9c0f195398cc7492a66",
-      "entry_hash": "664398e3a82fc55b7c705c09ce98cc9c940b01eb231dcbf313e075db7fa46ad7"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176096521910,
+      "timestamp_iso": "2026-06-05T01:16:16.096522+00:00",
+      "entry_hash": "53b4e88a7f4e1f54313aa0558a5f8ec95ec244b0366de982dce0c51043db854d"
     },
     {
       "seq": 43,
@@ -516,11 +475,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202888288,
-      "timestamp_iso": "2026-06-04T14:20:41.202888+00:00",
-      "prev_hash": "664398e3a82fc55b7c705c09ce98cc9c940b01eb231dcbf313e075db7fa46ad7",
-      "entry_hash": "44d42d856c92a5bf95554070d56cf5da29a8324eb712f4c197491bc706f54ff8"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176096624082,
+      "timestamp_iso": "2026-06-05T01:16:16.096624+00:00",
+      "entry_hash": "6536e2a57fdf7318021efadab0e628a6ccd6a11953803b2fee8413783a55010a"
     },
     {
       "seq": 44,
@@ -528,11 +486,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202899706,
-      "timestamp_iso": "2026-06-04T14:20:41.202900+00:00",
-      "prev_hash": "44d42d856c92a5bf95554070d56cf5da29a8324eb712f4c197491bc706f54ff8",
-      "entry_hash": "9ca5f61da6bf0e9b7e263ca6f8ecc6f623a932887ab9bf80732a0c0114386d4d"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176096733338,
+      "timestamp_iso": "2026-06-05T01:16:16.096733+00:00",
+      "entry_hash": "01580d45a5f99d303c4c64b7e3be4d7fb0ec8bdf648bbd15a0b3361b0d93ea3d"
     },
     {
       "seq": 45,
@@ -540,11 +497,10 @@
       "decision": "HIRE",
       "confidence": 0.6667,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202910063,
-      "timestamp_iso": "2026-06-04T14:20:41.202910+00:00",
-      "prev_hash": "9ca5f61da6bf0e9b7e263ca6f8ecc6f623a932887ab9bf80732a0c0114386d4d",
-      "entry_hash": "e5c362e989789745063d0c86acbb696d10388e7cf9170d4aad02046c39f32b4c"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176096848733,
+      "timestamp_iso": "2026-06-05T01:16:16.096849+00:00",
+      "entry_hash": "f8da72eb749829f98653acc3cf0821610420f9aab581b91b4b48f1ed16bf143a"
     },
     {
       "seq": 46,
@@ -552,11 +508,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202950388,
-      "timestamp_iso": "2026-06-04T14:20:41.202950+00:00",
-      "prev_hash": "e5c362e989789745063d0c86acbb696d10388e7cf9170d4aad02046c39f32b4c",
-      "entry_hash": "128cb987b2519a32f2bc16018e455fc07fe59de5237ffca5c770e4c727d4945f"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176096968712,
+      "timestamp_iso": "2026-06-05T01:16:16.096969+00:00",
+      "entry_hash": "f8b659c7bb657dc05dd39c38d3ab46ef780468377b0536ef48c735bc1dbdae5b"
     },
     {
       "seq": 47,
@@ -564,11 +519,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841202996262,
-      "timestamp_iso": "2026-06-04T14:20:41.202996+00:00",
-      "prev_hash": "128cb987b2519a32f2bc16018e455fc07fe59de5237ffca5c770e4c727d4945f",
-      "entry_hash": "c718ce58d9bd9329238296f5c65bed07f90c660842cacac406dd8f879c32c0ad"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176097079827,
+      "timestamp_iso": "2026-06-05T01:16:16.097080+00:00",
+      "entry_hash": "f90893e91ee5faeca4d662b60bf49e451efd4d0d0534f322824323742b36ba2f"
     },
     {
       "seq": 48,
@@ -576,11 +530,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203009585,
-      "timestamp_iso": "2026-06-04T14:20:41.203010+00:00",
-      "prev_hash": "c718ce58d9bd9329238296f5c65bed07f90c660842cacac406dd8f879c32c0ad",
-      "entry_hash": "30399d6bb3c0b8f6616898e382838bb845d2e1e50bb2780df9b4c09d1aba8719"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176097190227,
+      "timestamp_iso": "2026-06-05T01:16:16.097190+00:00",
+      "entry_hash": "32ccc0b76bfa2ba59125166d02c5ee302213a9191642c01b3df2cc1614778584"
     },
     {
       "seq": 49,
@@ -588,11 +541,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203020324,
-      "timestamp_iso": "2026-06-04T14:20:41.203020+00:00",
-      "prev_hash": "30399d6bb3c0b8f6616898e382838bb845d2e1e50bb2780df9b4c09d1aba8719",
-      "entry_hash": "5c779b65d7756097d25afe3d0912ba2e7280c21c531d7f96a262d09ae7dd43f1"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176097316507,
+      "timestamp_iso": "2026-06-05T01:16:16.097317+00:00",
+      "entry_hash": "80e0b581073d3c414853d32204e96df55b90a370afa88654a42f9d5ea69b95f7"
     },
     {
       "seq": 50,
@@ -600,11 +552,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203031302,
-      "timestamp_iso": "2026-06-04T14:20:41.203031+00:00",
-      "prev_hash": "5c779b65d7756097d25afe3d0912ba2e7280c21c531d7f96a262d09ae7dd43f1",
-      "entry_hash": "a7d091482524958ca11f1123ae4e646f30beae5e9bea2892f9c37ca4c60ee39e"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176097482645,
+      "timestamp_iso": "2026-06-05T01:16:16.097483+00:00",
+      "entry_hash": "8c18582dfd59b938e63c6603b2ceefe09366aac5f48f59a061c34a99eaf83843"
     },
     {
       "seq": 51,
@@ -612,11 +563,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203041508,
-      "timestamp_iso": "2026-06-04T14:20:41.203042+00:00",
-      "prev_hash": "a7d091482524958ca11f1123ae4e646f30beae5e9bea2892f9c37ca4c60ee39e",
-      "entry_hash": "c9de5add6e96006fe0f69b6e8398e094e767a80b3b3387ae99b51667371e46fd"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176097604883,
+      "timestamp_iso": "2026-06-05T01:16:16.097605+00:00",
+      "entry_hash": "f4f32dae6823ee216bbf09452d074080b57ca47d4a7f9003026bd0d066fbdc51"
     },
     {
       "seq": 52,
@@ -624,11 +574,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203051928,
-      "timestamp_iso": "2026-06-04T14:20:41.203052+00:00",
-      "prev_hash": "c9de5add6e96006fe0f69b6e8398e094e767a80b3b3387ae99b51667371e46fd",
-      "entry_hash": "444f9afa272cd07ca9970e9d79decc8e8757490bb500a8c05d8e0152b9fc0e99"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176097737020,
+      "timestamp_iso": "2026-06-05T01:16:16.097737+00:00",
+      "entry_hash": "0a3196cd2ddb951fde896e316bb0f8c756582235d3d40ee6f5f3d1fa4c30bae8"
     },
     {
       "seq": 53,
@@ -636,11 +585,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203063589,
-      "timestamp_iso": "2026-06-04T14:20:41.203063+00:00",
-      "prev_hash": "444f9afa272cd07ca9970e9d79decc8e8757490bb500a8c05d8e0152b9fc0e99",
-      "entry_hash": "9f95b0648b66fe69e1ddba327adaa6619dc17b56e8a4991e7ea25138a859358a"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176097875587,
+      "timestamp_iso": "2026-06-05T01:16:16.097876+00:00",
+      "entry_hash": "8fa5cce71ce93094d7d0baf76203199f5b511b7a99c2fdb6ae810ac130500482"
     },
     {
       "seq": 54,
@@ -648,11 +596,10 @@
       "decision": "HIRE",
       "confidence": 0.6667,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203074757,
-      "timestamp_iso": "2026-06-04T14:20:41.203075+00:00",
-      "prev_hash": "9f95b0648b66fe69e1ddba327adaa6619dc17b56e8a4991e7ea25138a859358a",
-      "entry_hash": "3aea57c068e29916dfa9e81f166d02476b31d268432a3b34b40741073b239f9c"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176098021908,
+      "timestamp_iso": "2026-06-05T01:16:16.098022+00:00",
+      "entry_hash": "a08aa7c248c31b87f5fb1f68f2b35efcee29ae83eabf4cab808085b00c9f5be2"
     },
     {
       "seq": 55,
@@ -660,11 +607,10 @@
       "decision": "HIRE",
       "confidence": 0.6667,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203085949,
-      "timestamp_iso": "2026-06-04T14:20:41.203086+00:00",
-      "prev_hash": "3aea57c068e29916dfa9e81f166d02476b31d268432a3b34b40741073b239f9c",
-      "entry_hash": "bbe05dc4801e053462b46a7a72a20ac967a88093d5d59e6aa8a3e7680dae352f"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176098197307,
+      "timestamp_iso": "2026-06-05T01:16:16.098197+00:00",
+      "entry_hash": "2664535cbb09cd346b1655a8164f01b9bc23abf181ef4d95de9a4dc7a6a860be"
     },
     {
       "seq": 56,
@@ -672,11 +618,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203096419,
-      "timestamp_iso": "2026-06-04T14:20:41.203096+00:00",
-      "prev_hash": "bbe05dc4801e053462b46a7a72a20ac967a88093d5d59e6aa8a3e7680dae352f",
-      "entry_hash": "dbdfb290bffaefb88072a9d5ca0ee5250002b822bb88c5f91277801fa6a59fbe"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176098327236,
+      "timestamp_iso": "2026-06-05T01:16:16.098327+00:00",
+      "entry_hash": "360a5ccdcb8999d82bd3ce2e537fd5ce9d881e54be0af9ec9715d9422c60e267"
     },
     {
       "seq": 57,
@@ -684,11 +629,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203107009,
-      "timestamp_iso": "2026-06-04T14:20:41.203107+00:00",
-      "prev_hash": "dbdfb290bffaefb88072a9d5ca0ee5250002b822bb88c5f91277801fa6a59fbe",
-      "entry_hash": "4c8eb7bff57b196fe1524e9d8b23aa751fd826e2c6dd6a24d032c49ad3518d8a"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176098494645,
+      "timestamp_iso": "2026-06-05T01:16:16.098495+00:00",
+      "entry_hash": "6767483eee94d0a8123230d052cbf83e7cfdf11041798049aaa9ba2e461469f2"
     },
     {
       "seq": 58,
@@ -696,11 +640,10 @@
       "decision": "HIRE",
       "confidence": 0.6667,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203117159,
-      "timestamp_iso": "2026-06-04T14:20:41.203117+00:00",
-      "prev_hash": "4c8eb7bff57b196fe1524e9d8b23aa751fd826e2c6dd6a24d032c49ad3518d8a",
-      "entry_hash": "c602ca8957c9d3acb582741d0cb32f94b1bc755a2c68d4b86c8c92b81bcddcfe"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176098644767,
+      "timestamp_iso": "2026-06-05T01:16:16.098645+00:00",
+      "entry_hash": "8073f2ccec57317feb52697f48481f9572a5d83cfce950d05509886b82b38a54"
     },
     {
       "seq": 59,
@@ -708,11 +651,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203127856,
-      "timestamp_iso": "2026-06-04T14:20:41.203128+00:00",
-      "prev_hash": "c602ca8957c9d3acb582741d0cb32f94b1bc755a2c68d4b86c8c92b81bcddcfe",
-      "entry_hash": "0ec13bd4582cc19c15228f9febd5baaee27fca13621218cbbe60ceaa1da4dc69"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176098780746,
+      "timestamp_iso": "2026-06-05T01:16:16.098781+00:00",
+      "entry_hash": "a44009d8fbaca50cf3743017e3102edcae4b05532abe36451af63db46a055286"
     },
     {
       "seq": 60,
@@ -720,11 +662,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203168084,
-      "timestamp_iso": "2026-06-04T14:20:41.203168+00:00",
-      "prev_hash": "0ec13bd4582cc19c15228f9febd5baaee27fca13621218cbbe60ceaa1da4dc69",
-      "entry_hash": "5a2bc34af17dcf898abaea31c0aa9143cd376f2ded2dc859d6a0072d6df59bbb"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176098922127,
+      "timestamp_iso": "2026-06-05T01:16:16.098922+00:00",
+      "entry_hash": "bb35da12e65a9bceaabe0a696d6931b59b959f77a81051ff7c06bb29fa55efb7"
     },
     {
       "seq": 61,
@@ -732,11 +673,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203185166,
-      "timestamp_iso": "2026-06-04T14:20:41.203185+00:00",
-      "prev_hash": "5a2bc34af17dcf898abaea31c0aa9143cd376f2ded2dc859d6a0072d6df59bbb",
-      "entry_hash": "77190c79817d52506c809a34cc349ccd2b41393c63068a982314d510ebd4a657"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176099076457,
+      "timestamp_iso": "2026-06-05T01:16:16.099076+00:00",
+      "entry_hash": "a38ee32af9b103f75a744f7d8aad0a318a372a0effe34eabbb9a738e8bb1df74"
     },
     {
       "seq": 62,
@@ -744,11 +684,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203196824,
-      "timestamp_iso": "2026-06-04T14:20:41.203197+00:00",
-      "prev_hash": "77190c79817d52506c809a34cc349ccd2b41393c63068a982314d510ebd4a657",
-      "entry_hash": "9b62c6b757b77e38d7220b9487b50f13f38b6d67b217f5b74eccaa2def7cd61e"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176099227161,
+      "timestamp_iso": "2026-06-05T01:16:16.099227+00:00",
+      "entry_hash": "7883a840bb5fce5a89ea9cf3b24eb85333f1aa72f6d82025b496d9cc206e84aa"
     },
     {
       "seq": 63,
@@ -756,11 +695,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203207195,
-      "timestamp_iso": "2026-06-04T14:20:41.203207+00:00",
-      "prev_hash": "9b62c6b757b77e38d7220b9487b50f13f38b6d67b217f5b74eccaa2def7cd61e",
-      "entry_hash": "b2998c0d240d7fdce2ad78f0a59c7b9752edc5a00dbae79f9408aa48fc8a1a61"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176099399577,
+      "timestamp_iso": "2026-06-05T01:16:16.099400+00:00",
+      "entry_hash": "5f31908226df3f9e6b65d59722d93b829f04a0f3fe72de253abe16b524055f48"
     },
     {
       "seq": 64,
@@ -768,11 +706,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203217803,
-      "timestamp_iso": "2026-06-04T14:20:41.203218+00:00",
-      "prev_hash": "b2998c0d240d7fdce2ad78f0a59c7b9752edc5a00dbae79f9408aa48fc8a1a61",
-      "entry_hash": "41a266e72a5823f0fd45e0915f1dfeec415a1754bc672f9ef175bba3ce48cf3a"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176099550296,
+      "timestamp_iso": "2026-06-05T01:16:16.099550+00:00",
+      "entry_hash": "5ce4df7c9f9606bbec025b44b8392e9d9a24314275309768729878d276cc6ec7"
     },
     {
       "seq": 65,
@@ -780,11 +717,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203255384,
-      "timestamp_iso": "2026-06-04T14:20:41.203255+00:00",
-      "prev_hash": "41a266e72a5823f0fd45e0915f1dfeec415a1754bc672f9ef175bba3ce48cf3a",
-      "entry_hash": "2252fbab3763d528b8dd3c95c38eb52f6e16bcd9556c13cbc958f785116c0d2d"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176099708100,
+      "timestamp_iso": "2026-06-05T01:16:16.099708+00:00",
+      "entry_hash": "7217b04196065619d706675546359c6aadafdb145770b588f4438bfe801491e7"
     },
     {
       "seq": 66,
@@ -792,11 +728,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203276755,
-      "timestamp_iso": "2026-06-04T14:20:41.203277+00:00",
-      "prev_hash": "2252fbab3763d528b8dd3c95c38eb52f6e16bcd9556c13cbc958f785116c0d2d",
-      "entry_hash": "1817032462959918dc8525782533cbc3f409403abc5f6329fa871bab0e9cf5c0"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176099868553,
+      "timestamp_iso": "2026-06-05T01:16:16.099869+00:00",
+      "entry_hash": "4c9adcff72fa203325170a9d2f645ed9a3919e8cd73f48258c79d9bbd9592e2b"
     },
     {
       "seq": 67,
@@ -804,11 +739,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203289657,
-      "timestamp_iso": "2026-06-04T14:20:41.203290+00:00",
-      "prev_hash": "1817032462959918dc8525782533cbc3f409403abc5f6329fa871bab0e9cf5c0",
-      "entry_hash": "5ec264f8979e682f6e71d8c0329453ddab1ae69a12c18bd535108d37eb82d074"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176100030493,
+      "timestamp_iso": "2026-06-05T01:16:16.100030+00:00",
+      "entry_hash": "f1977a1013e32eb03d79910827ff91c62ebbc989bc6f7ddc938faf7ff9a915e1"
     },
     {
       "seq": 68,
@@ -816,11 +750,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203300989,
-      "timestamp_iso": "2026-06-04T14:20:41.203301+00:00",
-      "prev_hash": "5ec264f8979e682f6e71d8c0329453ddab1ae69a12c18bd535108d37eb82d074",
-      "entry_hash": "769dedc7c3015ac04df6a33989e1a948a1abcb415081fbfbf18ebd9ab417d237"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176100193708,
+      "timestamp_iso": "2026-06-05T01:16:16.100194+00:00",
+      "entry_hash": "0108a130e928148909e4cab6a912a91843eba797bee965a7f5cc6ec9873deb56"
     },
     {
       "seq": 69,
@@ -828,11 +761,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203311759,
-      "timestamp_iso": "2026-06-04T14:20:41.203312+00:00",
-      "prev_hash": "769dedc7c3015ac04df6a33989e1a948a1abcb415081fbfbf18ebd9ab417d237",
-      "entry_hash": "5f4194d8c40ba8729c1c2e9956a31b5b7de166fca94b8359e218a3eb8f1cb6bd"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176100384231,
+      "timestamp_iso": "2026-06-05T01:16:16.100384+00:00",
+      "entry_hash": "bcfd148430a1c547affb0703d8a4fb9a63995982ea2dcc2cc22956e34e83cb31"
     },
     {
       "seq": 70,
@@ -840,11 +772,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203322540,
-      "timestamp_iso": "2026-06-04T14:20:41.203323+00:00",
-      "prev_hash": "5f4194d8c40ba8729c1c2e9956a31b5b7de166fca94b8359e218a3eb8f1cb6bd",
-      "entry_hash": "f662c842a005eb3ad413169004eb48a4314900f42a06ead441dd9bb40c772dc9"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176100546435,
+      "timestamp_iso": "2026-06-05T01:16:16.100547+00:00",
+      "entry_hash": "659b029c5e451189e254ea3d533b7d0858c532b090da2646798af0919cfe91f7"
     },
     {
       "seq": 71,
@@ -852,11 +783,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203332662,
-      "timestamp_iso": "2026-06-04T14:20:41.203333+00:00",
-      "prev_hash": "f662c842a005eb3ad413169004eb48a4314900f42a06ead441dd9bb40c772dc9",
-      "entry_hash": "3ec39cd7a31f74b53da0c93b9a708ea76f01e9bfc7c571bc7266e12adf14ac5d"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176100711436,
+      "timestamp_iso": "2026-06-05T01:16:16.100711+00:00",
+      "entry_hash": "f1228651a3ee71f3efaf3f9be5fea2ea53c0b527d6b839bc3ad61f896ab918f4"
     },
     {
       "seq": 72,
@@ -864,11 +794,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203343259,
-      "timestamp_iso": "2026-06-04T14:20:41.203343+00:00",
-      "prev_hash": "3ec39cd7a31f74b53da0c93b9a708ea76f01e9bfc7c571bc7266e12adf14ac5d",
-      "entry_hash": "0c7051013d061b6383e30aff0b4f5ca4750bde4a7af263a034432c9f11f9e5ea"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176100879450,
+      "timestamp_iso": "2026-06-05T01:16:16.100879+00:00",
+      "entry_hash": "78bce2d74396853363807044d48de8a751fcc6049994a9919511290e0e313a1c"
     },
     {
       "seq": 73,
@@ -876,11 +805,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203353709,
-      "timestamp_iso": "2026-06-04T14:20:41.203354+00:00",
-      "prev_hash": "0c7051013d061b6383e30aff0b4f5ca4750bde4a7af263a034432c9f11f9e5ea",
-      "entry_hash": "68ad57a0bb3c84ee30920d487527762ae3357bceb01b8380469a82b4e6625390"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176101061502,
+      "timestamp_iso": "2026-06-05T01:16:16.101061+00:00",
+      "entry_hash": "a3ad9fad01af8f6e9925582e9b9a05b07e4efc1ef22db00f06962a19894c7a70"
     },
     {
       "seq": 74,
@@ -888,11 +816,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203388538,
-      "timestamp_iso": "2026-06-04T14:20:41.203388+00:00",
-      "prev_hash": "68ad57a0bb3c84ee30920d487527762ae3357bceb01b8380469a82b4e6625390",
-      "entry_hash": "c9bd28f8c56876b2d92d1410680da503ea7f7ad41ad87dc7054a111cd415ec3e"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176101227055,
+      "timestamp_iso": "2026-06-05T01:16:16.101227+00:00",
+      "entry_hash": "e364382b88cb4ad85b38075963ebb2de1cbd640735ccc5361b064e5e458f0297"
     },
     {
       "seq": 75,
@@ -900,11 +827,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203406097,
-      "timestamp_iso": "2026-06-04T14:20:41.203406+00:00",
-      "prev_hash": "c9bd28f8c56876b2d92d1410680da503ea7f7ad41ad87dc7054a111cd415ec3e",
-      "entry_hash": "743a9350f8f6f45ea8ce3596a63bb170cb59ac55395924d51b2679f080198faf"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176101431596,
+      "timestamp_iso": "2026-06-05T01:16:16.101432+00:00",
+      "entry_hash": "246b2fda1c242ea53fb2867f0179a1b1eb09d20927e34f1ebaf2d7afaaa9cf62"
     },
     {
       "seq": 76,
@@ -912,11 +838,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203417673,
-      "timestamp_iso": "2026-06-04T14:20:41.203418+00:00",
-      "prev_hash": "743a9350f8f6f45ea8ce3596a63bb170cb59ac55395924d51b2679f080198faf",
-      "entry_hash": "c1591f83b0d3bde75d64d00cf7449f7b8455ff97bc6c14b9591f4d80c9526d2f"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176101607611,
+      "timestamp_iso": "2026-06-05T01:16:16.101608+00:00",
+      "entry_hash": "489b5ddc283e1455c34a53c015090675a0570f9425ede6edec6a4bf3c83a38a8"
     },
     {
       "seq": 77,
@@ -924,11 +849,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203430044,
-      "timestamp_iso": "2026-06-04T14:20:41.203430+00:00",
-      "prev_hash": "c1591f83b0d3bde75d64d00cf7449f7b8455ff97bc6c14b9591f4d80c9526d2f",
-      "entry_hash": "2342c25c042e963275dd5522c4b943995ea73eb3bddbc3d8097015deba351ba5"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176101778901,
+      "timestamp_iso": "2026-06-05T01:16:16.101779+00:00",
+      "entry_hash": "d8240c4ff84043aa46e7a8809ce1d41a49321255c29e32ed51138141e1a07cbc"
     },
     {
       "seq": 78,
@@ -936,11 +860,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203442909,
-      "timestamp_iso": "2026-06-04T14:20:41.203443+00:00",
-      "prev_hash": "2342c25c042e963275dd5522c4b943995ea73eb3bddbc3d8097015deba351ba5",
-      "entry_hash": "f78e7bbc1b3b9e2727a4ef71f814e66e33158830ba7681c0de47246940b911ee"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176101972211,
+      "timestamp_iso": "2026-06-05T01:16:16.101972+00:00",
+      "entry_hash": "45387127ee2c30206eeaf48077cf925a0054b19989c6dbaa46679b3cbc0dbeb6"
     },
     {
       "seq": 79,
@@ -948,11 +871,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203453819,
-      "timestamp_iso": "2026-06-04T14:20:41.203454+00:00",
-      "prev_hash": "f78e7bbc1b3b9e2727a4ef71f814e66e33158830ba7681c0de47246940b911ee",
-      "entry_hash": "0586c6d11c635e984d58bb8528db63cf4c191316a742a47839d7770baa72e951"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176102219351,
+      "timestamp_iso": "2026-06-05T01:16:16.102219+00:00",
+      "entry_hash": "bed4ef02c7908661aa66e79e6358a5ca57fec72f78e2664a514553b2f71a10e6"
     },
     {
       "seq": 80,
@@ -960,11 +882,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203464521,
-      "timestamp_iso": "2026-06-04T14:20:41.203465+00:00",
-      "prev_hash": "0586c6d11c635e984d58bb8528db63cf4c191316a742a47839d7770baa72e951",
-      "entry_hash": "99b532187da4c12f482c9810cc094871f1684f671fde2252bcce42448a568236"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176102429897,
+      "timestamp_iso": "2026-06-05T01:16:16.102430+00:00",
+      "entry_hash": "40ca9612e052847da8765793ca401384200a252927897093ae0ce3f2dfb1852c"
     },
     {
       "seq": 81,
@@ -972,11 +893,10 @@
       "decision": "HIRE",
       "confidence": 0.6667,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203499212,
-      "timestamp_iso": "2026-06-04T14:20:41.203499+00:00",
-      "prev_hash": "99b532187da4c12f482c9810cc094871f1684f671fde2252bcce42448a568236",
-      "entry_hash": "895b9b62a7533890deb84fbb776e895a8565e48bf0a726822dda02347404aa39"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176102624499,
+      "timestamp_iso": "2026-06-05T01:16:16.102624+00:00",
+      "entry_hash": "8025859765bfa7bfbe4ed73fdb4c08992c2b821fe670f7c76026f8c7641e4475"
     },
     {
       "seq": 82,
@@ -984,11 +904,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203521328,
-      "timestamp_iso": "2026-06-04T14:20:41.203521+00:00",
-      "prev_hash": "895b9b62a7533890deb84fbb776e895a8565e48bf0a726822dda02347404aa39",
-      "entry_hash": "1023e2176f8c40cbe387737e34ae04bc31c71701dfe3d520af4edf56e249f0f1"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176102822857,
+      "timestamp_iso": "2026-06-05T01:16:16.102823+00:00",
+      "entry_hash": "aa44052785bfcb6ad21e290e82464234442603009c999378fd3afb610f0fd6ff"
     },
     {
       "seq": 83,
@@ -996,11 +915,10 @@
       "decision": "HIRE",
       "confidence": 0.6667,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203533983,
-      "timestamp_iso": "2026-06-04T14:20:41.203534+00:00",
-      "prev_hash": "1023e2176f8c40cbe387737e34ae04bc31c71701dfe3d520af4edf56e249f0f1",
-      "entry_hash": "af2be76648e3dab7c25d17f2bc733ec15ac4c2a1ea794c391e763cc1d6372605"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176103055695,
+      "timestamp_iso": "2026-06-05T01:16:16.103056+00:00",
+      "entry_hash": "1ec8490641259ffd6ee0ebba645c5e601d078f1c76c3e377a9afe8d66af5a7d7"
     },
     {
       "seq": 84,
@@ -1008,11 +926,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203545360,
-      "timestamp_iso": "2026-06-04T14:20:41.203545+00:00",
-      "prev_hash": "af2be76648e3dab7c25d17f2bc733ec15ac4c2a1ea794c391e763cc1d6372605",
-      "entry_hash": "d362d510dfa81e1f77b3a50841a0935e13b53fd094bf4b0c7fb7f658919236c7"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176103259855,
+      "timestamp_iso": "2026-06-05T01:16:16.103260+00:00",
+      "entry_hash": "f8d6b6bc1a283d5e81b2a4bed02f40161f56997c5483165bfc29d72fde8235e9"
     },
     {
       "seq": 85,
@@ -1020,11 +937,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203556282,
-      "timestamp_iso": "2026-06-04T14:20:41.203556+00:00",
-      "prev_hash": "d362d510dfa81e1f77b3a50841a0935e13b53fd094bf4b0c7fb7f658919236c7",
-      "entry_hash": "998ce421ec19fb768a552415b5be15a95649ad071f738e956beedd95d54f9267"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176103489395,
+      "timestamp_iso": "2026-06-05T01:16:16.103489+00:00",
+      "entry_hash": "932950d7593c73dbf446402b1c691593b9ca63f906e15101ca6f8f2ba9ace800"
     },
     {
       "seq": 86,
@@ -1032,11 +948,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203567917,
-      "timestamp_iso": "2026-06-04T14:20:41.203568+00:00",
-      "prev_hash": "998ce421ec19fb768a552415b5be15a95649ad071f738e956beedd95d54f9267",
-      "entry_hash": "608d258e4de20fb6eee18a332cbc7cd2cafab1b783248c54e121e0f9f11cfc7d"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176103701679,
+      "timestamp_iso": "2026-06-05T01:16:16.103702+00:00",
+      "entry_hash": "fa7e31d18c80692e82120134abd452c08c1e8453200c4b43de3deea1904235cb"
     },
     {
       "seq": 87,
@@ -1044,11 +959,10 @@
       "decision": "HIRE",
       "confidence": 0.6667,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203579144,
-      "timestamp_iso": "2026-06-04T14:20:41.203579+00:00",
-      "prev_hash": "608d258e4de20fb6eee18a332cbc7cd2cafab1b783248c54e121e0f9f11cfc7d",
-      "entry_hash": "c5277d8f04dc758be79ba80431951ff3e282246bef7d5dfeba25c91b8aea8dee"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176103915787,
+      "timestamp_iso": "2026-06-05T01:16:16.103916+00:00",
+      "entry_hash": "48093f633e2db7452c4b89e29e7e803e5a1b3ece5d45c1bf58e2b345127c16a6"
     },
     {
       "seq": 88,
@@ -1056,11 +970,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203589541,
-      "timestamp_iso": "2026-06-04T14:20:41.203590+00:00",
-      "prev_hash": "c5277d8f04dc758be79ba80431951ff3e282246bef7d5dfeba25c91b8aea8dee",
-      "entry_hash": "e05b7afa7cbdc8d16b48cfc803a5d7912db77018d6789adf1dc8270dd3dfa6dd"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176104112815,
+      "timestamp_iso": "2026-06-05T01:16:16.104113+00:00",
+      "entry_hash": "6a80eafb14150972f572db858ce27cb79b8f9f12a236b78ba12119d1be607913"
     },
     {
       "seq": 89,
@@ -1068,11 +981,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203633492,
-      "timestamp_iso": "2026-06-04T14:20:41.203633+00:00",
-      "prev_hash": "e05b7afa7cbdc8d16b48cfc803a5d7912db77018d6789adf1dc8270dd3dfa6dd",
-      "entry_hash": "eee78fd97a4ca5df15db2678a74ec26384ac1436849f07f3564adc2e08e3d056"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176104318379,
+      "timestamp_iso": "2026-06-05T01:16:16.104318+00:00",
+      "entry_hash": "532606fbbc45d15d6c65738b90074bd056e3bdf9ba6bcbd5d073419be9896e64"
     },
     {
       "seq": 90,
@@ -1080,11 +992,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203648183,
-      "timestamp_iso": "2026-06-04T14:20:41.203648+00:00",
-      "prev_hash": "eee78fd97a4ca5df15db2678a74ec26384ac1436849f07f3564adc2e08e3d056",
-      "entry_hash": "d8bffa809355a7cbb5fa172f604f89207fccecfbe1ace547db2b046a1be8e5f2"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176104565828,
+      "timestamp_iso": "2026-06-05T01:16:16.104566+00:00",
+      "entry_hash": "e37e928a6424a7666a7a50e3a42eeb1ac2383bb362bb5212e246e6b7eade3492"
     },
     {
       "seq": 91,
@@ -1092,11 +1003,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203658796,
-      "timestamp_iso": "2026-06-04T14:20:41.203659+00:00",
-      "prev_hash": "d8bffa809355a7cbb5fa172f604f89207fccecfbe1ace547db2b046a1be8e5f2",
-      "entry_hash": "db40ce25e6d64e2fa3b913155e230ce4c7924e82d32bcddb82dcf06d86cca793"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176104782517,
+      "timestamp_iso": "2026-06-05T01:16:16.104783+00:00",
+      "entry_hash": "8441fa644d93d2741d22c5a278124bf30b4c409eda8af80c1728b11cdb796b07"
     },
     {
       "seq": 92,
@@ -1104,11 +1014,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203674612,
-      "timestamp_iso": "2026-06-04T14:20:41.203675+00:00",
-      "prev_hash": "db40ce25e6d64e2fa3b913155e230ce4c7924e82d32bcddb82dcf06d86cca793",
-      "entry_hash": "71dcd7918d085d662ddca6fb2eb7376c8052f50b090f25ff7114e6b7c24a951e"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176104998526,
+      "timestamp_iso": "2026-06-05T01:16:16.104998+00:00",
+      "entry_hash": "350cb79930bb917b0f31411a6c49500df46fc89c088155fb4bfc991d4b0996e2"
     },
     {
       "seq": 93,
@@ -1116,11 +1025,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203687642,
-      "timestamp_iso": "2026-06-04T14:20:41.203688+00:00",
-      "prev_hash": "71dcd7918d085d662ddca6fb2eb7376c8052f50b090f25ff7114e6b7c24a951e",
-      "entry_hash": "366c0409b901070e6fa0ebe8764f8b1e9ef3f10ee5a335f9eae85f395cb7a627"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176105219214,
+      "timestamp_iso": "2026-06-05T01:16:16.105219+00:00",
+      "entry_hash": "e1e7a4d4eac9a2e9c0163e67cbab1e9041e437446da10c199b0bc01a648120b9"
     },
     {
       "seq": 94,
@@ -1128,11 +1036,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203698537,
-      "timestamp_iso": "2026-06-04T14:20:41.203698+00:00",
-      "prev_hash": "366c0409b901070e6fa0ebe8764f8b1e9ef3f10ee5a335f9eae85f395cb7a627",
-      "entry_hash": "d35b666b5cd93d4bee8fabc749ba34c52bb4c4063c57ccf3f8dfb316625f60f6"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176105477723,
+      "timestamp_iso": "2026-06-05T01:16:16.105478+00:00",
+      "entry_hash": "127d0388dc11f74e6734e54cde36d8bc3009e1d4ef33dac691e397deb6f9e744"
     },
     {
       "seq": 95,
@@ -1140,11 +1047,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203709179,
-      "timestamp_iso": "2026-06-04T14:20:41.203709+00:00",
-      "prev_hash": "d35b666b5cd93d4bee8fabc749ba34c52bb4c4063c57ccf3f8dfb316625f60f6",
-      "entry_hash": "36c0c550e099e00e66b231e56931c212a36982e13dbd19b9c8907790b6ccb86c"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176105706697,
+      "timestamp_iso": "2026-06-05T01:16:16.105707+00:00",
+      "entry_hash": "2788d639a1876f5fd341b794187e2e5df736037dad69a7d25b1688fde26211eb"
     },
     {
       "seq": 96,
@@ -1152,11 +1058,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203719404,
-      "timestamp_iso": "2026-06-04T14:20:41.203719+00:00",
-      "prev_hash": "36c0c550e099e00e66b231e56931c212a36982e13dbd19b9c8907790b6ccb86c",
-      "entry_hash": "88912cef7fa4e5aee5175aecb32380e3c1d97899ec3d942e06739bed09af7e51"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176105942793,
+      "timestamp_iso": "2026-06-05T01:16:16.105943+00:00",
+      "entry_hash": "ecc9420e6f34fcb2ff0aa9198395f56a15bbb45c3b7e0e6d5723e52480738dc1"
     },
     {
       "seq": 97,
@@ -1164,11 +1069,10 @@
       "decision": "HIRE",
       "confidence": 1.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203729617,
-      "timestamp_iso": "2026-06-04T14:20:41.203730+00:00",
-      "prev_hash": "88912cef7fa4e5aee5175aecb32380e3c1d97899ec3d942e06739bed09af7e51",
-      "entry_hash": "2b515088670124e00bf4eb1508e050a1c7801f886e00dd626cc7b617d190a459"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176106201751,
+      "timestamp_iso": "2026-06-05T01:16:16.106202+00:00",
+      "entry_hash": "f555263d676996275cb18d9ac1be61d0f6f8e1d3d8c36d5224e3c762115ed20d"
     },
     {
       "seq": 98,
@@ -1176,11 +1080,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203740327,
-      "timestamp_iso": "2026-06-04T14:20:41.203740+00:00",
-      "prev_hash": "2b515088670124e00bf4eb1508e050a1c7801f886e00dd626cc7b617d190a459",
-      "entry_hash": "28eb2b8d5855f602ead77443ba90e01c3fc898f957dac41c2b320467d55083c9"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176106472392,
+      "timestamp_iso": "2026-06-05T01:16:16.106472+00:00",
+      "entry_hash": "b41b622575141cf704f43346680c13017701f689e5e51c29de70738234aed94d"
     },
     {
       "seq": 99,
@@ -1188,11 +1091,10 @@
       "decision": "REJECT",
       "confidence": 0.0,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203750563,
-      "timestamp_iso": "2026-06-04T14:20:41.203751+00:00",
-      "prev_hash": "28eb2b8d5855f602ead77443ba90e01c3fc898f957dac41c2b320467d55083c9",
-      "entry_hash": "7444e5db1111cdd654924848cdf8d09bb8fa59794efcf9567c7f84568118e193"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176106707601,
+      "timestamp_iso": "2026-06-05T01:16:16.106708+00:00",
+      "entry_hash": "c2eda456f52e9b2947212ac70cb5fe3282d7b1c7ac3da916379abf8b582aadde"
     },
     {
       "seq": 100,
@@ -1200,11 +1102,10 @@
       "decision": "HIRE",
       "confidence": 0.6667,
       "policy_allowed": true,
-      "policy_reason": "All approved features present; no protected attributes",
-      "timestamp_ns": 1780582841203812064,
-      "timestamp_iso": "2026-06-04T14:20:41.203812+00:00",
-      "prev_hash": "7444e5db1111cdd654924848cdf8d09bb8fa59794efcf9567c7f84568118e193",
-      "entry_hash": "9dc0d2fe93429487ad0e85e84efbe4ce4064346290f2713f5d8887c1f6c2dbd1"
+      "policy_reason": "all approved features; no protected attributes",
+      "timestamp_ns": 1780622176106962734,
+      "timestamp_iso": "2026-06-05T01:16:16.106963+00:00",
+      "entry_hash": "b1ea7c5581a8920e66cb2bfafddcb458a2bab9f57640da2f2d055d09a71c9010"
     }
   ]
 }
