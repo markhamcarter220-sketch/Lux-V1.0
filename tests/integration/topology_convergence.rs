@@ -5,6 +5,7 @@
 //! that the adjacency-matrix traversal correctly enforces the declared edges.
 
 use lux_kernel::{
+    audit::AuditLog,
     error::Error,
     topology::{BootingGraph, OperationalGraph},
 };
@@ -20,7 +21,7 @@ fn undeclared_edge_is_denied_on_sealed_graph() {
     let graph: OperationalGraph = booting.seal();
 
     // No edges declared → all traversals must fail.
-    let result = graph.traverse(node(1), node(2));
+    let result = graph.traverse(node(1), node(2), &mut AuditLog::new());
     assert_eq!(
         result,
         Err(Error::TopologyViolation { src: 1, dst: 2 }),
@@ -36,7 +37,7 @@ fn declared_edge_between_active_nodes_is_permitted() {
     booting.permit_edge(node(1), node(2)).unwrap();
     let graph = booting.seal();
 
-    assert!(graph.traverse(node(1), node(2)).is_ok(), "declared edge must be permitted");
+    assert!(graph.traverse(node(1), node(2), &mut AuditLog::new()).is_ok(), "declared edge must be permitted");
 }
 
 #[test]
@@ -48,7 +49,7 @@ fn reverse_edge_is_denied_when_undeclared() {
     let graph = booting.seal();
 
     assert!(
-        graph.traverse(node(2), node(1)).is_err(),
+        graph.traverse(node(2), node(1), &mut AuditLog::new()).is_err(),
         "undeclared reverse edge must be denied"
     );
 }
@@ -66,7 +67,7 @@ fn inactive_node_blocks_traversal() {
     let graph = booting.seal();
 
     assert!(
-        graph.traverse(node(1), node(2)).is_err(),
+        graph.traverse(node(1), node(2), &mut AuditLog::new()).is_err(),
         "inactive destination must block traversal after seal"
     );
 }

@@ -98,6 +98,24 @@ pub enum Error {
 }
 
 impl Error {
+    /// Returns a static string describing the denial reason, suitable for
+    /// embedding in an audit event.
+    ///
+    /// For `TopologyViolation`, the src/dst pair is not included because audit
+    /// events accept only `&'static str`; the edge coordinates are recorded in
+    /// the structured error returned to the caller.
+    #[must_use]
+    pub fn denial_reason_str(&self) -> &'static str {
+        match self {
+            Self::CapabilityDenied { reason }   => reason,
+            Self::QuotaExceeded { resource }     => resource,
+            Self::TopologyViolation { .. }        => "edge not in boot manifest",
+            Self::ManifestInvalid { detail }      => detail,
+            Self::SchedulerInvariant { detail }   => detail,
+            Self::UndefinedState { context }      => context,
+        }
+    }
+
     /// Returns the [`DenialClass`] for this error.
     ///
     /// Every variant is assigned to exactly one class — no ambiguous variants

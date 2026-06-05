@@ -8,6 +8,7 @@ use lux_kernel::{
     metabolism::{ledger::Ledger, quota::QuotaEnforcer},
     types::Quota,
 };
+use lux_kernel::audit::AuditLog;
 use core::num::NonZeroU32;
 use proptest::prelude::*;
 
@@ -27,7 +28,7 @@ proptest! {
         ledger.seed(node(1), Quota::new(ceiling));
 
         let enforcer = QuotaEnforcer;
-        let result = enforcer.deduct(&mut ledger, node(1), amount, "compute");
+        let result = enforcer.deduct(&mut ledger, node(1), amount, "compute", &mut AuditLog::new());
 
         prop_assert!(result.is_err(), "over-quota deduction must be denied");
         prop_assert_eq!(
@@ -49,7 +50,7 @@ proptest! {
         ledger.seed(node(1), Quota::new(ceiling));
 
         let enforcer  = QuotaEnforcer;
-        let result    = enforcer.deduct(&mut ledger, node(1), amount, "compute");
+        let result    = enforcer.deduct(&mut ledger, node(1), amount, "compute", &mut AuditLog::new());
 
         prop_assert!(result.is_ok(), "within-quota deduction must succeed");
         prop_assert_eq!(
@@ -70,8 +71,8 @@ proptest! {
         ledger.seed(node(1), Quota::new(ceiling));
         let enforcer = QuotaEnforcer;
 
-        let r1 = enforcer.deduct(&mut ledger, node(1), a, "compute");
-        let r2 = enforcer.deduct(&mut ledger, node(1), b, "compute");
+        let r1 = enforcer.deduct(&mut ledger, node(1), a, "compute", &mut AuditLog::new());
+        let r2 = enforcer.deduct(&mut ledger, node(1), b, "compute", &mut AuditLog::new());
 
         // If both succeed, total deducted must not exceed ceiling.
         if r1.is_ok() && r2.is_ok() {

@@ -18,6 +18,7 @@
 use heapless::Vec as HVec;
 
 use crate::{
+    audit::{AuditLog, EventKind},
     auth::{
         capability::{Capability, CapabilitySet},
         revocation::RevocationLedger,
@@ -52,7 +53,21 @@ impl Policy {
     ///
     /// Returns `Ok(())` iff all four checks pass (generation, rights,
     /// revocation, replay).  Every other path returns `Err(CapabilityDenied)`.
-    pub fn check(&mut self, cap: &Capability, required_right: CapabilitySet) -> Result<()> {
+    /// An audit event is always emitted to `audit` regardless of outcome.
+    pub fn check(
+        &mut self,
+        cap: &Capability,
+        required_right: CapabilitySet,
+        audit: &mut AuditLog,
+    ) -> Result<()> {
+        let actor = cap.target.get();
+        let result = self.check_inner(cap, required_right);
+        let denial = result.as_ref().err().map(|e| (e.denial_class(), e.denial_reason_str()));
+        audit.append(EventKind::CapabilityCheck, actor, 0, denial);
+        result
+    }
+
+    fn check_inner(&mut self, cap: &Capability, required_right: CapabilitySet) -> Result<()> {
         // Step 1: generation and rights.
         if !cap.authorises(required_right, self.current_generation) {
             return Err(Error::CapabilityDenied {

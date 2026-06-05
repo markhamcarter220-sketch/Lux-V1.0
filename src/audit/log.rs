@@ -78,11 +78,18 @@ use crate::{error::DenialClass, types::MAX_AUDIT_EVENTS};
 use super::event::{AuditEvent, EventKind, Outcome};
 
 /// Append-only, hash-chained audit log.
+///
+/// Structurally `!Send` and `!Sync`: the `PhantomData<*mut ()>` field
+/// prevents this type from being sent across threads or shared by reference
+/// without `unsafe`.  In a `no_std` kernel with no concurrent execution this
+/// is the correct model; if multi-core support is added the constraint must be
+/// re-evaluated.
 #[derive(Debug)]
 pub struct AuditLog {
-    events:    heapless::Vec<AuditEvent, MAX_AUDIT_EVENTS>,
-    last_hash: [u8; 32],
-    next_seq:  u64,
+    events:          heapless::Vec<AuditEvent, MAX_AUDIT_EVENTS>,
+    last_hash:       [u8; 32],
+    next_seq:        u64,
+    _not_send_sync:  core::marker::PhantomData<*mut ()>,
 }
 
 impl AuditLog {
@@ -90,9 +97,10 @@ impl AuditLog {
     #[must_use]
     pub fn new() -> Self {
         Self {
-            events:    heapless::Vec::new(),
-            last_hash: [0u8; 32],
-            next_seq:  0,
+            events:         heapless::Vec::new(),
+            last_hash:      [0u8; 32],
+            next_seq:       0,
+            _not_send_sync: core::marker::PhantomData,
         }
     }
 
@@ -223,18 +231,26 @@ impl AuditLog {
             }
             let ok = ev.outcome == Outcome::Permitted;
 
-            // class field: null or "halt" / "failure"
+            // Common prefix fields.
+            write!(writer,
+                r#"{{"seq":{},"kind":"{}","actor":{},"ts":{},"ok":{},"#,
+                ev.seq, ev.kind_str(), ev.actor, ev.timestamp, ok)?;
+
+            // class / reason fields.
             match ev.denial_class_str() {
-                None    => write!(writer,
-                    r#"{{"seq":{},"kind":"{}","actor":{},"ts":{},"ok":{},"class":null,"reason":null}}"#,
-                    ev.seq, ev.kind_str(), ev.actor, ev.timestamp, ok)?,
+                None    => write!(writer, r#""class":null,"reason":null,"#)?,
                 Some(c) => {
                     let reason = ev.denial_reason.unwrap_or("");
-                    write!(writer,
-                        r#"{{"seq":{},"kind":"{}","actor":{},"ts":{},"ok":{},"class":"{}","reason":"{}"}}"#,
-                        ev.seq, ev.kind_str(), ev.actor, ev.timestamp, ok, c, reason)?;
+                    write!(writer, r#""class":"{}","reason":"{}","#, c, reason)?;
                 }
             }
+
+            // Hash field — 32 bytes as 64 lowercase hex chars.
+            writer.write_str(r#""hash":""#)?;
+            for byte in &ev.hash {
+                write!(writer, "{:02x}", byte)?;
+            }
+            writer.write_str(r#""}"#)?;
         }
         writer.write_char(']')
     }

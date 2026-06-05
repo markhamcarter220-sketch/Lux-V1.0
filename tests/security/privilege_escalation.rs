@@ -12,6 +12,7 @@ use lux_kernel::{
     error::Error,
     types::Generation,
 };
+use lux_kernel::audit::AuditLog;
 use core::num::NonZeroU32;
 
 fn node(n: u32) -> NonZeroU32 {
@@ -31,7 +32,7 @@ fn stale_token_after_rotation_is_denied() {
     );
     policy.rotate_generation();
     assert_eq!(
-        policy.check(&stale_cap, CapabilitySet::SHUTDOWN),
+        policy.check(&stale_cap, CapabilitySet::SHUTDOWN, &mut AuditLog::new()),
         Err(Error::CapabilityDenied {
             reason: "token expired, insufficient rights, or wrong generation",
         }),
@@ -61,12 +62,12 @@ fn nonce_replay_is_denied() {
     let cap = Capability::new_for_test(node(1), node(2), CapabilitySet::SCHEDULE, gen, 42);
 
     assert!(
-        policy.check(&cap, CapabilitySet::SCHEDULE).is_ok(),
+        policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok(),
         "First presentation must succeed"
     );
     // Second check with the same nonce must fail — replay detected.
     assert_eq!(
-        policy.check(&cap, CapabilitySet::SCHEDULE),
+        policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()),
         Err(Error::CapabilityDenied { reason: "nonce replayed" }),
         "Replay must be denied"
     );
@@ -83,7 +84,7 @@ fn nonce_window_clears_on_rotation() {
         Generation(0),
         99,
     );
-    assert!(policy.check(&cap0, CapabilitySet::SCHEDULE).is_ok());
+    assert!(policy.check(&cap0, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
 
     // Rotate; old cap0 is now stale (generation mismatch), but nonce 99
     // should be cleared — a new token with nonce 99 in gen 1 must succeed.
@@ -96,7 +97,7 @@ fn nonce_window_clears_on_rotation() {
         99,                  // same nonce, new generation — must be accepted
     );
     assert!(
-        policy.check(&cap1, CapabilitySet::SCHEDULE).is_ok(),
+        policy.check(&cap1, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok(),
         "Nonce 99 must be reusable in the new generation"
     );
 }

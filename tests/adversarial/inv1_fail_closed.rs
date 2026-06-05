@@ -14,6 +14,7 @@ use lux_kernel::{
     topology::BootingGraph,
     types::{Generation, Quota},
 };
+use lux_kernel::audit::AuditLog;
 use core::num::NonZeroU32;
 use ed25519_dalek::{SigningKey, Signer};
 
@@ -53,7 +54,7 @@ fn attack_1_1_empty_rights_capability_denied_for_all_rights() {
         let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::empty(), gen, 100 + i as u64);
         // Empty rights fail at step 1 (authorises); nonce is never consumed.
         assert!(
-            policy.check(&cap, right).is_err(),
+            policy.check(&cap, right, &mut AuditLog::new()).is_err(),
             "empty-rights cap must be denied for {right:?}"
         );
     }
@@ -72,7 +73,7 @@ fn attack_1_2_stale_generation_denied_for_all_rights() {
     for (i, &right) in ALL_RIGHTS.iter().enumerate() {
         let cap = Capability::new_for_test(nz(1), nz(2), right, old_gen, 200 + i as u64);
         assert!(
-            policy.check(&cap, right).is_err(),
+            policy.check(&cap, right, &mut AuditLog::new()).is_err(),
             "stale-gen cap (gen 0 at policy gen 3) must be denied for {right:?}"
         );
     }
@@ -88,7 +89,7 @@ fn attack_1_3_full_rights_stale_generation_still_denied() {
     let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::all(), Generation(9), 42);
 
     assert!(matches!(
-        policy.check(&cap, CapabilitySet::SHUTDOWN),
+        policy.check(&cap, CapabilitySet::SHUTDOWN, &mut AuditLog::new()),
         Err(Error::CapabilityDenied { .. })
     ));
 }
@@ -131,7 +132,7 @@ fn attack_1_5_stale_generation_acts_as_temporal_expiry() {
 
     // Caps at gen 0 are valid now.
     let valid = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen0, 1);
-    assert!(policy.check(&valid, CapabilitySet::SCHEDULE).is_ok());
+    assert!(policy.check(&valid, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
 
     // Rotate — gen 0 caps are now "expired".
     policy.rotate_generation();
@@ -139,18 +140,18 @@ fn attack_1_5_stale_generation_acts_as_temporal_expiry() {
 
     let expired = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen0, 99);
     assert!(
-        policy.check(&expired, CapabilitySet::SCHEDULE).is_err(),
+        policy.check(&expired, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err(),
         "gen-0 cap must be expired after rotation to gen 1"
     );
 
     // Gen 1 caps are valid.
     let current = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen1, 100);
-    assert!(policy.check(&current, CapabilitySet::SCHEDULE).is_ok());
+    assert!(policy.check(&current, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
 
     // Rotate again — gen 1 caps also expire.
     policy.rotate_generation();
     let gen1_expired = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen1, 200);
-    assert!(policy.check(&gen1_expired, CapabilitySet::SCHEDULE).is_err());
+    assert!(policy.check(&gen1_expired, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err());
 }
 
 // ── Attack 1.6 ────────────────────────────────────────────────────────────────
@@ -169,7 +170,7 @@ fn attack_1_6_revoked_capability_stays_denied_persistently() {
         let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, nonce);
         assert!(
             matches!(
-                policy.check(&cap, CapabilitySet::SCHEDULE),
+                policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()),
                 Err(Error::CapabilityDenied { reason: "capability revoked" })
             ),
             "attempt {i}: revoked cap must be denied"
@@ -194,7 +195,7 @@ fn attack_1_7_revocation_takes_priority_over_full_rights() {
     for (i, &right) in ALL_RIGHTS.iter().enumerate() {
         let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::all(), gen, nonce);
         assert!(
-            policy.check(&cap, right).is_err(),
+            policy.check(&cap, right, &mut AuditLog::new()).is_err(),
             "full-rights revoked cap must be denied for {right:?} (attempt {i})"
         );
     }
@@ -233,10 +234,10 @@ fn attack_1_8_over_quota_deduction_is_atomic() {
 fn attack_1_9_error_paths_never_panic() {
     // Topology: out-of-range and inactive nodes.
     let op = BootingGraph::new().seal();
-    let _ = op.traverse(nz(1), nz(65));
-    let _ = op.traverse(nz(65), nz(1));
-    let _ = op.traverse(nz(1), nz(1));
-    let _ = op.traverse(nz(u32::MAX), nz(1));
+    let _ = op.traverse(nz(1), nz(65), &mut AuditLog::new());
+    let _ = op.traverse(nz(65), nz(1), &mut AuditLog::new());
+    let _ = op.traverse(nz(1), nz(1), &mut AuditLog::new());
+    let _ = op.traverse(nz(u32::MAX), nz(1), &mut AuditLog::new());
 
     // Ledger: unseeded node, zero balance, u64::MAX deduction.
     let mut ledger = Ledger::new();
@@ -248,7 +249,7 @@ fn attack_1_9_error_paths_never_panic() {
     // Policy: exhausted generation, empty rights.
     let mut policy = Policy::new(Generation(u64::MAX));
     let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::empty(), Generation(0), 1);
-    let _ = policy.check(&cap, CapabilitySet::SHUTDOWN);
+    let _ = policy.check(&cap, CapabilitySet::SHUTDOWN, &mut AuditLog::new());
 
     // Manifest: too short, all-zeros, garbage.
     let creds = BootCredentials::from_key_bytes([1u8; 32]).unwrap();
@@ -272,18 +273,18 @@ fn attack_1_10_check_revoke_sequence_is_consistent() {
 
     // Use nonce_a successfully.
     let cap_a = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, nonce_a);
-    assert!(policy.check(&cap_a, CapabilitySet::SCHEDULE).is_ok());
+    assert!(policy.check(&cap_a, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
 
     // Revoke nonce_b, then attempt use.
     policy.revoke_capability(nonce_b);
     let cap_b = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, nonce_b);
-    assert!(policy.check(&cap_b, CapabilitySet::SCHEDULE).is_err());
+    assert!(policy.check(&cap_b, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err());
 
     // nonce_a replay denied (already consumed in nonce window).
     let cap_a2 = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, nonce_a);
-    assert!(policy.check(&cap_a2, CapabilitySet::SCHEDULE).is_err());
+    assert!(policy.check(&cap_a2, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err());
 
     // nonce_b repeated attempt also denied (still revoked).
     let cap_b2 = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, nonce_b);
-    assert!(policy.check(&cap_b2, CapabilitySet::SCHEDULE).is_err());
+    assert!(policy.check(&cap_b2, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err());
 }

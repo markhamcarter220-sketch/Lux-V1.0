@@ -8,6 +8,7 @@ use lux_kernel::{
     auth::{capability::{Capability, CapabilitySet}, policy::Policy},
     types::Generation,
 };
+use lux_kernel::audit::AuditLog;
 use core::num::NonZeroU32;
 use proptest::prelude::*;
 
@@ -44,7 +45,7 @@ proptest! {
             ] {
                 if !rights.contains(right) {
                     prop_assert!(
-                        policy.check(&delegated, right).is_err(),
+                        policy.check(&delegated, right, &mut AuditLog::new()).is_err(),
                         "delegation amplified right {right:?}"
                     );
                     // delegated was moved — stop here.
@@ -82,8 +83,8 @@ proptest! {
         let c1 = Capability::new_for_test(node(1), node(2), CapabilitySet::SCHEDULE, gen, nonce);
         let c2 = Capability::new_for_test(node(1), node(2), CapabilitySet::SCHEDULE, gen, nonce);
 
-        let _ = policy.check(&c1, CapabilitySet::SCHEDULE); // first use
-        let r2 = policy.check(&c2, CapabilitySet::SCHEDULE);
+        let _ = policy.check(&c1, CapabilitySet::SCHEDULE, &mut AuditLog::new()); // first use
+        let r2 = policy.check(&c2, CapabilitySet::SCHEDULE, &mut AuditLog::new());
         prop_assert!(r2.is_err(), "second use of same nonce must be denied");
     }
 }

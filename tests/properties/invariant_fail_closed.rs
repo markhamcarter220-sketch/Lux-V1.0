@@ -8,6 +8,7 @@ use lux_kernel::{
     auth::{capability::{Capability, CapabilitySet}, policy::Policy},
     types::Generation,
 };
+use lux_kernel::audit::AuditLog;
 use core::num::NonZeroU32;
 use proptest::prelude::*;
 
@@ -37,7 +38,7 @@ proptest! {
         );
         let required = CapabilitySet::from_bits_truncate(required_bits);
         if !required.is_empty() {
-            prop_assert!(policy.check(&cap, required).is_err(),
+            prop_assert!(policy.check(&cap, required, &mut AuditLog::new()).is_err(),
                 "empty rights must always be denied");
         }
     }
@@ -56,7 +57,7 @@ proptest! {
             let gen = Generation(0);
             let mut policy = Policy::new(gen);
             let cap = Capability::new_for_test(node(1), node(2), rights, gen, nonce);
-            prop_assert!(policy.check(&cap, required).is_err(),
+            prop_assert!(policy.check(&cap, required, &mut AuditLog::new()).is_err(),
                 "insufficient rights must be denied");
         }
     }
@@ -76,7 +77,7 @@ proptest! {
             token_gen,
             nonce,
         );
-        prop_assert!(policy.check(&cap, CapabilitySet::SCHEDULE).is_err(),
+        prop_assert!(policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err(),
             "token from older generation must be denied");
     }
 
@@ -91,7 +92,7 @@ proptest! {
             CapabilitySet::SCHEDULE | CapabilitySet::READ_TOPOLOGY,
             gen, nonce,
         );
-        prop_assert!(policy.check(&cap, CapabilitySet::SCHEDULE).is_err(),
+        prop_assert!(policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err(),
             "revoked token must always be denied");
     }
 }

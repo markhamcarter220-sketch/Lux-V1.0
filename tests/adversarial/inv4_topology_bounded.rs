@@ -11,6 +11,7 @@ use lux_kernel::{
     topology::BootingGraph,
     types::{Generation, MAX_NODES},
 };
+use lux_kernel::audit::AuditLog;
 use core::num::NonZeroU32;
 
 fn nz(n: u32) -> NonZeroU32 { NonZeroU32::new(n).unwrap() }
@@ -27,9 +28,9 @@ fn attack_4_1_traversal_to_undeclared_node_denied() {
     let op = g.seal();
 
     // Node 4 was never activated.
-    assert!(op.traverse(nz(1), nz(4)).is_err(), "traversal to undeclared node must be denied");
-    assert!(op.traverse(nz(4), nz(1)).is_err(), "traversal from undeclared node must be denied");
-    assert!(op.traverse(nz(4), nz(4)).is_err(), "self-traversal on undeclared node must be denied");
+    assert!(op.traverse(nz(1), nz(4), &mut AuditLog::new()).is_err(), "traversal to undeclared node must be denied");
+    assert!(op.traverse(nz(4), nz(1), &mut AuditLog::new()).is_err(), "traversal from undeclared node must be denied");
+    assert!(op.traverse(nz(4), nz(4), &mut AuditLog::new()).is_err(), "self-traversal on undeclared node must be denied");
 }
 
 // ── Attack 4.2 ────────────────────────────────────────────────────────────────
@@ -44,10 +45,10 @@ fn attack_4_2_undeclared_edge_denied_even_if_both_nodes_active() {
     g.permit_edge(nz(1), nz(2)).unwrap(); // only 1→2 declared
     let op = g.seal();
 
-    assert!(op.traverse(nz(1), nz(2)).is_ok());
-    assert!(op.traverse(nz(1), nz(3)).is_err(), "1→3 undeclared must be denied");
-    assert!(op.traverse(nz(2), nz(3)).is_err(), "2→3 undeclared must be denied");
-    assert!(op.traverse(nz(3), nz(1)).is_err(), "3→1 undeclared must be denied");
+    assert!(op.traverse(nz(1), nz(2), &mut AuditLog::new()).is_ok());
+    assert!(op.traverse(nz(1), nz(3), &mut AuditLog::new()).is_err(), "1→3 undeclared must be denied");
+    assert!(op.traverse(nz(2), nz(3), &mut AuditLog::new()).is_err(), "2→3 undeclared must be denied");
+    assert!(op.traverse(nz(3), nz(1), &mut AuditLog::new()).is_err(), "3→1 undeclared must be denied");
 }
 
 // ── Attack 4.3 ────────────────────────────────────────────────────────────────
@@ -64,10 +65,10 @@ fn attack_4_3_transitive_shortcut_is_denied() {
     g.permit_edge(nz(2), nz(3)).unwrap(); // B→C
     let op = g.seal();
 
-    assert!(op.traverse(nz(1), nz(2)).is_ok()); // A→B: ok
-    assert!(op.traverse(nz(2), nz(3)).is_ok()); // B→C: ok
+    assert!(op.traverse(nz(1), nz(2), &mut AuditLog::new()).is_ok()); // A→B: ok
+    assert!(op.traverse(nz(2), nz(3), &mut AuditLog::new()).is_ok()); // B→C: ok
     assert!(
-        op.traverse(nz(1), nz(3)).is_err(),
+        op.traverse(nz(1), nz(3), &mut AuditLog::new()).is_err(),
         "A→C shortcut must be denied: transitive closure is not automatic"
     );
 }
@@ -83,9 +84,9 @@ fn attack_4_4_reverse_edge_traversal_denied() {
     g.permit_edge(nz(10), nz(20)).unwrap(); // 10→20 only
     let op = g.seal();
 
-    assert!(op.traverse(nz(10), nz(20)).is_ok(), "declared direction must be permitted");
+    assert!(op.traverse(nz(10), nz(20), &mut AuditLog::new()).is_ok(), "declared direction must be permitted");
     assert!(
-        op.traverse(nz(20), nz(10)).is_err(),
+        op.traverse(nz(20), nz(10), &mut AuditLog::new()).is_err(),
         "reverse of directed edge must be denied"
     );
 }
@@ -100,14 +101,14 @@ fn attack_4_5_self_loop_requires_explicit_declaration() {
     g_with.activate(nz(5)).unwrap();
     g_with.permit_edge(nz(5), nz(5)).unwrap();
     let op_with = g_with.seal();
-    assert!(op_with.traverse(nz(5), nz(5)).is_ok(), "declared self-loop must be permitted");
+    assert!(op_with.traverse(nz(5), nz(5), &mut AuditLog::new()).is_ok(), "declared self-loop must be permitted");
 
     // Without declared self-loop.
     let mut g_without = BootingGraph::new();
     g_without.activate(nz(5)).unwrap();
     let op_without = g_without.seal();
     assert!(
-        op_without.traverse(nz(5), nz(5)).is_err(),
+        op_without.traverse(nz(5), nz(5), &mut AuditLog::new()).is_err(),
         "undeclared self-loop must be denied"
     );
 }
@@ -128,13 +129,13 @@ fn attack_4_6_cyclic_topology_single_hop_only_no_infinite_traversal() {
     let op = g.seal();
 
     // Each declared hop is permitted.
-    assert!(op.traverse(nz(1), nz(2)).is_ok());
-    assert!(op.traverse(nz(2), nz(3)).is_ok());
-    assert!(op.traverse(nz(3), nz(1)).is_ok());
+    assert!(op.traverse(nz(1), nz(2), &mut AuditLog::new()).is_ok());
+    assert!(op.traverse(nz(2), nz(3), &mut AuditLog::new()).is_ok());
+    assert!(op.traverse(nz(3), nz(1), &mut AuditLog::new()).is_ok());
 
     // Skip edges (not declared) denied — no free path through the cycle.
-    assert!(op.traverse(nz(1), nz(3)).is_err(), "skip A→C in cycle must be denied");
-    assert!(op.traverse(nz(2), nz(1)).is_err(), "reverse 2→1 in cycle must be denied");
+    assert!(op.traverse(nz(1), nz(3), &mut AuditLog::new()).is_err(), "skip A→C in cycle must be denied");
+    assert!(op.traverse(nz(2), nz(1), &mut AuditLog::new()).is_err(), "reverse 2→1 in cycle must be denied");
 }
 
 // ── Attack 4.7 ────────────────────────────────────────────────────────────────
@@ -154,13 +155,13 @@ fn attack_4_7_disconnected_components_cannot_communicate() {
     let op = g.seal();
 
     // Within-component traversals: ok.
-    assert!(op.traverse(nz(1), nz(2)).is_ok());
-    assert!(op.traverse(nz(3), nz(4)).is_ok());
+    assert!(op.traverse(nz(1), nz(2), &mut AuditLog::new()).is_ok());
+    assert!(op.traverse(nz(3), nz(4), &mut AuditLog::new()).is_ok());
 
     // Cross-component traversals: all denied.
     for (s, d) in [(1,3),(1,4),(2,3),(2,4),(3,1),(3,2),(4,1),(4,2)] {
         assert!(
-            op.traverse(nz(s), nz(d)).is_err(),
+            op.traverse(nz(s), nz(d), &mut AuditLog::new()).is_err(),
             "cross-component ({s}→{d}) must be denied"
         );
     }
@@ -182,8 +183,8 @@ fn attack_4_8_sealed_graph_is_structurally_immutable() {
     assert!(op.is_active(nz(1)));
     assert!(op.is_active(nz(2)));
     assert!(!op.is_active(nz(3)));
-    assert!(op.traverse(nz(1), nz(2)).is_ok());
-    assert!(op.traverse(nz(2), nz(1)).is_err()); // reverse not committed
+    assert!(op.traverse(nz(1), nz(2), &mut AuditLog::new()).is_ok());
+    assert!(op.traverse(nz(2), nz(1), &mut AuditLog::new()).is_err()); // reverse not committed
 }
 
 // ── Attack 4.9 ────────────────────────────────────────────────────────────────
@@ -195,8 +196,8 @@ fn attack_4_9_out_of_bounds_node_ids_always_denied() {
 
     for id in [65u32, 100, 1000, u32::MAX] {
         let n = NonZeroU32::new(id).unwrap();
-        assert!(op.traverse(nz(1), n).is_err(), "dst={id} out-of-bounds must be denied");
-        assert!(op.traverse(n, nz(1)).is_err(), "src={id} out-of-bounds must be denied");
+        assert!(op.traverse(nz(1), n, &mut AuditLog::new()).is_err(), "dst={id} out-of-bounds must be denied");
+        assert!(op.traverse(n, nz(1), &mut AuditLog::new()).is_err(), "src={id} out-of-bounds must be denied");
         assert!(!op.is_active(n), "out-of-bounds node must report inactive");
     }
 }
@@ -218,16 +219,16 @@ fn attack_4_10_full_node_set_only_declared_ring_edges_work() {
     let op = g.seal();
 
     // Ring edges pass.
-    assert!(op.traverse(nz(1), nz(2)).is_ok());
-    assert!(op.traverse(nz(2), nz(3)).is_ok());
-    assert!(op.traverse(nz(3), nz(4)).is_ok());
-    assert!(op.traverse(nz(4), nz(1)).is_ok());
+    assert!(op.traverse(nz(1), nz(2), &mut AuditLog::new()).is_ok());
+    assert!(op.traverse(nz(2), nz(3), &mut AuditLog::new()).is_ok());
+    assert!(op.traverse(nz(3), nz(4), &mut AuditLog::new()).is_ok());
+    assert!(op.traverse(nz(4), nz(1), &mut AuditLog::new()).is_ok());
 
     // Non-ring edges denied even though all nodes are active.
-    assert!(op.traverse(nz(1), nz(3)).is_err()); // skip
-    assert!(op.traverse(nz(2), nz(4)).is_err()); // skip
-    assert!(op.traverse(nz(5), nz(1)).is_err()); // undeclared
-    assert!(op.traverse(nz(63), nz(64)).is_err()); // undeclared
+    assert!(op.traverse(nz(1), nz(3), &mut AuditLog::new()).is_err()); // skip
+    assert!(op.traverse(nz(2), nz(4), &mut AuditLog::new()).is_err()); // skip
+    assert!(op.traverse(nz(5), nz(1), &mut AuditLog::new()).is_err()); // undeclared
+    assert!(op.traverse(nz(63), nz(64), &mut AuditLog::new()).is_err()); // undeclared
 }
 
 // ── Attack 4.11 ───────────────────────────────────────────────────────────────
@@ -246,7 +247,7 @@ fn attack_4_11_permit_edge_to_inactive_node_denied_at_declaration_time() {
     );
     // The ghost edge was never stored; traversal is also denied.
     let op = g.seal();
-    assert!(op.traverse(nz(1), nz(2)).is_err());
+    assert!(op.traverse(nz(1), nz(2), &mut AuditLog::new()).is_err());
 }
 
 // ── Attack 4.12 ───────────────────────────────────────────────────────────────
@@ -266,20 +267,20 @@ fn attack_4_12_topology_and_capability_are_independent_defence_layers() {
 
     // Layer 1 (capability) passes, Layer 2 (topology) catches undeclared edge.
     let cap_ok = Capability::new_for_test(nz(1), nz(3), CapabilitySet::READ_TOPOLOGY, gen, 1);
-    assert!(policy.check(&cap_ok, CapabilitySet::READ_TOPOLOGY).is_ok()); // cap: ok
-    assert!(op.traverse(nz(1), nz(3)).is_err(), "topology layer must catch undeclared edge");
+    assert!(policy.check(&cap_ok, CapabilitySet::READ_TOPOLOGY, &mut AuditLog::new()).is_ok()); // cap: ok
+    assert!(op.traverse(nz(1), nz(3), &mut AuditLog::new()).is_err(), "topology layer must catch undeclared edge");
 
     // Layer 1 (capability) catches wrong right before topology even checked.
     let cap_bad = Capability::new_for_test(nz(1), nz(2), CapabilitySet::empty(), gen, 2);
     assert!(
-        policy.check(&cap_bad, CapabilitySet::READ_TOPOLOGY).is_err(),
+        policy.check(&cap_bad, CapabilitySet::READ_TOPOLOGY, &mut AuditLog::new()).is_err(),
         "capability layer must catch empty rights"
     );
     // (Topology is still valid — it is the cap layer that fires.)
-    assert!(op.traverse(nz(1), nz(2)).is_ok()); // topology itself is fine
+    assert!(op.traverse(nz(1), nz(2), &mut AuditLog::new()).is_ok()); // topology itself is fine
 
     // Both layers satisfied: operation proceeds.
     let cap_valid = Capability::new_for_test(nz(1), nz(2), CapabilitySet::READ_TOPOLOGY, gen, 3);
-    assert!(policy.check(&cap_valid, CapabilitySet::READ_TOPOLOGY).is_ok());
-    assert!(op.traverse(nz(1), nz(2)).is_ok());
+    assert!(policy.check(&cap_valid, CapabilitySet::READ_TOPOLOGY, &mut AuditLog::new()).is_ok());
+    assert!(op.traverse(nz(1), nz(2), &mut AuditLog::new()).is_ok());
 }

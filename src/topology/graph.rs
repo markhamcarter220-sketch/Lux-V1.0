@@ -18,6 +18,7 @@
 //! Both existence and active-state checks are therefore O(1) bitwise ops.
 
 use crate::{
+    audit::{AuditLog, EventKind},
     error::Error,
     types::{NodeId, MAX_NODES},
     Result,
@@ -111,7 +112,17 @@ impl OperationalGraph {
     /// - either node ID exceeds `MAX_NODES`
     /// - either node is not active
     /// - the edge is not declared in the manifest
-    pub fn traverse(&self, src: NodeId, dst: NodeId) -> Result<()> {
+    ///
+    /// An audit event is always emitted to `audit` regardless of outcome.
+    pub fn traverse(&self, src: NodeId, dst: NodeId, audit: &mut AuditLog) -> Result<()> {
+        let actor = src.get();
+        let result = self.traverse_inner(src, dst);
+        let denial = result.as_ref().err().map(|e| (e.denial_class(), e.denial_reason_str()));
+        audit.append(EventKind::TopologyTraverse, actor, 0, denial);
+        result
+    }
+
+    fn traverse_inner(&self, src: NodeId, dst: NodeId) -> Result<()> {
         let si = node_idx(src)?;
         let di = node_idx(dst)?;
 
@@ -155,7 +166,7 @@ fn node_idx(id: NodeId) -> Result<usize> {
 #[cfg(test)]
 mod tests {
     use super::{BootingGraph, OperationalGraph};
-    use crate::{error::Error, types::MAX_NODES};
+    use crate::{audit::AuditLog, error::Error, types::MAX_NODES};
     use core::num::NonZeroU32;
 
     fn nz(n: u32) -> NonZeroU32 {
@@ -345,7 +356,7 @@ mod tests {
 
     #[test]
     fn traverse_declared_active_edge_is_permitted() {
-        assert!(single_edge(1, 2).traverse(nz(1), nz(2)).is_ok());
+        assert!(single_edge(1, 2).traverse(nz(1), nz(2), &mut AuditLog::new()).is_ok());
     }
 
     #[test]
@@ -355,7 +366,7 @@ mod tests {
         g.activate(nz(2)).unwrap();
         let op = g.seal();
         assert!(matches!(
-            op.traverse(nz(1), nz(2)),
+            op.traverse(nz(1), nz(2), &mut AuditLog::new()),
             Err(Error::TopologyViolation { src: 1, dst: 2 })
         ));
     }
@@ -367,7 +378,7 @@ mod tests {
         g.activate(nz(1)).unwrap();
         let op = g.seal();
         assert!(matches!(
-            op.traverse(nz(1), nz(2)),
+            op.traverse(nz(1), nz(2), &mut AuditLog::new()),
             Err(Error::TopologyViolation { src: 1, dst: 2 })
         ));
     }
@@ -376,7 +387,7 @@ mod tests {
     fn traverse_both_nodes_inactive_is_denied() {
         let op = BootingGraph::new().seal();
         assert!(matches!(
-            op.traverse(nz(1), nz(2)),
+            op.traverse(nz(1), nz(2), &mut AuditLog::new()),
             Err(Error::TopologyViolation { src: 1, dst: 2 })
         ));
     }
@@ -389,7 +400,7 @@ mod tests {
         // Both active, but no permit_edge — traversal must still be denied.
         let op = g.seal();
         assert!(matches!(
-            op.traverse(nz(10), nz(20)),
+            op.traverse(nz(10), nz(20), &mut AuditLog::new()),
             Err(Error::TopologyViolation { src: 10, dst: 20 })
         ));
     }
@@ -398,9 +409,9 @@ mod tests {
     fn traverse_reverse_of_declared_edge_is_denied() {
         // Declare (1 → 2); the reverse (2 → 1) must not be implicitly permitted.
         let op = single_edge(1, 2);
-        assert!(op.traverse(nz(1), nz(2)).is_ok());
+        assert!(op.traverse(nz(1), nz(2), &mut AuditLog::new()).is_ok());
         assert!(matches!(
-            op.traverse(nz(2), nz(1)),
+            op.traverse(nz(2), nz(1), &mut AuditLog::new()),
             Err(Error::TopologyViolation { src: 2, dst: 1 })
         ));
     }
@@ -409,7 +420,7 @@ mod tests {
     fn traverse_src_out_of_range_is_denied() {
         let op = BootingGraph::new().seal();
         assert!(matches!(
-            op.traverse(nz(65), nz(1)),
+            op.traverse(nz(65), nz(1), &mut AuditLog::new()),
             Err(Error::TopologyViolation { src: 65, .. })
         ));
     }
@@ -418,7 +429,7 @@ mod tests {
     fn traverse_dst_out_of_range_is_denied() {
         let op = BootingGraph::new().seal();
         assert!(matches!(
-            op.traverse(nz(1), nz(65)),
+            op.traverse(nz(1), nz(65), &mut AuditLog::new()),
             Err(Error::TopologyViolation { .. })
         ));
     }
@@ -429,7 +440,7 @@ mod tests {
         g.activate(nz(7)).unwrap();
         g.permit_edge(nz(7), nz(7)).unwrap();
         let op = g.seal();
-        assert!(op.traverse(nz(7), nz(7)).is_ok());
+        assert!(op.traverse(nz(7), nz(7), &mut AuditLog::new()).is_ok());
     }
 
     #[test]
@@ -438,7 +449,7 @@ mod tests {
         g.activate(nz(7)).unwrap();
         let op = g.seal();
         assert!(matches!(
-            op.traverse(nz(7), nz(7)),
+            op.traverse(nz(7), nz(7), &mut AuditLog::new()),
             Err(Error::TopologyViolation { src: 7, dst: 7 })
         ));
     }
@@ -449,7 +460,7 @@ mod tests {
         for i in 1u32..=5 {
             for j in 1u32..=5 {
                 assert!(
-                    op.traverse(nz(i), nz(j)).is_err(),
+                    op.traverse(nz(i), nz(j), &mut AuditLog::new()).is_err(),
                     "empty graph must deny edge ({i} → {j})"
                 );
             }
@@ -466,12 +477,12 @@ mod tests {
         g.permit_edge(nz(3), nz(4)).unwrap();
         let op = g.seal();
 
-        assert!(op.traverse(nz(1), nz(2)).is_ok());
-        assert!(op.traverse(nz(3), nz(4)).is_ok());
+        assert!(op.traverse(nz(1), nz(2), &mut AuditLog::new()).is_ok());
+        assert!(op.traverse(nz(3), nz(4), &mut AuditLog::new()).is_ok());
         // All other pairs among {1,2,3,4} must be denied.
         for (s, d) in [(1, 3), (1, 4), (2, 1), (2, 3), (2, 4), (3, 1), (3, 2), (4, 1), (4, 2), (4, 3)] {
             assert!(
-                op.traverse(nz(s), nz(d)).is_err(),
+                op.traverse(nz(s), nz(d), &mut AuditLog::new()).is_err(),
                 "undeclared edge ({s} → {d}) must be denied"
             );
         }
@@ -480,7 +491,7 @@ mod tests {
     #[test]
     fn traverse_error_fields_carry_exact_src_and_dst() {
         let op = BootingGraph::new().seal();
-        let err = op.traverse(nz(11), nz(22)).unwrap_err();
+        let err = op.traverse(nz(11), nz(22), &mut AuditLog::new()).unwrap_err();
         assert_eq!(err, Error::TopologyViolation { src: 11, dst: 22 });
     }
 
@@ -529,14 +540,14 @@ mod tests {
         g.permit_edge(nz(4), nz(1)).unwrap();
         let op = g.seal();
 
-        assert!(op.traverse(nz(1), nz(2)).is_ok());
-        assert!(op.traverse(nz(2), nz(3)).is_ok());
-        assert!(op.traverse(nz(3), nz(4)).is_ok());
-        assert!(op.traverse(nz(4), nz(1)).is_ok());
+        assert!(op.traverse(nz(1), nz(2), &mut AuditLog::new()).is_ok());
+        assert!(op.traverse(nz(2), nz(3), &mut AuditLog::new()).is_ok());
+        assert!(op.traverse(nz(3), nz(4), &mut AuditLog::new()).is_ok());
+        assert!(op.traverse(nz(4), nz(1), &mut AuditLog::new()).is_ok());
         // Non-ring edges must be denied even though all 64 nodes are active.
-        assert!(op.traverse(nz(1), nz(3)).is_err());
-        assert!(op.traverse(nz(2), nz(4)).is_err());
-        assert!(op.traverse(nz(5), nz(1)).is_err());
+        assert!(op.traverse(nz(1), nz(3), &mut AuditLog::new()).is_err());
+        assert!(op.traverse(nz(2), nz(4), &mut AuditLog::new()).is_err());
+        assert!(op.traverse(nz(5), nz(1), &mut AuditLog::new()).is_err());
     }
 
     #[test]
@@ -550,6 +561,6 @@ mod tests {
         assert!(op.is_active(nz(1)));
         assert!(op.is_active(nz(2)));
         assert!(!op.is_active(nz(3)));
-        assert!(op.traverse(nz(1), nz(2)).is_ok());
+        assert!(op.traverse(nz(1), nz(2), &mut AuditLog::new()).is_ok());
     }
 }

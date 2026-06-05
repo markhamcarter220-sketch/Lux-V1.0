@@ -13,6 +13,7 @@ use lux_kernel::{
     metabolism::quota::QuotaEnforcer,
     types::{Generation, Quota},
 };
+use lux_kernel::audit::AuditLog;
 use core::num::NonZeroU32;
 
 fn node(n: u32) -> NonZeroU32 {
@@ -31,7 +32,7 @@ fn inv1_no_capability_no_access() {
         10,
     );
     assert_eq!(
-        policy.check(&cap, CapabilitySet::SCHEDULE),
+        policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()),
         Err(Error::CapabilityDenied {
             reason: "token expired, insufficient rights, or wrong generation",
         }),
@@ -60,7 +61,7 @@ fn inv3_quota_overflow_is_rejected() {
     let mut ledger = Ledger::default();
     ledger.seed(node(1), Quota::new(100));
     let enforcer = QuotaEnforcer;
-    let result = enforcer.deduct(&mut ledger, node(1), 200, "compute");
+    let result = enforcer.deduct(&mut ledger, node(1), 200, "compute", &mut AuditLog::new());
     assert_eq!(
         result,
         Err(Error::QuotaExceeded { resource: "compute" }),
@@ -74,7 +75,7 @@ fn inv3_ledger_unchanged_after_failed_deduction() {
     let mut ledger = Ledger::default();
     ledger.seed(node(1), Quota::new(50));
     let enforcer = QuotaEnforcer;
-    let _ = enforcer.deduct(&mut ledger, node(1), 999, "memory");
+    let _ = enforcer.deduct(&mut ledger, node(1), 999, "memory", &mut AuditLog::new());
     assert_eq!(
         ledger.balance(node(1)),
         Some(50),

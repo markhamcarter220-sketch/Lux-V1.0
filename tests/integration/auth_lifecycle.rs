@@ -8,6 +8,7 @@ use lux_kernel::{
     error::Error,
     types::Generation,
 };
+use lux_kernel::audit::AuditLog;
 use core::num::NonZeroU32;
 
 fn node(n: u32) -> NonZeroU32 {
@@ -19,7 +20,7 @@ fn valid_capability_passes_policy_check() {
     let gen = Generation(0);
     let mut policy = Policy::new(gen);
     let cap = Capability::new_for_test(node(1), node(2), CapabilitySet::SCHEDULE, gen, 1);
-    assert!(policy.check(&cap, CapabilitySet::SCHEDULE).is_ok());
+    assert!(policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
 }
 
 #[test]
@@ -27,7 +28,7 @@ fn expired_generation_is_denied() {
     let mut policy = Policy::new(Generation(5));
     let cap = Capability::new_for_test(node(1), node(2), CapabilitySet::SCHEDULE, Generation(3), 2);
     assert_eq!(
-        policy.check(&cap, CapabilitySet::SCHEDULE),
+        policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()),
         Err(Error::CapabilityDenied {
             reason: "token expired, insufficient rights, or wrong generation",
         })
@@ -64,5 +65,5 @@ fn delegation_within_rights_succeeds() {
     let delegated = delegated.unwrap();
 
     let mut policy = Policy::new(gen);
-    assert!(policy.check(&delegated, CapabilitySet::SCHEDULE).is_ok());
+    assert!(policy.check(&delegated, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
 }

@@ -12,6 +12,7 @@ use lux_kernel::{
     error::Error,
     types::Generation,
 };
+use lux_kernel::audit::AuditLog;
 use core::num::NonZeroU32;
 
 fn node(n: u32) -> NonZeroU32 { NonZeroU32::new(n).unwrap() }
@@ -30,7 +31,7 @@ fn revoke_live_token_denies_immediately() {
 
     let c = cap(100, gen);
     assert_eq!(
-        policy.check(&c, CapabilitySet::SCHEDULE),
+        policy.check(&c, CapabilitySet::SCHEDULE, &mut AuditLog::new()),
         Err(Error::CapabilityDenied { reason: "capability revoked" }),
         "revoked token must be denied"
     );
@@ -44,7 +45,7 @@ fn non_revoked_token_is_permitted() {
 
     // Different nonce — not revoked.
     let c = cap(200, gen);
-    assert!(policy.check(&c, CapabilitySet::SCHEDULE).is_ok());
+    assert!(policy.check(&c, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
 }
 
 #[test]
@@ -59,7 +60,7 @@ fn revocation_checked_before_nonce_consumption() {
 
     let c = cap(77, gen);
     // Check 1: must deny for revocation, NOT consume the nonce.
-    let r1 = policy.check(&c, CapabilitySet::SCHEDULE);
+    let r1 = policy.check(&c, CapabilitySet::SCHEDULE, &mut AuditLog::new());
     assert_eq!(r1, Err(Error::CapabilityDenied { reason: "capability revoked" }));
 
     // Un-revoke (simulate by using rotation which clears revocation).
@@ -67,7 +68,7 @@ fn revocation_checked_before_nonce_consumption() {
     // Now re-issue at gen 1 with the same nonce.
     let gen1 = policy.generation();
     let c2 = cap(77, gen1);
-    assert!(policy.check(&c2, CapabilitySet::SCHEDULE).is_ok());
+    assert!(policy.check(&c2, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
 }
 
 #[test]
@@ -94,7 +95,7 @@ fn revocation_does_not_affect_different_nonces() {
     // Nonces 4, 5, 6 must still work.
     for n in 4..=6u64 {
         let c = cap(n, gen);
-        assert!(policy.check(&c, CapabilitySet::SCHEDULE).is_ok(), "nonce {n} should pass");
+        assert!(policy.check(&c, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok(), "nonce {n} should pass");
     }
 }
 
@@ -108,7 +109,7 @@ fn revoked_nonce_reusable_in_new_generation() {
 
     // Nonce 55 in gen 1 must be treated as fresh.
     let c = cap(55, gen1);
-    assert!(policy.check(&c, CapabilitySet::SCHEDULE).is_ok());
+    assert!(policy.check(&c, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
 }
 
 #[test]
@@ -121,7 +122,7 @@ fn multiple_revocations_all_deny() {
     for n in 0..20u64 {
         let c = cap(n, gen);
         assert!(
-            policy.check(&c, CapabilitySet::SCHEDULE).is_err(),
+            policy.check(&c, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err(),
             "nonce {n} should be denied"
         );
     }

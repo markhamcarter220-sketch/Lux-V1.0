@@ -152,17 +152,17 @@ Tier 3 — ROADMAP
   [ ] WASM execution substrate integration
   [ ] Distributed topology consensus protocol
 
-Open items — known gaps, not hidden
-  [ ] Audit log wiring: Policy::check, Ledger::deduct, and
-      OperationalGraph::traverse do not yet call AuditLog::append.
-      The audit module is complete but not integrated into the operational
-      call path.
-  [ ] AuditLog !Send/!Sync: no explicit opt-out from Send/Sync.
-      In a no_std kernel with concurrent execution, this should be
-      structurally enforced.
-  [ ] Hash field absent from JSON export: export_json omits the entry_hash
-      field, preventing external hash-chain verification without re-computing
-      from raw fields.
+Tier 2.9 — COMPLETE (gap closures)
+  [x] Audit log wiring: Policy::check, QuotaEnforcer::deduct, and
+      OperationalGraph::traverse all call AuditLog::append — every
+      operational decision is now audited with HALT/FAILURE classification.
+  [x] AuditLog !Send/!Sync: structurally enforced via
+      PhantomData<*mut ()>; cannot be sent across threads without unsafe.
+  [x] Hash field in JSON export: export_json now includes "hash":"<hex64>"
+      on every entry, enabling external hash-chain verification without
+      re-computing from raw fields.
+
+Open items — none at this time.
 ```
 
 ---
@@ -246,7 +246,7 @@ cargo build --release
 ### Test
 
 ```sh
-# All tests (189 total: unit, integration, property, security, adversarial)
+# All tests (199 total: unit, integration, property, security, adversarial)
 cargo test --all-features
 
 # Security invariant tests only

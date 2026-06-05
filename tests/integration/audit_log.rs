@@ -1,6 +1,15 @@
 //! Integration tests: audit log integrity, hash chain, and export.
 
-use lux_kernel::audit::{AuditLog, DenialClass, EventKind, Outcome};
+use lux_kernel::{
+    audit::{AuditLog, DenialClass, EventKind, Outcome},
+    auth::{capability::{Capability, CapabilitySet}, policy::Policy},
+    metabolism::{ledger::Ledger, quota::QuotaEnforcer},
+    topology::{graph::BootingGraph},
+    types::{Generation, Quota},
+};
+use core::num::NonZeroU32;
+
+fn nz(n: u32) -> NonZeroU32 { NonZeroU32::new(n).unwrap() }
 
 // Shorthand helpers so test bodies stay readable.
 fn permit(log: &mut AuditLog, kind: EventKind, actor: u32) -> bool {
@@ -270,4 +279,146 @@ fn chain_remains_valid_at_capacity() {
         permit(&mut log, EventKind::CapabilityCheck, 1);
     }
     assert!(log.verify_chain());
+}
+
+// ── Audit wiring: Policy::check emits events ──────────────────────────────────
+
+#[test]
+fn policy_check_denied_emits_halt_event() {
+    let gen = Generation(0);
+    let mut policy = Policy::new(gen);
+    let mut log = AuditLog::new();
+    // Empty rights → CapabilityDenied (HALT)
+    let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::empty(), gen, 1);
+    assert!(policy.check(&cap, CapabilitySet::SCHEDULE, &mut log).is_err());
+    assert_eq!(log.len(), 1);
+    let ev = log.events().next().unwrap();
+    assert_eq!(ev.kind,         EventKind::CapabilityCheck);
+    assert_eq!(ev.outcome,      Outcome::Denied);
+    assert_eq!(ev.denial_class, Some(DenialClass::Halt));
+}
+
+#[test]
+fn policy_check_permitted_emits_permitted_event() {
+    let gen = Generation(0);
+    let mut policy = Policy::new(gen);
+    let mut log = AuditLog::new();
+    let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, 1);
+    assert!(policy.check(&cap, CapabilitySet::SCHEDULE, &mut log).is_ok());
+    assert_eq!(log.len(), 1);
+    let ev = log.events().next().unwrap();
+    assert_eq!(ev.outcome,      Outcome::Permitted);
+    assert_eq!(ev.denial_class, None);
+}
+
+// ── Audit wiring: QuotaEnforcer::deduct emits events ─────────────────────────
+
+#[test]
+fn quota_deduct_over_limit_emits_failure_event() {
+    let enforcer = QuotaEnforcer;
+    let mut ledger = Ledger::new();
+    let mut log = AuditLog::new();
+    ledger.seed(nz(1), Quota::new(5));
+    // Deduct more than available → Err(QuotaExceeded) → FAILURE class
+    assert!(enforcer.deduct(&mut ledger, nz(1), 10, "compute", &mut log).is_err());
+    assert_eq!(log.len(), 1);
+    let ev = log.events().next().unwrap();
+    assert_eq!(ev.kind,         EventKind::ResourceDeduction);
+    assert_eq!(ev.outcome,      Outcome::Denied);
+    assert_eq!(ev.denial_class, Some(DenialClass::Failure));
+}
+
+#[test]
+fn quota_deduct_within_limit_emits_permitted_event() {
+    let enforcer = QuotaEnforcer;
+    let mut ledger = Ledger::new();
+    let mut log = AuditLog::new();
+    ledger.seed(nz(1), Quota::new(100));
+    assert!(enforcer.deduct(&mut ledger, nz(1), 10, "compute", &mut log).is_ok());
+    assert_eq!(log.len(), 1);
+    let ev = log.events().next().unwrap();
+    assert_eq!(ev.outcome,      Outcome::Permitted);
+    assert_eq!(ev.denial_class, None);
+}
+
+// ── Audit wiring: OperationalGraph::traverse emits events ────────────────────
+
+#[test]
+fn traverse_denied_emits_halt_event() {
+    let op = BootingGraph::new().seal();
+    let mut log = AuditLog::new();
+    assert!(op.traverse(nz(1), nz(2), &mut log).is_err());
+    assert_eq!(log.len(), 1);
+    let ev = log.events().next().unwrap();
+    assert_eq!(ev.kind,         EventKind::TopologyTraverse);
+    assert_eq!(ev.outcome,      Outcome::Denied);
+    assert_eq!(ev.denial_class, Some(DenialClass::Halt));
+}
+
+#[test]
+fn traverse_permitted_emits_permitted_event() {
+    let mut g = BootingGraph::new();
+    g.activate(nz(1)).unwrap();
+    g.activate(nz(2)).unwrap();
+    g.permit_edge(nz(1), nz(2)).unwrap();
+    let op = g.seal();
+    let mut log = AuditLog::new();
+    assert!(op.traverse(nz(1), nz(2), &mut log).is_ok());
+    assert_eq!(log.len(), 1);
+    let ev = log.events().next().unwrap();
+    assert_eq!(ev.outcome,      Outcome::Permitted);
+    assert_eq!(ev.denial_class, None);
+}
+
+// ── JSON export: hash field present ──────────────────────────────────────────
+
+#[test]
+fn json_export_includes_hash_field_on_every_entry() {
+    let mut log = AuditLog::new();
+    permit(&mut log, EventKind::CapabilityCheck, 1);
+    deny(  &mut log, EventKind::TopologyTraverse, 2, DenialClass::Halt, "undeclared edge");
+    let mut out = String::new();
+    log.export_json(&mut out).unwrap();
+    // Both entries must contain the hash field with 64 lowercase hex chars.
+    assert!(out.contains(r#""hash":""#), "hash field must be present");
+    // Each hash is 64 hex chars; verify both entries contain it.
+    let hash_count = out.matches(r#""hash":""#).count();
+    assert_eq!(hash_count, 2, "both entries must have a hash field");
+}
+
+#[test]
+fn json_export_hash_field_is_64_hex_chars() {
+    let mut log = AuditLog::new();
+    permit(&mut log, EventKind::CapabilityCheck, 1);
+    let mut out = String::new();
+    log.export_json(&mut out).unwrap();
+    // Extract value between "hash":"  and  "
+    let start = out.find(r#""hash":""#).unwrap() + 8;
+    let rest = &out[start..];
+    let end = rest.find('"').unwrap();
+    let hash_hex = &rest[..end];
+    assert_eq!(hash_hex.len(), 64, "hash must be exactly 64 hex chars (32 bytes)");
+    assert!(hash_hex.chars().all(|c| c.is_ascii_hexdigit()), "hash must be lowercase hex");
+}
+
+#[test]
+fn json_export_hash_matches_event_hash_field() {
+    let mut log = AuditLog::new();
+    permit(&mut log, EventKind::CapabilityCheck, 42);
+    let event_hash = log.events().next().unwrap().hash;
+    let expected_hex: String = event_hash.iter().map(|b| format!("{:02x}", b)).collect();
+    let mut out = String::new();
+    log.export_json(&mut out).unwrap();
+    assert!(out.contains(&expected_hex), "JSON hash must match event.hash field");
+}
+
+#[test]
+fn verify_chain_still_valid_after_export() {
+    let mut log = AuditLog::new();
+    for i in 0..10u32 {
+        permit(&mut log, EventKind::CapabilityCheck, i);
+    }
+    let mut out = String::new();
+    log.export_json(&mut out).unwrap();
+    assert!(log.verify_chain(), "chain must remain valid after export");
 }

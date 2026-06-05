@@ -46,7 +46,7 @@ fn attack_5_1_sustained_10k_operations_no_panic() {
     for i in 0u64..10_000 {
         let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, i);
         // After NONCE_WINDOW ops the policy denies — that is correct behaviour.
-        let _ = policy.check(&cap, CapabilitySet::SCHEDULE);
+        let _ = policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new());
         let _ = ledger.deduct(nz(1), 1);
     }
     // Reaching this line proves no panic occurred.
@@ -87,13 +87,13 @@ fn attack_5_3_nonce_window_fill_then_rotate_recovers_capacity() {
     // Fill all NONCE_WINDOW slots.
     for i in 0u64..NONCE_WINDOW as u64 {
         let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, i);
-        assert!(policy.check(&cap, CapabilitySet::SCHEDULE).is_ok(), "slot {i}");
+        assert!(policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok(), "slot {i}");
     }
 
     // Window exhausted.
     let overflow = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, 99_999);
     assert!(matches!(
-        policy.check(&overflow, CapabilitySet::SCHEDULE),
+        policy.check(&overflow, CapabilitySet::SCHEDULE, &mut AuditLog::new()),
         Err(Error::CapabilityDenied { reason: "nonce window exhausted; rotate generation" })
     ));
 
@@ -104,7 +104,7 @@ fn attack_5_3_nonce_window_fill_then_rotate_recovers_capacity() {
 
     // Nonce 0 is usable again.
     let fresh = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, new_gen, 0);
-    assert!(policy.check(&fresh, CapabilitySet::SCHEDULE).is_ok());
+    assert!(policy.check(&fresh, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
 }
 
 // ── Attack 5.4 ────────────────────────────────────────────────────────────────
@@ -120,7 +120,7 @@ fn attack_5_4_rotation_clears_revocations_and_nonce_window_atomically() {
     for nonce in [10u64, 20, 30] { policy.revoke_capability(nonce); }
     for nonce in [100u64, 200, 300] {
         let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, nonce);
-        assert!(policy.check(&cap, CapabilitySet::SCHEDULE).is_ok());
+        assert!(policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
     }
     assert!(policy.is_revoked(10));
 
@@ -133,11 +133,11 @@ fn attack_5_4_rotation_clears_revocations_and_nonce_window_atomically() {
 
     // Old-gen cap stale.
     let stale = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, 999);
-    assert!(policy.check(&stale, CapabilitySet::SCHEDULE).is_err());
+    assert!(policy.check(&stale, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err());
 
     // New-gen cap with a previously-revoked nonce now works.
     let fresh = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, new_gen, 10);
-    assert!(policy.check(&fresh, CapabilitySet::SCHEDULE).is_ok());
+    assert!(policy.check(&fresh, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_ok());
 }
 
 // ── Attack 5.5 ────────────────────────────────────────────────────────────────
@@ -206,7 +206,7 @@ fn attack_5_7_revocation_ledger_at_max_capacity_no_panic() {
     for nonce in 0u64..10 {
         let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, nonce);
         assert!(
-            policy.check(&cap, CapabilitySet::SCHEDULE).is_err(),
+            policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()).is_err(),
             "revoked nonce {nonce} must remain denied"
         );
     }
