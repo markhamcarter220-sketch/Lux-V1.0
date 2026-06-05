@@ -173,7 +173,7 @@ impl PyPolicyGate {
     #[allow(clippy::needless_pass_by_value)]
     pub fn check(&self, feature_names: Vec<String>) -> PyResult<PyObject> {
         Python::with_gil(|py| {
-            let result = PyDict::new_bound(py);
+            let result = PyDict::new(py);
 
             // Invariant 1: exact protected-attribute match.
             for name in &feature_names {
