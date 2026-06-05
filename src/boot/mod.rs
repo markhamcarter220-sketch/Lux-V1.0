@@ -27,14 +27,15 @@ pub use manifest::Manifest;
 use sha2::{Digest, Sha256};
 
 use crate::{
-    audit::AuditLog,
+    audit::{AuditLog, EventKind},
     auth::policy::Policy,
-    consensus::{ConsensusProposal, PeerSet, Transport, run_consensus_proposal},
+    consensus::{PeerSet, RaftNode, RaftTransport},
+    error::{DenialClass, Error},
     hsm::HsmProvider,
     metabolism::ledger::Ledger,
     topology::graph::{BootingGraph, OperationalGraph},
     tpm::{NullTpm, TpmProvider, TpmQuote},
-    types::Generation,
+    types::{Generation, NodeId},
     Result,
 };
 
@@ -51,9 +52,28 @@ pub struct BootState {
     pub(crate) policy:      Policy,
     attestation:            TpmQuote,
     manifest_hash:          [u8; 32],
+    local_id:               NodeId,
 }
 
 impl BootState {
+    /// Returns the local node ID used for Raft leader election.
+    ///
+    /// Defaults to node 1.  Override with [`BootState::with_local_id`] for
+    /// multi-node deployments where this node is not node 1.
+    #[must_use]
+    pub const fn local_id(&self) -> NodeId {
+        self.local_id
+    }
+
+    /// Return a copy of `self` with `local_id` set to `id`.
+    ///
+    /// Used by multi-node deployments that are not node 1 in the topology.
+    #[must_use]
+    pub const fn with_local_id(mut self, id: NodeId) -> Self {
+        self.local_id = id;
+        self
+    }
+
     /// Returns a shared reference to the sealed topology graph.
     #[must_use]
     pub const fn graph(&self) -> &OperationalGraph {
@@ -112,43 +132,89 @@ impl BootState {
         ))
     }
 
-    /// Run a distributed consensus round to validate a topology traversal.
+    /// Run a Raft consensus round to validate a topology traversal.
     ///
-    /// The local sealed graph is checked first.  Its verdict — along with the
-    /// votes from all peers in `peer_set` — determines the outcome:
+    /// The local sealed graph is the authoritative gate: if the edge
+    /// `(src, dst)` is not declared in the boot manifest, the operation
+    /// aborts immediately regardless of what peer votes might say (fail-closed).
+    /// Only if the local graph permits the edge does the node proceed to
+    /// elect itself Raft leader (using [`BootState::local_id`] as the candidate
+    /// identity) and replicate the entry to peers.
     ///
-    /// - **Committed** (`Ok(())`): a quorum of peers (including the local node)
-    ///   accepted the traversal `src → dst`.
-    /// - **Aborted** (`Err(TopologyViolation)`): the local graph denies the
-    ///   edge, or fewer than `peer_set.quorum_threshold()` peers accepted.
+    /// - **Committed** (`Ok(())`): a quorum agreed to the entry.
+    /// - **Aborted** (`Err(TopologyViolation)`): local graph denied the edge,
+    ///   or leader election failed, or fewer than quorum peers acknowledged.
     ///
-    /// An `EventKind::TopologyChange` audit event is always appended to `audit`.
+    /// An `EventKind::TopologyChange` audit event is always appended for the
+    /// consensus outcome (in addition to the `TopologyTraverse` event emitted
+    /// by the local graph check).
     ///
     /// # Single-node deployments
     ///
-    /// Pass `PeerSet::new()` (empty) — the round is a local check with no
-    /// network I/O.
+    /// Pass `PeerSet::new()` (empty) — the node becomes leader immediately and
+    /// commits without any network I/O.
     ///
     /// # Errors
     ///
     /// Returns `Err(TopologyViolation { src, dst })` when the traversal is
-    /// denied by quorum or the local graph.
-    pub fn run_topology_consensus<T: Transport>(
+    /// denied by the local graph or consensus fails to reach quorum.
+    pub fn run_topology_consensus<T: RaftTransport>(
         &mut self,
         peer_set:  &PeerSet,
-        proposal:  &ConsensusProposal,
+        src:       NodeId,
+        dst:       NodeId,
         transport: &mut T,
         audit:     &mut AuditLog,
     ) -> Result<()> {
-        let local_accept = self.graph.traverse(proposal.src, proposal.dst, audit).is_ok();
-        let full_proposal = ConsensusProposal {
-            round_id:          proposal.round_id,
-            src:               proposal.src,
-            dst:               proposal.dst,
-            local_accept,
-            local_attestation: *self.attestation.as_bytes(),
-        };
-        run_consensus_proposal(peer_set, &full_proposal, transport, audit)
+        // I4: local sealed graph is the authoritative gate (fail-closed).
+        let local_ok = self.graph.traverse(src, dst, audit).is_ok();
+        if !local_ok {
+            return Err(Error::TopologyViolation { src: src.get(), dst: dst.get() });
+        }
+
+        let mut node = RaftNode::new(self.local_id, peer_set);
+        node.start_election(transport);
+
+        if !node.is_leader() {
+            while let Some((from, msg)) = transport.recv() {
+                let _ = node.step(from, msg, transport);
+                if node.is_leader() {
+                    break;
+                }
+            }
+        }
+
+        if !node.is_leader() {
+            audit.append(
+                EventKind::TopologyChange,
+                src.get(),
+                0,
+                Some((DenialClass::Halt, "topology consensus not reached")),
+            );
+            return Err(Error::TopologyViolation { src: src.get(), dst: dst.get() });
+        }
+
+        node.propose(src, dst, transport)?;
+
+        let mut committed = node.commit_index() >= node.log_len();
+        if !committed {
+            while let Some((from, msg)) = transport.recv() {
+                if node.step(from, msg, transport).is_some() {
+                    committed = true;
+                    break;
+                }
+            }
+        }
+
+        let denial = (!committed)
+            .then_some((DenialClass::Halt, "topology consensus not reached"));
+        audit.append(EventKind::TopologyChange, src.get(), 0, denial);
+
+        if committed {
+            Ok(())
+        } else {
+            Err(Error::TopologyViolation { src: src.get(), dst: dst.get() })
+        }
     }
 
     /// Decode and verify `raw_manifest`, run the full boot sequence with a
@@ -223,6 +289,6 @@ impl BootState {
 
         let policy = Policy::new(Generation(0));
 
-        Ok(Self { graph, ledger, policy, attestation, manifest_hash })
+        Ok(Self { graph, ledger, policy, attestation, manifest_hash, local_id: NodeId::MIN })
     }
 }

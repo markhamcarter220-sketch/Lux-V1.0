@@ -153,8 +153,8 @@ Tier 3 — IN PROGRESS (software-complete; hardware integration pending deployme
 [~] Formal cost model — Lean 4 proof of 7 ledger invariants (lean/LuxCostModel.lean)
     See docs/FORMAL_COST_MODEL.md for theorem statements and TLA+ relationship.
     Mechanical verification requires Lean 4 toolchain (lake build in lean/).
-[ ] WASM execution substrate integration
-[ ] Distributed topology consensus protocol
+[~] WASM execution substrate — Wasmtime-backed executor, 3 host functions, 12 integration tests (src/wasm/, tests/wasm_executor.rs)
+[~] Distributed topology consensus — full Raft state machine, 20 unit tests + integration tests (src/consensus/, tests/raft.rs)
 
 AUDIT & VERIFICATION STATUS:
 [x] Internal security review (Lux Project Contributors)
