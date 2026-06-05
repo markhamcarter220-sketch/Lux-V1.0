@@ -106,6 +106,27 @@ impl Capability {
         self.target
     }
 
+    /// Returns the raw rights bits (used by HSM capability signing).
+    #[cfg(feature = "hsm")]
+    #[must_use]
+    pub(crate) const fn rights_bits(&self) -> u32 {
+        self.rights.bits()
+    }
+
+    /// Returns the raw generation value (used by HSM capability signing).
+    #[cfg(feature = "hsm")]
+    #[must_use]
+    pub(crate) const fn generation_raw(&self) -> u64 {
+        self.generation.0
+    }
+
+    /// Returns the raw nonce (used by HSM capability signing).
+    #[cfg(feature = "hsm")]
+    #[must_use]
+    pub(crate) const fn nonce_raw(&self) -> u64 {
+        self.nonce
+    }
+
     /// Test-only constructor — use only in test harnesses.
     ///
     /// Not gated behind `#[cfg(test)]` because integration tests compile as

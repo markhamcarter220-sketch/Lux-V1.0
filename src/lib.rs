@@ -11,8 +11,10 @@
 //!    unlisted edges are denied.
 
 // When the `python` feature is enabled the crate links against std (required by
-// PyO3).  In all other configurations the crate remains fully no_std.
-#![cfg_attr(not(feature = "python"), no_std)]
+// PyO3).  When the `hsm` feature is enabled the crate also requires std because
+// the key store uses `Mutex<HashMap>`.  In all other configurations the crate
+// remains fully no_std.
+#![cfg_attr(not(any(feature = "python", feature = "hsm")), no_std)]
 #![deny(
     clippy::all,
     clippy::pedantic,
@@ -22,7 +24,9 @@
 )]
 // unsafe_code is denied globally but allowed locally in src/python/ where PyO3
 // requires an unsafe extern "C" entry point for the Python C ABI.
-#![cfg_attr(not(feature = "python"), deny(unsafe_code))]
+// The `hsm` feature also opts out because the key store uses std interior
+// mutability constructs that require the std prelude.
+#![cfg_attr(not(any(feature = "python", feature = "hsm")), deny(unsafe_code))]
 #![warn(clippy::nursery)]
 
 pub mod audit;

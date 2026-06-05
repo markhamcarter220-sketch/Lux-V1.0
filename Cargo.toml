@@ -32,6 +32,7 @@ heapless      = { version = "0.8", default-features = false }
 minicbor      = { version = "0.21", default-features = false }
 ed25519-dalek = { version = "2.1", default-features = false }
 sha2          = { version = "0.10", default-features = false }
+rand_core     = { version = "0.6", features = ["getrandom"], optional = true }
 serde         = { version = "1.0", features = ["derive"], optional = true }
 # Tier 3 Item 6: Python bindings (optional; enables std)
 pyo3          = { version = "0.24.1", features = ["extension-module"], optional = true }
@@ -49,7 +50,7 @@ serde       = ["dep:serde"]
 std         = []
 # HSM integration: exposes the HsmProvider trait for real HSM driver backends.
 # When disabled (default), only SoftwareHsm is available.
-hsm         = []
+hsm         = ["std", "dep:rand_core"]
 # TPM integration: exposes TpmProvider for real TPM 2.0 driver backends.
 # When disabled (default), only SoftwareTpm and NullTpm are available.
 tpm         = []
