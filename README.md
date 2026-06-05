@@ -147,14 +147,17 @@ Tier 2.5 — COMPLETE (compliance demonstrations)
 [x] Fair lending reference implementation (ECOA/FHA) — lending-audit/
 [x] Criminal justice governance demonstration — recidivism-demo/
 
-Tier 3 — IN PROGRESS (software-complete; hardware integration pending deployment)
-[~] HSM-backed capability minting — SoftwareKeyStore + YubiHSM/PKCS#11 stubs (src/hsm/)
+Tier 3 — IN PROGRESS (2/5 complete; 3 pending hardware deployment or toolchain)
+[x] WASM execution substrate — Wasmtime-backed executor, 3 host functions, 12 integration tests (src/wasm/, tests/wasm_executor.rs)
+[x] Distributed topology consensus — full Raft state machine, 21 unit tests + integration tests (src/consensus/, tests/raft.rs)
+[~] HSM-backed capability minting — SoftwareKeyStore + YubiHSM/PKCS#11 stubs (src/hsm/);
+    3 HSM/RevocationLedger state-disagreement integration tests (tests/hsm_state_disagreement.rs)
+    Pending: real YubiHSM or PKCS#11 hardware deployment
 [~] TPM-anchored boot attestation — BootAttestation + TssTpm stub (src/tpm/, tests/tpm.rs)
+    Pending: physical TPM chip + TSS stack
 [~] Formal cost model — Lean 4 proof of 7 ledger invariants (lean/LuxCostModel.lean)
     See docs/FORMAL_COST_MODEL.md for theorem statements and TLA+ relationship.
-    Mechanical verification requires Lean 4 toolchain (lake build in lean/).
-[~] WASM execution substrate — Wasmtime-backed executor, 3 host functions, 12 integration tests (src/wasm/, tests/wasm_executor.rs)
-[~] Distributed topology consensus — full Raft state machine, 21 unit tests + integration tests (src/consensus/, tests/raft.rs)
+    Pending: mechanical verification requires Lean 4 toolchain (lake build in lean/)
 
 AUDIT & VERIFICATION STATUS:
 [x] Internal security review (Lux Project Contributors)
@@ -245,7 +248,7 @@ cargo build --release
 ### Test
 
 ```sh
-# All tests (309 total: unit, integration, property, security, adversarial)
+# All tests (312 total: unit, integration, property, security, adversarial)
 cargo test --all-features
 
 # Security invariant tests only
@@ -330,7 +333,7 @@ lux-v1.0/
 │   ├── FORMAL_VERIFICATION.md  # TLC results and inductive proof sketches
 │   ├── FORMAL_COST_MODEL.md    # Lean 4 theorems and TLA+ relationship
 │   ├── SECURITY.md             # Threat model and audit findings
-│   └── adr/                    # Architecture Decision Records (0001–0003)
+│   └── adr/                    # Architecture Decision Records (0001–0005)
 ├── benches/                # Criterion throughput benchmarks
 ├── scripts/
 │   ├── ci_full.sh          # Local CI gate orchestrator
