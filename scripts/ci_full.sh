@@ -24,11 +24,16 @@ cargo test --all-features --workspace
 
 echo ""
 echo "--- Phase 4: Security Path Tests ---"
-cargo test --test invariant_enforcement --test privilege_escalation -- --nocapture
+cargo test --all-features --test security -- --nocapture
 
 echo ""
 echo "--- Phase 5: Coverage Threshold ---"
-bash "${SCRIPT_DIR}/coverage.sh"
+if cargo llvm-cov --version &>/dev/null; then
+  bash "${SCRIPT_DIR}/coverage.sh"
+else
+  echo "==> cargo-llvm-cov not installed; skipping coverage (install with: cargo install cargo-llvm-cov)"
+  echo "coverage: SKIPPED"
+fi
 
 echo ""
 echo "========================================"
