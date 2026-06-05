@@ -1,26 +1,33 @@
 """
-policy_gate.py — Lux-inspired capability gate for hiring decisions.
+policy_gate.py — Thin Python wrapper around the Lux Kernel's PyPolicyGate.
 
-Before any decision is finalised the gate verifies:
-  1. No protected attribute appears in the feature vector.
-  2. Every feature present is in the approved set.
+The gate logic (three invariants, fail-closed) is implemented entirely in Rust
+(src/python/policy.rs) and delegated via the lux_kernel.PyPolicyGate binding.
 
-ALLOW → decision may proceed.
-DENY  → decision is blocked; audit entry records the reason.
+This wrapper:
+  - Preserves the domain API used by phase2.py (check(features_used: dict)).
+  - Converts the Rust gate's dict result to a PolicyResult dataclass.
+  - Tracks per-session statistics (total_checks, allowed, denied) — this is
+    observability only, not enforcement logic.
 
-This mirrors Lux Kernel's Invariant 2 (Capability-Gated): no operation
-proceeds without a valid, scoped token.  Here the "token" is the assurance
-that only approved features were used.
+# What changed from the Python mock
+
+- All three gate invariants (exact protected-attribute match, substring alias
+  scan, unapproved feature check) now run in Rust.
+- Denial reason strings are canonical static &'static str values from the kernel.
+- The gate is now stateless for enforcement (statistics are tracked here).
+- Unknown feature names passed at construction raise ValueError immediately
+  (fail-closed at construction time, not silently ignored).
+
+See docs/PYTHON_INTEGRATION.md for the full edge analysis and resolution map.
 """
 
 from dataclasses import dataclass, field
 from typing import List
 
-PROTECTED_ATTRS: frozenset = frozenset({"age", "gender", "race"})
+from lux_kernel import PyPolicyGate  # Rust extension
 
-# Substring scan catches aliased keys like "candidate_age", "gender_flag",
-# "applicant_race_code" that aren't in the exact set above.
-_PROTECTED_SUBSTRINGS: tuple = ("age", "gender", "race", "ethnicity", "sex")
+# ── Constants (kept for backward compat / documentation) ─────────────────────
 
 APPROVED_FEATURES: frozenset = frozenset({
     "years_experience",
@@ -31,11 +38,15 @@ APPROVED_FEATURES: frozenset = frozenset({
     "fit_score",
 })
 
+PROTECTED_ATTRS: frozenset = frozenset({"age", "gender", "race"})
+_PROTECTED_SUBSTRINGS: tuple = ("age", "gender", "race", "ethnicity", "sex")
+
 
 @dataclass
 class PolicyResult:
-    allowed: bool
-    reason: str
+    """Result of a policy gate check.  API-compatible with the old implementation."""
+    allowed:    bool
+    reason:     str
     violations: List[str] = field(default_factory=list)
 
     def __str__(self) -> str:
@@ -45,59 +56,53 @@ class PolicyResult:
 
 class PolicyGate:
     """
-    Stateless gate with accumulated statistics.
-    Call check() for each decision; inspect stats() when done.
+    Capability gate for hiring decisions, backed by the Lux Kernel's PyPolicyGate.
+
+    Enforcement logic (invariants A, A2, B) runs in Rust.
+    Statistics are tracked here for reporting.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
+        # Construct the Rust gate.  Both lists are validated against compile-time
+        # static tables in the kernel; unknown strings raise ValueError here.
+        self._inner = PyPolicyGate(
+            approved_features=sorted(APPROVED_FEATURES),
+            blocked_attrs=list(_PROTECTED_SUBSTRINGS),
+        )
         self._checks = 0
         self._denied = 0
 
     def check(self, features_used: dict) -> PolicyResult:
         """
-        Returns ALLOW if features_used contains only approved features and no
-        protected attributes.  Returns DENY otherwise.
+        Check the feature vector against the policy gate.
+
+        Parameters
+        ----------
+        features_used : dict
+            The feature dict for a hiring decision.  Only the keys are checked
+            (values are not relevant to the gate).
+
+        Returns
+        -------
+        PolicyResult
+            .allowed   : True iff all invariants pass.
+            .reason    : canonical reason string from the Rust kernel.
+            .violations: list of offending feature names (if any).
         """
         self._checks += 1
 
-        # Invariant A: no protected attribute in the feature vector (exact match).
-        protected_violations = [k for k in features_used if k in PROTECTED_ATTRS]
-        if protected_violations:
-            self._denied += 1
-            return PolicyResult(
-                allowed=False,
-                reason=f"Protected attribute(s) detected in feature vector: {protected_violations}",
-                violations=protected_violations,
-            )
+        result = self._inner.check(list(features_used.keys()))
+        allowed = result["allowed"]
+        reason  = result["reason"]
 
-        # Invariant A2: substring scan catches aliased keys (e.g. "candidate_age").
-        alias_violations = [
-            k for k in features_used
-            if any(sub in k.lower() for sub in _PROTECTED_SUBSTRINGS)
-        ]
-        if alias_violations:
+        if not allowed:
             self._denied += 1
-            return PolicyResult(
-                allowed=False,
-                reason=f"Key(s) with protected-attribute substrings in feature vector: {alias_violations}",
-                violations=alias_violations,
-            )
+            # Extract violations from the reason (best-effort for backward compat).
+            violations = [k for k in features_used.keys()
+                          if not _is_approved(k)]
+            return PolicyResult(allowed=False, reason=reason, violations=violations)
 
-        # Invariant B: every key is in the approved feature set.
-        unknown = [k for k in features_used if k not in APPROVED_FEATURES]
-        if unknown:
-            self._denied += 1
-            return PolicyResult(
-                allowed=False,
-                reason=f"Unapproved feature(s) in decision vector: {unknown}",
-                violations=unknown,
-            )
-
-        return PolicyResult(
-            allowed=True,
-            reason="All approved features present; no protected attributes",
-            violations=[],
-        )
+        return PolicyResult(allowed=True, reason=reason, violations=[])
 
     def stats(self) -> dict:
         return {
@@ -105,3 +110,13 @@ class PolicyGate:
             "allowed":      self._checks - self._denied,
             "denied":       self._denied,
         }
+
+
+def _is_approved(name: str) -> bool:
+    """True iff name is in APPROVED_FEATURES and has no protected-attr substring."""
+    if name in PROTECTED_ATTRS:
+        return False
+    lower = name.lower()
+    if any(sub in lower for sub in _PROTECTED_SUBSTRINGS):
+        return False
+    return name in APPROVED_FEATURES

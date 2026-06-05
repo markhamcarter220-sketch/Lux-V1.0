@@ -16,6 +16,10 @@ pub enum EventKind {
     TopologyTraverse  = 3,
     /// A distributed consensus round was run to validate a topology change.
     TopologyChange    = 4,
+    /// A hiring decision was made by a governed AI model.
+    HiringDecision    = 5,
+    /// A policy gate check was performed before a governed operation.
+    PolicyGateCheck   = 6,
 }
 
 /// Result of the audited operation.
@@ -74,6 +78,8 @@ impl AuditEvent {
             EventKind::ResourceDeduction => "resource_deduct",
             EventKind::TopologyTraverse  => "topo_traverse",
             EventKind::TopologyChange    => "topo_change",
+            EventKind::HiringDecision    => "hiring_decision",
+            EventKind::PolicyGateCheck   => "policy_gate_check",
         }
     }
 

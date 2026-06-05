@@ -15,6 +15,9 @@ publish     = false
 [lib]
 name = "lux_kernel"
 path = "src/lib.rs"
+# cdylib is required for PyO3's Python extension module (.so / .pyd).
+# rlib is retained for cargo test and for use as a Rust dependency.
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 thiserror     = "2.0"
@@ -27,6 +30,8 @@ minicbor      = { version = "0.21", default-features = false }
 ed25519-dalek = { version = "2.1", default-features = false }
 sha2          = { version = "0.10", default-features = false }
 serde         = { version = "1.0", features = ["derive"], optional = true }
+# Tier 3 Item 6: Python bindings (optional; enables std)
+pyo3          = { version = "0.21", features = ["extension-module"], optional = true }
 
 [dev-dependencies]
 proptest   = "1.4"
@@ -47,6 +52,10 @@ hsm         = []
 tpm         = []
 # WASM execution substrate: compiles Lux's enforcement points as wasm32 exports.
 wasm        = []
+# Python extension module: exposes PyAuditLog and PyPolicyGate via PyO3.
+# Enabling this feature switches the crate from no_std to std (PyO3 requires std).
+# Build with: maturin develop --features python
+python      = ["dep:pyo3"]
 
 [profile.release]
 opt-level   = 3

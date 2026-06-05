@@ -1,0 +1,14 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "lux_kernel"
+version = "1.0.0"
+requires-python = ">=3.8"
+description = "Lux Kernel Python bindings — PyAuditLog and PyPolicyGate"
+
+[tool.maturin]
+# Build with the python feature, which enables PyO3 and switches the crate to std.
+features = ["python"]
+module-name = "lux_kernel"
