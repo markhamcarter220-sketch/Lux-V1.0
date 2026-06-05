@@ -147,10 +147,12 @@ Tier 2.5 — COMPLETE (compliance demonstrations)
 [x] Fair lending reference implementation (ECOA/FHA) — lending-audit/
 [x] Criminal justice governance demonstration — recidivism-demo/
 
-Tier 3 — ROADMAP (future integrations)
-[ ] HSM-backed capability minting
-[ ] TPM-anchored boot attestation
-[ ] Formal cost model (resource accounting proofs)
+Tier 3 — IN PROGRESS (software-complete; hardware integration pending deployment)
+[~] HSM-backed capability minting — SoftwareKeyStore + YubiHSM/PKCS#11 stubs (src/hsm/)
+[~] TPM-anchored boot attestation — BootAttestation + TssTpm stub (src/tpm/, tests/tpm.rs)
+[~] Formal cost model — Lean 4 proof of 7 ledger invariants (lean/LuxCostModel.lean)
+    See docs/FORMAL_COST_MODEL.md for theorem statements and TLA+ relationship.
+    Mechanical verification requires Lean 4 toolchain (lake build in lean/).
 [ ] WASM execution substrate integration
 [ ] Distributed topology consensus protocol
 
@@ -319,10 +321,14 @@ lux-v1.0/
 │   ├── *.py                # Pipeline: 150 defendants, LogisticRegression, proxy blocking
 │   ├── output/             # Generated decisions, audit log, fairness report
 │   └── docs/               # demo_proof_statement.md
+├── lean/
+│   ├── LuxCostModel.lean       # Lean 4 formal proof of 7 ledger invariants (I3)
+│   └── lakefile.lean           # Lake build file (lake build to verify)
 ├── docs/
 │   ├── ARCHITECTURE.md         # Conceptual model → implementation bridge
 │   ├── ADVERSARIAL_TESTING.md  # 63-attack test methodology
 │   ├── FORMAL_VERIFICATION.md  # TLC results and inductive proof sketches
+│   ├── FORMAL_COST_MODEL.md    # Lean 4 theorems and TLA+ relationship
 │   ├── SECURITY.md             # Threat model and audit findings
 │   └── adr/                    # Architecture Decision Records (0001–0003)
 ├── benches/                # Criterion throughput benchmarks
