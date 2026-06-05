@@ -139,6 +139,18 @@ If either condition fails, the method returns `None`.  Because `Capability`
 is `!Clone` and there is no `unsafe` code in the crate, there is no mechanism
 for a caller to construct a `Capability` with arbitrary rights.
 
+### 3.4 Fail-Closed Negative-Space Specification
+
+Fail-closed is defined by what it excludes. The following patterns violate fail-closed and will be rejected in code review:
+
+- **Silent defaults that grant access:** Any code path that returns `Ok` when input is unrecognized.
+- **Graceful degradation:** Reducing rights rather than denying the operation. Fail-closed never scales back privileges; it denies.
+- **Privilege escalation via exception handling:** Catching an error and proceeding anyway. The error is the denial.
+- **"Hidden yes" paths:** A code path disguised as a deny-by-default but containing a backdoor check that permits access.
+- **Ambient authority:** Any operation that doesn't require an explicit capability token at the call site.
+
+**Decision tree for contributors:** If your code path answers "maybe" to "would an adversary call this legitimate?", you've violated fail-closed. The kernel must answer only "yes" (token valid, operation authorized) or "no" (explicit error). There is no "proceed with reduced rights."
+
 ---
 
 ## 4. Subsystem Map
@@ -185,6 +197,30 @@ for a caller to construct a `Capability` with arbitrary rights.
 | `error` | I1 | `Error` | Exhaustive denial taxonomy |
 | `types` | — | `NodeId`, `Quota`, `Generation` | Domain primitives |
 
+### 4.1 Topology Invariant — Boundary Conditions
+
+The topology graph is derived from the manifest and enforced at traversal time. The following boundary conditions are resolved as follows:
+
+**Self-loops (A → A):** Allowed. The kernel does not forbid a node declaring an edge to itself. The authorization check `I2` (capability-gated) still applies; the operation must be authorized regardless of graph shape.
+
+**Missing nodes:** If the manifest declares an edge A → B but B is not in the quota table, this is caught at manifest parse time in `boot::Manifest::parse_and_verify()`. The manifest is rejected with `ManifestInvalid` before the kernel is initialized. No partial state is created.
+
+**Cycles (A → B → A):** Allowed. The topology is a general directed graph, not a DAG. Cycles do not violate `I4`. However, cycles combined with unbounded traversal could create livelock; the caller's responsibility is to provide a traversal policy (e.g., maximum hop count).
+
+**Undeclared edges (caller attempts A → C when only A → B → C exists):** Denied at traversal time with `TopologyViolation` error. The caller must follow the manifest graph exactly; shortcutting through intermediate nodes is not permitted by the kernel.
+
+### 4.2 Resource Ledger — State and Concurrency Semantics
+
+The ledger in `metabolism::Ledger` tracks quota balances per node. Its state model is as follows:
+
+**Stateless vs. Stateful:** The ledger is stateful. The quota *ceilings* are derived from the manifest and immutable (set at boot). The quota *balances* are mutable runtime state, decremented by each `deduct()` call and never replenished except at reboot. There is no "reset to ceiling" operation.
+
+**Concurrent deductions:** If two requests attempt to deduct quota for the same node simultaneously, the ledger enforces atomicity via checked arithmetic in `Ledger::deduct()`. The first deduction that would cause `balance < 0` returns `Err(QuotaExceeded)`. The second deduction is evaluated independently against the updated balance. Both operations are fail-closed (no silent over-commit).
+
+**Negative balance prevention:** The kernel prevents negative balance by design: `checked_sub()` returns `None` if the subtraction would underflow. The caller receives `Err(QuotaExceeded)` before any state mutation. This is not a matter of runtime validation alone; it is structural.
+
+**Relation to revocation ledger:** The resource ledger (this subsystem) is distinct from the "Tier 2: Capability revocation ledger" mentioned in the maturity table. The resource ledger enforces `I3` (accountable resources). The revocation ledger (future) will track which tokens have been explicitly revoked. They serve different invariants and may be unified in a later design review, but are currently separate concerns.
+
 ---
 
 ## 5. Boot Sequence
@@ -222,6 +258,8 @@ Detailed rationale for key design choices is recorded in
   deny-by-default is a structural property, not a policy rule.
 - [`0002-capability-based-auth.md`](adr/0002-capability-based-auth.md) — why
   object-capabilities rather than RBAC or ABAC.
+- [`0005-revocation-semantics.md`](adr/0005-revocation-semantics.md) — generation-based
+  revocation limitation and deferral of per-token granular revocation to Tier 2.
 
 ---
 
