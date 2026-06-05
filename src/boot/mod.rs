@@ -24,6 +24,8 @@ pub use credentials::BootCredentials;
 pub use decode::ManifestDecoder;
 pub use manifest::Manifest;
 
+use sha2::{Digest, Sha256};
+
 use crate::{
     audit::AuditLog,
     auth::policy::Policy,
@@ -48,6 +50,7 @@ pub struct BootState {
     pub(crate) ledger:      Ledger,
     pub(crate) policy:      Policy,
     attestation:            TpmQuote,
+    manifest_hash:          [u8; 32],
 }
 
 impl BootState {
@@ -75,6 +78,38 @@ impl BootState {
     #[must_use]
     pub const fn attestation_quote(&self) -> &TpmQuote {
         &self.attestation
+    }
+
+    /// Returns the SHA-256 hash of the raw manifest bytes used during boot.
+    ///
+    /// This is the measurement value extended into the TPM PCR during
+    /// [`BootState::initialise_with_tpm`].
+    #[must_use]
+    pub const fn manifest_hash(&self) -> &[u8; 32] {
+        &self.manifest_hash
+    }
+
+    /// Produce a fresh [`BootAttestation`] by quoting the boot PCR with `nonce`.
+    ///
+    /// The nonce should be a verifier-supplied random value (challenge-response).
+    /// The returned attestation can be sent to the verifier, who reconstructs
+    /// the expected PCR state and calls [`crate::tpm::attestation::BootAttestation::verify`].
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err(ManifestInvalid)` if the TPM cannot produce a quote.
+    pub fn produce_attestation<T: TpmProvider>(
+        &self,
+        tpm: &T,
+        nonce: [u8; 32],
+    ) -> Result<crate::tpm::attestation::BootAttestation> {
+        let quote = tpm.quote(0, &nonce)?;
+        Ok(crate::tpm::attestation::BootAttestation::new(
+            self.manifest_hash,
+            0,
+            nonce,
+            quote,
+        ))
     }
 
     /// Run a distributed consensus round to validate a topology traversal.
@@ -157,6 +192,12 @@ impl BootState {
         credentials: &BootCredentials<H>,
         tpm: &mut T,
     ) -> Result<Self> {
+        let manifest_hash: [u8; 32] = {
+            let mut h = Sha256::new();
+            h.update(raw_manifest);
+            h.finalize().into()
+        };
+
         let manifest = ManifestDecoder::decode(raw_manifest, credentials)?;
 
         let mut booting = BootingGraph::new();
@@ -182,6 +223,6 @@ impl BootState {
 
         let policy = Policy::new(Generation(0));
 
-        Ok(Self { graph, ledger, policy, attestation })
+        Ok(Self { graph, ledger, policy, attestation, manifest_hash })
     }
 }

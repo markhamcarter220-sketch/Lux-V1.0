@@ -24,9 +24,17 @@
 //!   bound to the current PCR state.  A quote produced before a subsequent
 //!   `extend_pcr` must not match the post-extension state.
 
+pub mod attestation;
 pub mod mock;
 
+#[cfg(feature = "tpm")]
+pub mod tss;
+
+pub use attestation::BootAttestation;
 pub use mock::SoftwareTpm;
+
+#[cfg(feature = "tpm")]
+pub use tss::TssTpmProvider;
 
 use crate::Result;
 
@@ -80,6 +88,25 @@ pub trait TpmProvider {
     /// Returns [`crate::error::Error::ManifestInvalid`] if `pcr_index` is out
     /// of range or the TPM cannot produce a quote.
     fn quote(&self, pcr_index: u8, nonce: &[u8; 32]) -> Result<TpmQuote>;
+
+    /// Read the current value of PCR `pcr_index`.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`crate::error::Error::ManifestInvalid`] if `pcr_index` is out of range.
+    fn read_pcr(&self, pcr_index: u8) -> Result<[u8; 32]>;
+
+    /// Verify that `quote` is a valid attestation for PCR `pcr_index` with `nonce`.
+    ///
+    /// The verification algorithm is implementation-specific:
+    /// - [`SoftwareTpm`]: recomputes the expected quote bytes and compares.
+    /// - Real TPM: verifies the `TPMS_ATTEST` structure against the AK public key.
+    /// - [`NullTpm`]: accepts only all-zero quotes.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`crate::error::Error::ManifestInvalid`] if the quote is invalid.
+    fn verify_quote(&self, pcr_index: u8, nonce: &[u8; 32], quote: &TpmQuote) -> Result<()>;
 }
 
 /// Zero-cost no-op TPM provider.
@@ -97,5 +124,19 @@ impl TpmProvider for NullTpm {
 
     fn quote(&self, _pcr_index: u8, _nonce: &[u8; 32]) -> Result<TpmQuote> {
         Ok(TpmQuote([0u8; 64]))
+    }
+
+    fn read_pcr(&self, _pcr_index: u8) -> Result<[u8; 32]> {
+        Ok([0u8; 32])
+    }
+
+    fn verify_quote(&self, _pcr_index: u8, _nonce: &[u8; 32], quote: &TpmQuote) -> Result<()> {
+        if quote.is_null() {
+            Ok(())
+        } else {
+            Err(crate::error::Error::ManifestInvalid {
+                detail: "NullTpm: non-null quote cannot be verified",
+            })
+        }
     }
 }

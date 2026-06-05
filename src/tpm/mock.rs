@@ -78,4 +78,33 @@ impl TpmProvider for SoftwareTpm {
 
         Ok(TpmQuote(quote))
     }
+
+    fn read_pcr(&self, pcr_index: u8) -> Result<[u8; 32]> {
+        let idx = pcr_index as usize;
+        if idx >= PCR_COUNT {
+            return Err(Error::ManifestInvalid { detail: "TPM PCR index out of range" });
+        }
+        Ok(self.pcrs[idx])
+    }
+
+    fn verify_quote(&self, pcr_index: u8, nonce: &[u8; 32], quote: &TpmQuote) -> Result<()> {
+        let idx = pcr_index as usize;
+        if idx >= PCR_COUNT {
+            return Err(Error::ManifestInvalid { detail: "TPM PCR index out of range" });
+        }
+        let pcr_value = self.pcrs[idx];
+
+        let mut h = Sha256::new();
+        h.update(pcr_value);
+        h.update(nonce);
+        let expected_signed: [u8; 32] = h.finalize().into();
+
+        if quote.0[..32] == pcr_value && quote.0[32..] == expected_signed {
+            Ok(())
+        } else {
+            Err(Error::ManifestInvalid {
+                detail: "TPM quote verification failed: PCR value or signature mismatch",
+            })
+        }
+    }
 }
