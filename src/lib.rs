@@ -14,7 +14,7 @@
 // PyO3).  When the `hsm` feature is enabled the crate also requires std because
 // the key store uses `Mutex<HashMap>`.  In all other configurations the crate
 // remains fully no_std.
-#![cfg_attr(not(any(feature = "python", feature = "hsm")), no_std)]
+#![cfg_attr(not(any(feature = "python", feature = "hsm", feature = "wasm")), no_std)]
 #![deny(
     clippy::all,
     clippy::pedantic,
@@ -26,7 +26,7 @@
 // requires an unsafe extern "C" entry point for the Python C ABI.
 // The `hsm` feature also opts out because the key store uses std interior
 // mutability constructs that require the std prelude.
-#![cfg_attr(not(any(feature = "python", feature = "hsm")), deny(unsafe_code))]
+#![cfg_attr(not(any(feature = "python", feature = "hsm", feature = "wasm")), deny(unsafe_code))]
 #![warn(clippy::nursery)]
 
 pub mod audit;

@@ -28,6 +28,9 @@
 //! actual `Capability` in a private bounded table (see [`WasmShim`]).
 
 pub mod host;
+pub mod executor;
+
+pub use executor::WasmExecutor;
 
 use crate::{
     audit::AuditLog,

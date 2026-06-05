@@ -95,6 +95,16 @@ pub enum Error {
         /// The context in which the undefined state was encountered.
         context: &'static str,
     },
+
+    /// A WASM guest trapped, or the executor failed to compile or instantiate the module.
+    ///
+    /// Maps to [`DenialClass::Halt`] — execution was stopped and no kernel state
+    /// was modified beyond what any prior host-function calls already committed.
+    #[error("WASM fault: {detail}")]
+    WasmFault {
+        /// Static description of the fault category.
+        detail: &'static str,
+    },
 }
 
 impl Error {
@@ -110,7 +120,9 @@ impl Error {
             Self::CapabilityDenied { reason }                               => reason,
             Self::QuotaExceeded { resource }                                => resource,
             Self::TopologyViolation { .. }                                  => "edge not in boot manifest",
-            Self::ManifestInvalid { detail } | Self::SchedulerInvariant { detail } => detail,
+            Self::ManifestInvalid { detail }
+            | Self::SchedulerInvariant { detail }
+            | Self::WasmFault { detail }                                    => detail,
             Self::UndefinedState { context }                                => context,
         }
     }
@@ -138,7 +150,8 @@ impl Error {
             Self::CapabilityDenied { .. }
             | Self::TopologyViolation { .. }
             | Self::ManifestInvalid { .. }
-            | Self::UndefinedState { .. } => DenialClass::Halt,
+            | Self::UndefinedState { .. }
+            | Self::WasmFault { .. } => DenialClass::Halt,
 
             // ── FAILURE: authorization passed, execution failed ───────────────
             //

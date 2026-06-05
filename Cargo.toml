@@ -36,6 +36,8 @@ rand_core     = { version = "0.6", features = ["getrandom"], optional = true }
 serde         = { version = "1.0", features = ["derive"], optional = true }
 # Tier 3 Item 6: Python bindings (optional; enables std)
 pyo3          = { version = "0.24.1", features = ["extension-module"], optional = true }
+# Tier 3 Item 4: WASM execution substrate
+wasmtime      = { version = "45", optional = true }
 
 [dev-dependencies]
 proptest   = "1.4"
@@ -55,7 +57,7 @@ hsm         = ["std", "dep:rand_core"]
 # When disabled (default), only SoftwareTpm and NullTpm are available.
 tpm         = []
 # WASM execution substrate: compiles Lux's enforcement points as wasm32 exports.
-wasm        = []
+wasm        = ["dep:wasmtime", "std"]
 # Python extension module: exposes PyAuditLog and PyPolicyGate via PyO3.
 # Enabling this feature switches the crate from no_std to std (PyO3 requires std).
 # Build with: maturin develop --features python
