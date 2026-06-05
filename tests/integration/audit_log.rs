@@ -209,10 +209,10 @@ fn chain_detects_hash_field_mutation() {
         DenialClass::Halt,
         "undeclared edge",
     );
-    let hash2_after_2 = log2.head_hash();
+    let log2_head = log2.head_hash();
 
     assert_ne!(
-        hash_after_2, hash2_after_2,
+        hash_after_2, log2_head,
         "different events must produce different chain heads"
     );
 }
@@ -525,7 +525,11 @@ fn json_export_hash_matches_event_hash_field() {
     let mut log = AuditLog::new();
     permit(&mut log, EventKind::CapabilityCheck, 42);
     let event_hash = log.events().next().unwrap().hash;
-    let expected_hex: String = event_hash.iter().map(|b| format!("{:02x}", b)).collect();
+    let expected_hex: String = event_hash.iter().fold(String::new(), |mut s, b| {
+        use core::fmt::Write as _;
+        write!(s, "{b:02x}").unwrap();
+        s
+    });
     let mut out = String::new();
     log.export_json(&mut out).unwrap();
     assert!(

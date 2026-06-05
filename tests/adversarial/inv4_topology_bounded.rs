@@ -259,7 +259,7 @@ fn attack_4_9_out_of_bounds_node_ids_always_denied() {
 #[test]
 fn attack_4_10_full_node_set_only_declared_ring_edges_work() {
     let mut g = BootingGraph::new();
-    for i in 1u32..=(MAX_NODES as u32) {
+    for i in 1u32..=u32::try_from(MAX_NODES).expect("constant fits in u32") {
         g.activate(nz(i)).unwrap();
     }
     // Ring: 1→2→3→4→1.

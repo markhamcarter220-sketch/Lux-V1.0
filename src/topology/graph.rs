@@ -262,11 +262,11 @@ mod tests {
     #[test]
     fn all_64_nodes_can_be_activated() {
         let mut g = BootingGraph::new();
-        for i in 1u32..=(MAX_NODES as u32) {
+        for i in 1u32..=(u32::try_from(MAX_NODES).expect("MAX_NODES=64 fits in u32")) {
             assert!(g.activate(nz(i)).is_ok(), "node {i} must be activatable");
         }
         let op = g.seal();
-        for i in 1u32..=(MAX_NODES as u32) {
+        for i in 1u32..=(u32::try_from(MAX_NODES).expect("MAX_NODES=64 fits in u32")) {
             assert!(
                 op.is_active(nz(i)),
                 "node {i} must be active after full activation"
@@ -373,7 +373,7 @@ mod tests {
         // Default::default() must produce the same empty sealed state as new().
         let op_new = BootingGraph::new().seal();
         let op_def = BootingGraph::default().seal();
-        for i in 1u32..=(MAX_NODES as u32) {
+        for i in 1u32..=(u32::try_from(MAX_NODES).expect("MAX_NODES=64 fits in u32")) {
             assert_eq!(
                 op_new.is_active(nz(i)),
                 op_def.is_active(nz(i)),
@@ -575,7 +575,7 @@ mod tests {
     #[test]
     fn fully_populated_graph_only_permits_declared_edges() {
         let mut g = BootingGraph::new();
-        for i in 1u32..=(MAX_NODES as u32) {
+        for i in 1u32..=(u32::try_from(MAX_NODES).expect("MAX_NODES=64 fits in u32")) {
             g.activate(nz(i)).unwrap();
         }
         // Declare a ring: 1→2→3→4→1.

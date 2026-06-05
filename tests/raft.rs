@@ -22,7 +22,7 @@ struct MockTransport {
 }
 
 impl MockTransport {
-    fn new() -> Self {
+    const fn new() -> Self {
         Self {
             sent: heapless::Vec::new(),
         }

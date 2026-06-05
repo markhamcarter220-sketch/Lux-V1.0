@@ -262,7 +262,7 @@ fn attack_5_8_audit_log_at_capacity_no_overwrite_chain_intact() {
     let mut log = AuditLog::new();
 
     for i in 0..MAX_AUDIT_EVENTS {
-        let ok = log.append(EventKind::CapabilityCheck, i as u32, 0, None);
+        let ok = log.append(EventKind::CapabilityCheck, u32::try_from(i).expect("constant fits in u32"), 0, None);
         assert!(ok, "append {i} must succeed");
     }
     assert_eq!(log.len(), MAX_AUDIT_EVENTS);
@@ -291,7 +291,7 @@ fn attack_5_8_audit_log_at_capacity_no_overwrite_chain_intact() {
     assert_eq!(events[0].actor, 0);
     assert_eq!(
         events[MAX_AUDIT_EVENTS - 1].actor,
-        (MAX_AUDIT_EVENTS - 1) as u32
+        u32::try_from(MAX_AUDIT_EVENTS - 1).expect("constant fits in u32")
     );
 }
 

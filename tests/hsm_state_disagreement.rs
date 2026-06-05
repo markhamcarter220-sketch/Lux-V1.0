@@ -1,4 +1,4 @@
-//! Integration tests: HSM ↔ RevocationLedger state-disagreement scenarios.
+//! Integration tests: HSM ↔ `RevocationLedger` state-disagreement scenarios.
 //!
 //! Three scenarios where the local in-memory `RevocationLedger` and the
 //! hardware-backed HSM keystore disagree on the validity of a capability.

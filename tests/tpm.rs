@@ -1,4 +1,4 @@
-//! TPM integration tests — SoftwareTpm, NullTpm, BootAttestation, and TssTpmProvider stub.
+//! TPM integration tests — `SoftwareTpm`, `NullTpm`, `BootAttestation`, and `TssTpmProvider` stub.
 
 use lux_kernel::{
     boot::{BootCredentials, BootState},

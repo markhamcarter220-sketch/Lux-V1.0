@@ -1,7 +1,7 @@
-/// Adversarial assault on all four Lux Kernel security invariants.
-///
-/// 63 distinct exploit attempts across 6 attack categories.
-/// Every test is a denial — zero successful privilege escalations.
+//! Adversarial assault on all four Lux Kernel security invariants.
+//!
+//! 63 distinct exploit attempts across 6 attack categories.
+//! Every test is a denial — zero successful privilege escalations.
 
 #[path = "adversarial/inv1_fail_closed.rs"]
 mod inv1_fail_closed;

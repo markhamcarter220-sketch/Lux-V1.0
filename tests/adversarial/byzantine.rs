@@ -49,7 +49,7 @@ fn attack_6_1_majority_malicious_capabilities_individually_denied() {
         };
         let cap = Capability::new_for_test(nz(1), nz(2), rights, gen, 1000 + i);
         match policy.check(&cap, CapabilitySet::SCHEDULE, &mut AuditLog::new()) {
-            Ok(_) => permitted += 1,
+            Ok(()) => permitted += 1,
             Err(_) => denied += 1,
         }
     }
@@ -71,7 +71,7 @@ fn attack_6_1_majority_malicious_capabilities_individually_denied() {
 #[test]
 fn attack_6_2_o1_traversal_completes_for_all_node_pairs() {
     let mut g = BootingGraph::new();
-    for i in 1u32..=(MAX_NODES as u32) {
+    for i in 1u32..=u32::try_from(MAX_NODES).expect("constant fits in u32") {
         g.activate(nz(i)).unwrap();
     }
     // Sparse topology: only one edge.
@@ -80,8 +80,8 @@ fn attack_6_2_o1_traversal_completes_for_all_node_pairs() {
 
     // All 64×64 = 4096 traversal pairs must complete (pass or fail) without
     // hanging.  The O(1) bitmask means the same code path runs each time.
-    for src in 1u32..=(MAX_NODES as u32) {
-        for dst in 1u32..=(MAX_NODES as u32) {
+    for src in 1u32..=u32::try_from(MAX_NODES).expect("constant fits in u32") {
+        for dst in 1u32..=u32::try_from(MAX_NODES).expect("constant fits in u32") {
             let _ = op.traverse(nz(src), nz(dst), &mut AuditLog::new());
         }
     }
@@ -264,9 +264,9 @@ fn attack_6_7_zero_bits_capability_denied_for_all_rights_and_combinations() {
     );
 
     // Paired combinations.
-    for i in 0..ALL_RIGHTS.len() {
-        for j in (i + 1)..ALL_RIGHTS.len() {
-            let combo = ALL_RIGHTS[i] | ALL_RIGHTS[j];
+    for (i, &right_i) in ALL_RIGHTS.iter().enumerate() {
+        for &right_j in ALL_RIGHTS.iter().skip(i + 1) {
+            let combo = right_i | right_j;
             assert!(
                 !empty.authorises(combo, gen),
                 "empty cap must not authorise {combo:?}"

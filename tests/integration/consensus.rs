@@ -34,7 +34,7 @@ struct MockRaftTransport {
 }
 
 impl MockRaftTransport {
-    fn new() -> Self {
+    const fn new() -> Self {
         Self {
             incoming: heapless::Vec::new(),
             recv_idx: 0,
@@ -110,8 +110,8 @@ fn four_peers_quorum_is_three() {
 #[test]
 fn peer_set_add_beyond_capacity_fails() {
     let mut ps = PeerSet::new();
-    for i in 1..=16 {
-        ps.add(node(i as u32)).unwrap();
+    for i in 1u32..=16 {
+        ps.add(node(i)).unwrap();
     }
     assert!(ps.add(node(17)).is_err(), "capacity exceeded must fail");
 }
@@ -120,27 +120,25 @@ fn peer_set_add_beyond_capacity_fails() {
 
 /// Build a minimal signed manifest with edge 1→2 and quota 1000 on node 1.
 fn boot_with_edge() -> BootState {
+    use ed25519_dalek::Signer as _;
     let sk = SigningKey::from_bytes(&[0u8; 32]);
     let creds = BootCredentials::from_key_bytes(sk.verifying_key().to_bytes()).unwrap();
-    let payload = {
-        let mut b = Vec::new();
-        b.push(0x83u8); // array(3)
-        b.push(0x01); // version = 1
-                      // edges = [[1, 2]]
-        b.push(0x81); // array(1)
-        b.push(0x82); // array(2)
-        b.push(0x01); // src = 1
-        b.push(0x02); // dst = 2
-                      // quotas = [[1, 1000]]
-        b.push(0x81); // array(1)
-        b.push(0x82); // array(2)
-        b.push(0x01); // node = 1
-        b.push(0x19);
-        b.push(0x03);
-        b.push(0xe8); // quota = 1000
-        b
-    };
-    use ed25519_dalek::Signer as _;
+    let payload = vec![
+        0x83u8, // array(3)
+        0x01, // version = 1
+        // edges = [[1, 2]]
+        0x81, // array(1)
+        0x82, // array(2)
+        0x01, // src = 1
+        0x02, // dst = 2
+        // quotas = [[1, 1000]]
+        0x81, // array(1)
+        0x82, // array(2)
+        0x01, // node = 1
+        0x19,
+        0x03,
+        0xe8, // quota = 1000
+    ];
     let sig = sk.sign(&payload);
     let mut wire = sig.to_bytes().to_vec();
     wire.extend_from_slice(&payload);
@@ -321,7 +319,7 @@ fn raft_messages_sent_on_success() {
     );
 }
 
-/// When election fails (no vote grant, transport exhausted) no AppendEntries
+/// When election fails (no vote grant, transport exhausted) no `AppendEntries`
 /// are ever sent — the node never reaches leadership.
 #[test]
 fn no_append_entries_sent_when_election_fails() {

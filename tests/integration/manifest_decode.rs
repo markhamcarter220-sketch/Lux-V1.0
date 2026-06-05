@@ -44,26 +44,26 @@ fn encode_payload(version: u32, edges: &[(u32, u32)], quotas: &[(u32, u64)]) -> 
 
 fn encode_array_header(buf: &mut Vec<u8>, n: usize) {
     if n < 24 {
-        buf.push(0x80 | n as u8);
+        buf.push(0x80 | u8::try_from(n).expect("n < 24 fits in u8"));
     } else {
         buf.push(0x98);
-        buf.push(n as u8);
+        buf.push(u8::try_from(n).expect("n fits in u8"));
     }
 }
 
 fn encode_uint(buf: &mut Vec<u8>, v: u64) {
     if v < 24 {
-        buf.push(v as u8);
+        buf.push(u8::try_from(v).expect("v < 24 fits in u8"));
     } else if v < 256 {
         buf.push(0x18);
-        buf.push(v as u8);
+        buf.push(u8::try_from(v).expect("v < 256 fits in u8"));
     } else if v < 65536 {
         buf.push(0x19);
-        buf.push((v >> 8) as u8);
-        buf.push(v as u8);
+        buf.push(u8::try_from(v >> 8).expect("high byte fits in u8"));
+        buf.push(u8::try_from(v & 0xff).expect("low byte fits in u8"));
     } else if v < 0x1_0000_0000 {
         buf.push(0x1a);
-        buf.extend_from_slice(&(v as u32).to_be_bytes());
+        buf.extend_from_slice(&u32::try_from(v).expect("v < 2^32 fits in u32").to_be_bytes());
     } else {
         buf.push(0x1b);
         buf.extend_from_slice(&v.to_be_bytes());
@@ -101,10 +101,10 @@ fn valid_minimal_manifest_empty_edges_and_quotas() {
     let m = ManifestDecoder::decode(&wire, &creds).unwrap();
     assert_eq!(m.version(), 1);
     assert!(
-        m.permits_edge(
+        !m.permits_edge(
             core::num::NonZeroU32::new(1).unwrap(),
             core::num::NonZeroU32::new(2).unwrap()
-        ) == false
+        )
     );
 }
 
@@ -119,7 +119,7 @@ fn valid_single_edge_single_quota() {
     let n1 = core::num::NonZeroU32::new(1).unwrap();
     let n2 = core::num::NonZeroU32::new(2).unwrap();
     assert!(m.permits_edge(n1, n2));
-    assert_eq!(m.quota_for(n1).map(|q| q.get()), Some(1000));
+    assert_eq!(m.quota_for(n1).map(lux_kernel::types::Quota::get), Some(1000));
 }
 
 #[test]
@@ -135,7 +135,7 @@ fn valid_multi_edge_multi_quota() {
     let n1 = core::num::NonZeroU32::new(1).unwrap();
     let n3 = core::num::NonZeroU32::new(3).unwrap();
     assert!(m.permits_edge(n1, n3));
-    assert_eq!(m.quota_for(n3).map(|q| q.get()), Some(750));
+    assert_eq!(m.quota_for(n3).map(lux_kernel::types::Quota::get), Some(750));
 }
 
 #[test]
@@ -146,7 +146,7 @@ fn valid_large_quota_u64_max() {
 
     let m = ManifestDecoder::decode(&wire, &creds).unwrap();
     let n1 = core::num::NonZeroU32::new(1).unwrap();
-    assert_eq!(m.quota_for(n1).map(|q| q.get()), Some(u64::MAX));
+    assert_eq!(m.quota_for(n1).map(lux_kernel::types::Quota::get), Some(u64::MAX));
 }
 
 #[test]
@@ -241,14 +241,15 @@ fn adversarial_truncated_after_signature_rejected() {
 fn adversarial_zero_node_id_in_edge_rejected() {
     let (sk, creds) = test_key();
     // Manually encode edge [0, 1] — node 0 is invalid (NodeId = NonZeroU32).
-    let mut payload = Vec::new();
-    payload.push(0x83); // array(3)
-    payload.push(0x01); // version = 1
-    payload.push(0x81); // edges: array(1)
-    payload.push(0x82); // edge: array(2)
-    payload.push(0x00); // src = 0  ← invalid
-    payload.push(0x01); // dst = 1
-    payload.push(0x80); // quotas: array(0)
+    let payload = vec![
+        0x83u8, // array(3)
+        0x01, // version = 1
+        0x81, // edges: array(1)
+        0x82, // edge: array(2)
+        0x00, // src = 0  ← invalid
+        0x01, // dst = 1
+        0x80, // quotas: array(0)
+    ];
 
     let wire = make_wire(&payload, &sk);
     assert!(matches!(
@@ -262,14 +263,15 @@ fn adversarial_zero_node_id_in_edge_rejected() {
 #[test]
 fn adversarial_zero_node_id_in_quota_rejected() {
     let (sk, creds) = test_key();
-    let mut payload = Vec::new();
-    payload.push(0x83);
-    payload.push(0x01); // version
-    payload.push(0x80); // edges: empty
-    payload.push(0x81); // quotas: array(1)
-    payload.push(0x82);
-    payload.push(0x00); // node = 0 ← invalid
-    payload.push(0x0a); // ceiling = 10
+    let payload = vec![
+        0x83u8,
+        0x01, // version
+        0x80, // edges: empty
+        0x81, // quotas: array(1)
+        0x82,
+        0x00, // node = 0 ← invalid
+        0x0a, // ceiling = 10
+    ];
 
     let wire = make_wire(&payload, &sk);
     assert!(matches!(
@@ -283,10 +285,11 @@ fn adversarial_zero_node_id_in_quota_rejected() {
 #[test]
 fn adversarial_wrong_outer_array_len_rejected() {
     let (sk, creds) = test_key();
-    let mut payload = Vec::new();
-    payload.push(0x82); // array(2) instead of array(3)
-    payload.push(0x01);
-    payload.push(0x80);
+    let payload = vec![
+        0x82u8, // array(2) instead of array(3)
+        0x01,
+        0x80,
+    ];
 
     let wire = make_wire(&payload, &sk);
     assert!(matches!(
@@ -300,15 +303,16 @@ fn adversarial_wrong_outer_array_len_rejected() {
 #[test]
 fn adversarial_edge_with_wrong_inner_len_rejected() {
     let (sk, creds) = test_key();
-    let mut payload = Vec::new();
-    payload.push(0x83);
-    payload.push(0x01);
-    payload.push(0x81); // 1 edge
-    payload.push(0x83); // array(3) instead of array(2)
-    payload.push(0x01);
-    payload.push(0x02);
-    payload.push(0x03);
-    payload.push(0x80);
+    let payload = vec![
+        0x83u8,
+        0x01,
+        0x81, // 1 edge
+        0x83, // array(3) instead of array(2)
+        0x01,
+        0x02,
+        0x03,
+        0x80,
+    ];
 
     let wire = make_wire(&payload, &sk);
     assert!(matches!(

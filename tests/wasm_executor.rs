@@ -39,7 +39,7 @@ fn make_shim() -> WasmShim {
     WasmShim::from_parts(policy, ledger, graph)
 }
 
-/// Build a capability for node 1, with ALLOC_RESOURCE | SCHEDULE rights, generation 0.
+/// Build a capability for node 1, with `ALLOC_RESOURCE` | `SCHEDULE` rights, generation 0.
 fn make_cap() -> Capability {
     let issuer = NonZeroU32::new(1).unwrap();
     let target = NonZeroU32::new(1).unwrap();
@@ -54,7 +54,7 @@ fn make_cap() -> Capability {
 
 // ── I2: Capability-gated ─────────────────────────────────────────────────────
 
-/// WAT: calls lux_policy_check(0, ALLOC_RESOURCE_bits) → should return 0.
+/// WAT: calls `lux_policy_check(0, ALLOC_RESOURCE_bits)` → should return 0.
 #[test]
 fn executor_policy_check_permitted() -> lux_kernel::Result<()> {
     let shim = make_shim();
@@ -81,7 +81,7 @@ fn executor_policy_check_permitted() -> lux_kernel::Result<()> {
     Ok(())
 }
 
-/// WAT: calls lux_policy_check(99, 2) — handle 99 was never registered → -1.
+/// WAT: calls `lux_policy_check(99, 2)` — handle 99 was never registered → -1.
 #[test]
 fn executor_policy_check_invalid_handle() -> lux_kernel::Result<()> {
     let shim = make_shim();
@@ -210,7 +210,7 @@ fn executor_topology_traverse_denied() -> lux_kernel::Result<()> {
     Ok(())
 }
 
-/// WAT: traverses from node 0 (invalid — NonZeroU32 sentinel) → -1.
+/// WAT: traverses from node 0 (invalid — `NonZeroU32` sentinel) → -1.
 #[test]
 fn executor_topology_invalid_node() -> lux_kernel::Result<()> {
     let shim = make_shim();

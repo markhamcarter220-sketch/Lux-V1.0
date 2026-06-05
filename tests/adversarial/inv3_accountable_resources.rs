@@ -301,13 +301,13 @@ fn attack_3_11_quota_exhaustion_does_not_cascade_to_other_nodes() {
 fn attack_3_12_full_ledger_capacity_all_nodes_independent() {
     let mut ledger = Ledger::new();
 
-    for i in 1u32..=(MAX_NODES as u32) {
+    for i in 1u32..=u32::try_from(MAX_NODES).expect("constant fits in u32") {
         let n = nz(i);
         ledger.seed(n, Quota::new(100));
     }
 
     // Every node can independently deduct.
-    for i in 1u32..=(MAX_NODES as u32) {
+    for i in 1u32..=u32::try_from(MAX_NODES).expect("constant fits in u32") {
         let n = nz(i);
         assert!(
             ledger.deduct(n, 50).is_some(),
