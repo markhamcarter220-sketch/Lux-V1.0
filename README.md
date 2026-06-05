@@ -154,7 +154,7 @@ Tier 3 — IN PROGRESS (software-complete; hardware integration pending deployme
     See docs/FORMAL_COST_MODEL.md for theorem statements and TLA+ relationship.
     Mechanical verification requires Lean 4 toolchain (lake build in lean/).
 [~] WASM execution substrate — Wasmtime-backed executor, 3 host functions, 12 integration tests (src/wasm/, tests/wasm_executor.rs)
-[~] Distributed topology consensus — full Raft state machine, 20 unit tests + integration tests (src/consensus/, tests/raft.rs)
+[~] Distributed topology consensus — full Raft state machine, 21 unit tests + integration tests (src/consensus/, tests/raft.rs)
 
 AUDIT & VERIFICATION STATUS:
 [x] Internal security review (Lux Project Contributors)
@@ -245,7 +245,7 @@ cargo build --release
 ### Test
 
 ```sh
-# All tests (199 total: unit, integration, property, security, adversarial)
+# All tests (309 total: unit, integration, property, security, adversarial)
 cargo test --all-features
 
 # Security invariant tests only
