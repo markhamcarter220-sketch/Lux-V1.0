@@ -125,7 +125,7 @@ fn boot_with_edge() -> BootState {
     let creds = BootCredentials::from_key_bytes(sk.verifying_key().to_bytes()).unwrap();
     let payload = vec![
         0x83u8, // array(3)
-        0x01, // version = 1
+        0x01,   // version = 1
         // edges = [[1, 2]]
         0x81, // array(1)
         0x82, // array(2)
@@ -135,9 +135,7 @@ fn boot_with_edge() -> BootState {
         0x81, // array(1)
         0x82, // array(2)
         0x01, // node = 1
-        0x19,
-        0x03,
-        0xe8, // quota = 1000
+        0x19, 0x03, 0xe8, // quota = 1000
     ];
     let sig = sk.sign(&payload);
     let mut wire = sig.to_bytes().to_vec();

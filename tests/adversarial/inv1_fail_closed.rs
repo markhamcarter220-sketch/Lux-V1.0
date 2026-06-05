@@ -316,7 +316,8 @@ fn attack_1_10_check_revoke_sequence_is_consistent() {
         .is_err());
 
     // nonce_b repeated attempt also denied (still revoked).
-    let cap_b2_retry = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, nonce_b);
+    let cap_b2_retry =
+        Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, nonce_b);
     assert!(policy
         .check(&cap_b2_retry, CapabilitySet::SCHEDULE, &mut AuditLog::new())
         .is_err());
