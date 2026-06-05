@@ -3,7 +3,6 @@
 **A fail-closed, capability-authenticated governance microkernel.**
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/markhamcarter220-sketch/lux-v1.0/actions)
-[![Security Audit](https://img.shields.io/badge/audit-A%2B-brightgreen)](docs/SECURITY.md)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![Rust 1.78+](https://img.shields.io/badge/rust-1.78%2B-orange)](https://www.rust-lang.org)
 [![no_std](https://img.shields.io/badge/no__std-yes-blue)](#)
@@ -61,7 +60,7 @@ formally verified by TLC model checking across 322,560 distinct states
 
 See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for a full derivation of
 each invariant from first principles, and [`docs/SECURITY.md`](docs/SECURITY.md)
-for the threat model and audit findings.
+for the threat model. Note: Third-party security audit is not yet complete (see [Project Maturity](#project-maturity)).
 
 ---
 
@@ -120,50 +119,47 @@ java -XX:+UseParallelGC -jar tla2tools.jar MC.tla -config MC.cfg -workers 4
 
 ## Project Maturity
 
+See [`TIER_BOUNDARIES.md`](TIER_BOUNDARIES.md) for detailed explanation of maturity levels.
+See [`AUDIT_ROADMAP.md`](AUDIT_ROADMAP.md) for third-party audit timeline and criteria.
+
 ```
-Tier 1 — COMPLETE
-  [x] Core error taxonomy (HALT/FAILURE denial classification, exhaustive variants)
-  [x] Capability token model (object-capability, no ambient authority)
-  [x] Policy enforcement point (fail-closed gate)
-  [x] Resource ledger (checked arithmetic, no silent overflow)
-  [x] Topology graph (static, manifest-derived, deny-by-default)
-  [x] Work queue (bounded capacity, priority-ordered)
-  [x] Boot manifest validation framework
-  [x] 100% security-path test coverage
+Tier 1 — PRODUCTION-READY (core security enforced, tested, verified)
+[x] Core error taxonomy (HALT/FAILURE denial classification, exhaustive variants)
+[x] Capability token model (object-capability, no ambient authority)
+[x] Policy enforcement point (fail-closed gate)
+[x] Resource ledger (checked arithmetic, no silent overflow)
+[x] Topology graph (static, manifest-derived, deny-by-default)
+[x] Work queue (bounded capacity, priority-ordered)
+[x] Boot manifest validation framework
+[x] 100% security-path test coverage
+[x] Adversarial test suite (63 attacks, 0 escalations) — tests/adversarial/
+[x] TLA+ formal verification (322,560 states, 0 violations) — tla/
 
-Tier 2 — COMPLETE
-  [x] Wire-format manifest decoder (CBOR)          src/boot/decode.rs
-  [x] Cryptographic manifest signature (Ed25519)   src/boot/credentials.rs
-  [x] Capability revocation ledger (O(1))          src/auth/revocation.rs
-  [x] Audit event log (append-only, hash-chained)  src/audit/
-  [x] Formal property tests (proptest)             tests/properties/
+Tier 2 — COMPLETE (cryptography, audit, revocation integrated)
+[x] Wire-format manifest decoder (CBOR) — src/boot/decode.rs
+[x] Cryptographic manifest signature (Ed25519) — src/boot/credentials.rs
+[x] Capability revocation ledger (O(1) via epoch) — src/auth/revocation.rs
+[x] Audit event log (append-only, hash-chained) — src/audit/
+[x] Formal property tests (proptest) — tests/properties/
 
-Tier 2.5 — COMPLETE (beyond original roadmap)
-  [x] Adversarial test suite (63 attacks, 0 escalations)    tests/adversarial/
-  [x] TLA+ formal verification (322,560 states, 0 violations) tla/
-  [x] EU AI Act reference implementation (hiring)           hiring-audit/
-  [x] Fair lending reference implementation (ECOA/FHA)      lending-audit/
-  [x] Criminal justice governance demonstration             recidivism-demo/
+Tier 2.5 — COMPLETE (compliance demonstrations)
+[x] EU AI Act reference implementation (hiring-audit/)
+[x] Fair lending reference implementation (ECOA/FHA) — lending-audit/
+[x] Criminal justice governance demonstration — recidivism-demo/
 
-Tier 3 — ROADMAP
-  [ ] HSM-backed capability minting
-  [ ] TPM-anchored boot attestation
-  [ ] Formal cost model (resource accounting proofs)
-  [ ] WASM execution substrate integration
-  [ ] Distributed topology consensus protocol
+Tier 3 — ROADMAP (future integrations)
+[ ] HSM-backed capability minting
+[ ] TPM-anchored boot attestation
+[ ] Formal cost model (resource accounting proofs)
+[ ] WASM execution substrate integration
+[ ] Distributed topology consensus protocol
 
-Tier 2.9 — COMPLETE (gap closures)
-  [x] Audit log wiring: Policy::check, QuotaEnforcer::deduct, and
-      OperationalGraph::traverse all call AuditLog::append — every
-      operational decision is now audited with HALT/FAILURE classification.
-  [x] AuditLog !Send/!Sync: structurally enforced via
-      PhantomData<*mut ()>; cannot be sent across threads without unsafe.
-  [x] Hash field in JSON export: export_json now includes "hash":"<hex64>"
-      on every entry, enabling external hash-chain verification without
-      re-computing from raw fields.
-
-Open items:
-  [ ] Independent security audit — requires a third-party security firm
+AUDIT & VERIFICATION STATUS:
+[x] Internal security review (Lux Project Contributors)
+[x] TLA+ formal model verification (322,560 states exhaustively checked)
+[x] Adversarial test suite (63 named attack vectors, 0 successful escalations)
+[ ] Third-party security audit — PLANNED (vendor selection in progress)
+    Target: Q3 2026. See AUDIT_ROADMAP.md for timeline.
 ```
 
 ---
