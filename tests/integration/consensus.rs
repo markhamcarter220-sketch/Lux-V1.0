@@ -11,7 +11,7 @@
 use lux_kernel::{
     audit::AuditLog,
     boot::{BootCredentials, BootState},
-    consensus::{run_consensus_proposal, ConsensusMessage, PeerSet, Transport},
+    consensus::{run_consensus_proposal, ConsensusMessage, ConsensusProposal, PeerSet, Transport},
     tpm::TpmQuote,
     types::NodeId,
 };
@@ -119,7 +119,7 @@ fn single_node_local_accept_commits() {
     let mut a = AuditLog::new();
 
     let result = run_consensus_proposal(
-        &ps, 0, node(1), node(2), true, &quote, &mut t, &mut a,
+        &ps, &ConsensusProposal { round_id: 0, src: node(1), dst: node(2), local_accept: true, local_attestation: *quote.as_bytes() }, &mut t, &mut a,
     );
     assert!(result.is_ok(), "single-node accept must commit");
     assert!(t.sent_messages().is_empty(), "no messages sent in single-node mode");
@@ -134,7 +134,7 @@ fn single_node_local_reject_aborts() {
     let mut a = AuditLog::new();
 
     let result = run_consensus_proposal(
-        &ps, 0, node(1), node(2), false, &quote, &mut t, &mut a,
+        &ps, &ConsensusProposal { round_id: 0, src: node(1), dst: node(2), local_accept: false, local_attestation: *quote.as_bytes() }, &mut t, &mut a,
     );
     assert!(result.is_err(), "single-node reject must abort");
     assert!(t.sent_messages().is_empty());
@@ -155,7 +155,7 @@ fn majority_accepts_commits() {
     t.add_vote(node(3), false);
 
     let result = run_consensus_proposal(
-        &ps, 1, node(1), node(2), true, &quote, &mut t, &mut AuditLog::new(),
+        &ps, &ConsensusProposal { round_id: 1, src: node(1), dst: node(2), local_accept: true, local_attestation: *quote.as_bytes() }, &mut t, &mut AuditLog::new(),
     );
     assert!(result.is_ok(), "majority accept must commit");
 }
@@ -173,7 +173,7 @@ fn majority_rejects_aborts() {
     t.add_vote(node(3), false);
 
     let result = run_consensus_proposal(
-        &ps, 2, node(1), node(2), false, &quote, &mut t, &mut AuditLog::new(),
+        &ps, &ConsensusProposal { round_id: 2, src: node(1), dst: node(2), local_accept: false, local_attestation: *quote.as_bytes() }, &mut t, &mut AuditLog::new(),
     );
     assert!(result.is_err(), "majority reject must abort");
 }
@@ -190,7 +190,7 @@ fn partitioned_minority_cannot_commit() {
     t.add_vote(node(2), true); // only 1 peer responds; transport exhausted
 
     let result = run_consensus_proposal(
-        &ps, 3, node(1), node(2), true, &quote, &mut t, &mut AuditLog::new(),
+        &ps, &ConsensusProposal { round_id: 3, src: node(1), dst: node(2), local_accept: true, local_attestation: *quote.as_bytes() }, &mut t, &mut AuditLog::new(),
     );
     // local=accept + peer2=accept = 2 < quorum 3 → abort
     assert!(result.is_err(), "partitioned minority must not commit");
@@ -210,7 +210,7 @@ fn all_peers_accept_commits() {
     t.add_vote(node(4), true);
 
     let result = run_consensus_proposal(
-        &ps, 4, node(1), node(2), true, &quote, &mut t, &mut AuditLog::new(),
+        &ps, &ConsensusProposal { round_id: 4, src: node(1), dst: node(2), local_accept: true, local_attestation: *quote.as_bytes() }, &mut t, &mut AuditLog::new(),
     );
     assert!(result.is_ok(), "unanimous accept must commit");
 }
@@ -226,7 +226,7 @@ fn timeout_with_no_votes_aborts() {
     // no votes added → recv_vote returns None immediately
 
     let result = run_consensus_proposal(
-        &ps, 5, node(1), node(2), false, &quote, &mut t, &mut AuditLog::new(),
+        &ps, &ConsensusProposal { round_id: 5, src: node(1), dst: node(2), local_accept: false, local_attestation: *quote.as_bytes() }, &mut t, &mut AuditLog::new(),
     );
     // local=reject, no peer votes → 0 accepts < quorum 1 → abort
     assert!(result.is_err(), "timeout with local reject must abort");
@@ -245,7 +245,7 @@ fn propose_and_commit_messages_are_sent_on_success() {
 
     let mut a = AuditLog::new();
     let _ = run_consensus_proposal(
-        &ps, 10, node(1), node(2), true, &quote, &mut t, &mut a,
+        &ps, &ConsensusProposal { round_id: 10, src: node(1), dst: node(2), local_accept: true, local_attestation: *quote.as_bytes() }, &mut t, &mut a,
     );
 
     let sent = t.sent_messages();
@@ -264,7 +264,7 @@ fn propose_and_abort_messages_are_sent_on_failure() {
     t.add_vote(node(2), false); // peer rejects
 
     let _ = run_consensus_proposal(
-        &ps, 11, node(1), node(2), false, &quote, &mut t, &mut AuditLog::new(),
+        &ps, &ConsensusProposal { round_id: 11, src: node(1), dst: node(2), local_accept: false, local_attestation: *quote.as_bytes() }, &mut t, &mut AuditLog::new(),
     );
 
     let sent = t.sent_messages();
@@ -283,7 +283,7 @@ fn consensus_commit_emits_one_permitted_audit_event() {
     let mut a = AuditLog::new();
 
     let _ = run_consensus_proposal(
-        &ps, 0, node(1), node(2), true, &quote, &mut t, &mut a,
+        &ps, &ConsensusProposal { round_id: 0, src: node(1), dst: node(2), local_accept: true, local_attestation: *quote.as_bytes() }, &mut t, &mut a,
     );
     assert_eq!(a.len(), 1);
     let ev = a.events().next().unwrap();
@@ -298,7 +298,7 @@ fn consensus_abort_emits_one_denied_audit_event() {
     let mut a = AuditLog::new();
 
     let _ = run_consensus_proposal(
-        &ps, 0, node(1), node(2), false, &quote, &mut t, &mut a,
+        &ps, &ConsensusProposal { round_id: 0, src: node(1), dst: node(2), local_accept: false, local_attestation: *quote.as_bytes() }, &mut t, &mut a,
     );
     assert_eq!(a.len(), 1);
     let ev = a.events().next().unwrap();
@@ -341,7 +341,7 @@ fn boot_state_consensus_declared_edge_single_node_commits() {
     let mut t    = MockTransport::new();
     let mut a    = AuditLog::new();
 
-    let result = boot.run_topology_consensus(&ps, 0, node(1), node(2), &mut t, &mut a);
+    let result = boot.run_topology_consensus(&ps, &ConsensusProposal { round_id: 0, src: node(1), dst: node(2), local_accept: false, local_attestation: [0u8; 64] }, &mut t, &mut a);
     // Single-node: audit gets topo_traverse (from local check) + topo_change
     assert!(result.is_ok(), "declared edge in single-node must commit");
 }
@@ -353,7 +353,7 @@ fn boot_state_consensus_undeclared_edge_single_node_aborts() {
     let mut t    = MockTransport::new();
     let mut a    = AuditLog::new();
 
-    let result = boot.run_topology_consensus(&ps, 0, node(2), node(1), &mut t, &mut a);
+    let result = boot.run_topology_consensus(&ps, &ConsensusProposal { round_id: 0, src: node(2), dst: node(1), local_accept: false, local_attestation: [0u8; 64] }, &mut t, &mut a);
     assert!(result.is_err(), "undeclared edge in single-node must abort");
 }
 
@@ -375,7 +375,7 @@ fn boot_state_consensus_quorum_overrides_local_graph() {
 
     let mut a = AuditLog::new();
     // Propose undeclared edge 2→1 (local graph will deny it)
-    let result = boot.run_topology_consensus(&ps, 0, node(2), node(1), &mut t, &mut a);
+    let result = boot.run_topology_consensus(&ps, &ConsensusProposal { round_id: 0, src: node(2), dst: node(1), local_accept: false, local_attestation: [0u8; 64] }, &mut t, &mut a);
     // local=reject (0) + peer=accept (1) = 1 >= quorum(1) → commit
     assert!(result.is_ok(), "single peer override of local reject must commit when quorum is 1");
 }

@@ -65,6 +65,10 @@ impl ManifestDecoder {
     /// 3. Decode CBOR payload into `Manifest`.
     ///
     /// Any failure at any step returns `Err(ManifestInvalid { detail })`.
+    ///
+    /// # Errors
+    /// Returns `Err(ManifestInvalid)` if the wire format is too short, the signature is
+    /// invalid, or the CBOR payload is malformed.
     pub fn decode<H: HsmProvider>(bytes: &[u8], credentials: &BootCredentials<H>) -> Result<Manifest> {
         if bytes.len() < MIN_WIRE_LEN {
             return Err(Error::ManifestInvalid {

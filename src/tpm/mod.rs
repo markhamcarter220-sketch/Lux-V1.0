@@ -36,7 +36,7 @@ use crate::Result;
 /// - bytes `[0..32]`  — current PCR value
 /// - bytes `[32..64]` — SHA-256(PCR value || nonce)
 ///
-/// Real TPM quotes carry additional structure (TPMS_ATTEST, signature) but
+/// Real TPM quotes carry additional structure (`TPMS_ATTEST`, signature) but
 /// the 64-byte newtype is sufficient for the kernel's attestation API.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct TpmQuote(pub [u8; 64]);
@@ -44,7 +44,7 @@ pub struct TpmQuote(pub [u8; 64]);
 impl TpmQuote {
     /// Returns the raw quote bytes.
     #[must_use]
-    pub fn as_bytes(&self) -> &[u8; 64] {
+    pub const fn as_bytes(&self) -> &[u8; 64] {
         &self.0
     }
 

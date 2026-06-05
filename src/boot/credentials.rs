@@ -50,7 +50,7 @@ impl BootCredentials<SoftwareHsm> {
 impl<H: HsmProvider> BootCredentials<H> {
     /// Construct credentials from any [`HsmProvider`] implementation.
     #[must_use]
-    pub fn new(hsm: H) -> Self {
+    pub const fn new(hsm: H) -> Self {
         Self { hsm }
     }
 

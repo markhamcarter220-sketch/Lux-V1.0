@@ -30,7 +30,7 @@ pub struct SoftwareTpm {
 impl SoftwareTpm {
     /// Construct a fresh TPM with all PCRs initialised to zero.
     #[must_use]
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self { pcrs: [[0u8; 32]; PCR_COUNT] }
     }
 

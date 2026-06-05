@@ -17,7 +17,7 @@ pub struct Ledger {
 impl Ledger {
     /// Constructs an empty ledger.
     #[must_use]
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self { balances: LinearMap::new() }
     }
 

@@ -54,7 +54,7 @@ impl<const N: usize> core::fmt::Debug for WorkQueue<N> {
 impl<const N: usize> WorkQueue<N> {
     /// Construct an empty queue.
     #[must_use]
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self { inner: BinaryHeap::new() }
     }
 
@@ -62,6 +62,9 @@ impl<const N: usize> WorkQueue<N> {
     ///
     /// Returns `Err(SchedulerInvariant)` if the queue is at capacity — the
     /// fail-closed response to sustained overload.
+    ///
+    /// # Errors
+    /// Returns `Err(SchedulerInvariant)` if the queue has reached capacity `N`.
     pub fn enqueue(&mut self, item: WorkItem) -> Result<()> {
         self.inner
             .push(item)

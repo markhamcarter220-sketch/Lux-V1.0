@@ -105,14 +105,13 @@ impl Error {
     /// events accept only `&'static str`; the edge coordinates are recorded in
     /// the structured error returned to the caller.
     #[must_use]
-    pub fn denial_reason_str(&self) -> &'static str {
+    pub const fn denial_reason_str(&self) -> &'static str {
         match self {
-            Self::CapabilityDenied { reason }   => reason,
-            Self::QuotaExceeded { resource }     => resource,
-            Self::TopologyViolation { .. }        => "edge not in boot manifest",
-            Self::ManifestInvalid { detail }      => detail,
-            Self::SchedulerInvariant { detail }   => detail,
-            Self::UndefinedState { context }      => context,
+            Self::CapabilityDenied { reason }                               => reason,
+            Self::QuotaExceeded { resource }                                => resource,
+            Self::TopologyViolation { .. }                                  => "edge not in boot manifest",
+            Self::ManifestInvalid { detail } | Self::SchedulerInvariant { detail } => detail,
+            Self::UndefinedState { context }                                => context,
         }
     }
 
@@ -122,27 +121,24 @@ impl Error {
     /// exist.  See the module-level documentation for the HALT / FAILURE
     /// semantics.
     #[must_use]
-    pub fn denial_class(&self) -> DenialClass {
+    pub const fn denial_class(&self) -> DenialClass {
         match self {
             // ── HALT: authorization never established ─────────────────────────
             //
             // CapabilityDenied: token is absent, expired, revoked, replayed, or
             //   the nonce window is exhausted.  No execution was attempted.
-            Self::CapabilityDenied { .. } => DenialClass::Halt,
-
             // TopologyViolation: the requested edge is not declared in the boot
             //   manifest, so no authorization path for this traversal exists.
             //   Also covers BootingGraph configuration errors (pre-operational).
-            Self::TopologyViolation { .. } => DenialClass::Halt,
-
             // ManifestInvalid: boot-time validation failed before any
             //   operational state was established.
-            Self::ManifestInvalid { .. } => DenialClass::Halt,
-
             // UndefinedState: the state machine reached an unrecognised
             //   transition.  The fail-closed contract requires halting the
             //   sub-system rather than proceeding in an unknown state.
-            Self::UndefinedState { .. } => DenialClass::Halt,
+            Self::CapabilityDenied { .. }
+            | Self::TopologyViolation { .. }
+            | Self::ManifestInvalid { .. }
+            | Self::UndefinedState { .. } => DenialClass::Halt,
 
             // ── FAILURE: authorization passed, execution failed ───────────────
             //
@@ -150,12 +146,10 @@ impl Error {
             //   passed, but the resource ledger could not satisfy the requested
             //   deduction.  Execution was attempted; atomicity holds (ledger
             //   unchanged on failure).
-            Self::QuotaExceeded { .. } => DenialClass::Failure,
-
             // SchedulerInvariant: a correctness invariant (e.g. priority
             //   inversion) was detected during scheduling execution, after the
             //   caller's authority was confirmed.
-            Self::SchedulerInvariant { .. } => DenialClass::Failure,
+            Self::QuotaExceeded { .. } | Self::SchedulerInvariant { .. } => DenialClass::Failure,
         }
     }
 }

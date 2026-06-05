@@ -1,4 +1,4 @@
-//! PyAuditLog — Python binding for the kernel's append-only, hash-chained audit log.
+//! `PyAuditLog` — Python binding for the kernel's append-only, hash-chained audit log.
 //!
 //! # EDGE B resolution: &'static str denial reasons
 //!
@@ -11,11 +11,11 @@
 //! The `PyPolicyGate` in `super::policy` emits exactly these strings as denial
 //! reasons, so the round-trip (gate → audit) is lossless for the hiring pipeline.
 //!
-//! # EDGE G resolution: AuditLog is !Send
+//! # EDGE G resolution: `AuditLog` is !Send
 //!
-//! `AuditLog` holds `PhantomData<*mut ()>`, making it `!Send + !Sync`.  PyO3
+//! `AuditLog` holds `PhantomData<*mut ()>`, making it `!Send + !Sync`.  `PyO3`
 //! requires `T: Send` for `#[pyclass]` unless `unsendable` is set.
-//! `#[pyclass(unsendable)]` tells PyO3 that this object may only be used from
+//! `#[pyclass(unsendable)]` tells `PyO3` that this object may only be used from
 //! the Python thread that created it; attempting cross-thread use raises
 //! `RuntimeError` at the Python layer.
 
@@ -55,9 +55,8 @@ fn parse_kind(s: &str) -> PyResult<EventKind> {
         "topo_traverse"     => Ok(EventKind::TopologyTraverse),
         "topo_change"       => Ok(EventKind::TopologyChange),
         other => Err(pyo3::exceptions::PyValueError::new_err(format!(
-            "unknown EventKind {:?}; accepted: hiring_decision, policy_gate_check, \
-             capability_check, cap_revoked, resource_deduct, topo_traverse, topo_change",
-            other
+            "unknown EventKind {other:?}; accepted: hiring_decision, policy_gate_check, \
+             capability_check, cap_revoked, resource_deduct, topo_traverse, topo_change"
         ))),
     }
 }
@@ -67,8 +66,7 @@ fn parse_denial_class(s: &str) -> PyResult<DenialClass> {
         "halt"    => Ok(DenialClass::Halt),
         "failure" => Ok(DenialClass::Failure),
         other => Err(pyo3::exceptions::PyValueError::new_err(format!(
-            "unknown DenialClass {:?}; use \"halt\" or \"failure\"",
-            other
+            "unknown DenialClass {other:?}; use \"halt\" or \"failure\""
         ))),
     }
 }
@@ -88,10 +86,17 @@ pub struct PyAuditLog {
     inner: AuditLog,
 }
 
+impl Default for PyAuditLog {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[pymethods]
 impl PyAuditLog {
     #[new]
-    pub fn new() -> Self {
+    #[must_use]
+    pub const fn new() -> Self {
         Self { inner: AuditLog::new() }
     }
 
@@ -100,17 +105,17 @@ impl PyAuditLog {
     /// Parameters
     /// ----------
     /// kind : str
-    ///     One of: "hiring_decision", "policy_gate_check", "capability_check",
-    ///     "cap_revoked", "resource_deduct", "topo_traverse", "topo_change".
+    ///     One of: "`hiring_decision`", "`policy_gate_check`", "`capability_check`",
+    ///     "`cap_revoked`", "`resource_deduct`", "`topo_traverse`", "`topo_change`".
     /// actor : int
     ///     Node / candidate ID (u32 range).
     /// timestamp : int
-    ///     Caller-supplied monotonic counter in nanoseconds (e.g. time.time_ns()).
+    ///     Caller-supplied monotonic counter in nanoseconds (e.g. `time.time_ns()`).
     ///     The kernel does not own a clock; callers supply this value.
-    /// denial_class : str | None
+    /// `denial_class` : str | None
     ///     "halt" (authorisation never established) or "failure" (execution
     ///     failed after authorisation passed).  None for permitted events.
-    /// denial_reason : str | None
+    /// `denial_reason` : str | None
     ///     One of the static denial reason strings (EDGE B resolution), or None.
     ///     Unknown strings silently fall back to "policy violation".
     ///
@@ -119,6 +124,9 @@ impl PyAuditLog {
     /// bool
     ///     True on success.  False if the log is at capacity (512 events) — the
     ///     event is NOT recorded (fail-closed: no silent overwrites).
+    ///
+    /// # Errors
+    /// Returns `Err` if `kind` or `denial_class` is an unrecognised string.
     pub fn append(
         &mut self,
         kind:          &str,
@@ -128,15 +136,14 @@ impl PyAuditLog {
         denial_reason: Option<&str>,
     ) -> PyResult<bool> {
         let kind  = parse_kind(kind)?;
-        let actor = actor as u32; // caller-responsible: candidate_id always fits u32
+        let actor = u32::try_from(actor).unwrap_or(u32::MAX); // caller-responsible: candidate_id always fits u32
 
         let denial = match denial_class {
             None => None,
             Some(cls_str) => {
                 let cls    = parse_denial_class(cls_str)?;
                 let reason = denial_reason
-                    .map(map_denial_reason)
-                    .unwrap_or("policy violation");
+                    .map_or("policy violation", map_denial_reason);
                 Some((cls, reason))
             }
         };
@@ -149,6 +156,7 @@ impl PyAuditLog {
     /// Returns True iff every event's hash matches the expected value
     /// recomputed from its predecessor.  Any single-bit mutation anywhere
     /// in the event log or in the hash fields is detected.
+    #[must_use]
     pub fn verify_chain(&self) -> bool {
         self.inner.verify_chain()
     }
@@ -159,34 +167,40 @@ impl PyAuditLog {
     ///   seq, kind, actor, ts, ok, class, reason, hash (64-char lowercase hex).
     ///
     /// The "hash" field is the SHA-256 of this event's chain input.
+    ///
+    /// # Errors
+    /// Returns `Err` if the internal JSON writer fails.
     pub fn export_json(&self) -> PyResult<String> {
         let mut buf = String::new();
         self.inner
             .export_json(&mut buf)
             .map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(
-                format!("export_json failed: {:?}", e),
+                format!("export_json failed: {e:?}"),
             ))?;
         Ok(buf)
     }
 
     /// Number of events currently in the log.
+    #[must_use]
     pub fn len(&self) -> usize {
         self.inner.len()
     }
 
     /// True if the log contains no events.
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.inner.is_empty()
     }
 
     /// 64-char hex string of the most recent event's hash.
     /// Returns 64 zeros for an empty log.
+    #[must_use]
     pub fn head_hash(&self) -> String {
-        self.inner
-            .head_hash()
-            .iter()
-            .map(|b| format!("{:02x}", b))
-            .collect()
+        self.inner.head_hash().iter().fold(String::with_capacity(64), |mut s, b| {
+            use core::fmt::Write;
+            let _ = write!(s, "{b:02x}");
+            s
+        })
     }
 
     fn __len__(&self) -> usize {

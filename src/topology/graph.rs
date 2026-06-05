@@ -39,7 +39,7 @@ pub struct BootingGraph {
 impl BootingGraph {
     /// Construct an empty booting graph with no nodes or edges.
     #[must_use]
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             active_nodes: 0,
             edge_matrix:  [0u64; MAX_NODES],
@@ -49,6 +49,9 @@ impl BootingGraph {
     /// Declare `id` as an active node.
     ///
     /// Returns `Err(TopologyViolation)` if the node ID exceeds `MAX_NODES`.
+    ///
+    /// # Errors
+    /// Returns `Err(TopologyViolation)` if the node ID is out of range.
     pub fn activate(&mut self, id: NodeId) -> Result<()> {
         let idx = node_idx(id)?;
         self.active_nodes |= 1u64 << idx;
@@ -61,6 +64,9 @@ impl BootingGraph {
     /// if either endpoint has not yet been activated.  Requiring pre-activation
     /// prevents ghost edges — undeclared-inactive edges that would be silently
     /// non-traversable with no diagnostic at declaration time (fail-closed).
+    ///
+    /// # Errors
+    /// Returns `Err(TopologyViolation)` if either node ID is out of range or not yet activated.
     pub fn permit_edge(&mut self, src: NodeId, dst: NodeId) -> Result<()> {
         let si = node_idx(src)?;
         let di = node_idx(dst)?;
@@ -79,7 +85,7 @@ impl BootingGraph {
     /// immutable `OperationalGraph`.  After this call, `activate` and
     /// `permit_edge` are no longer reachable — enforced by the type system.
     #[must_use]
-    pub fn seal(self) -> OperationalGraph {
+    pub const fn seal(self) -> OperationalGraph {
         OperationalGraph {
             active_nodes: self.active_nodes,
             edge_matrix:  self.edge_matrix,
@@ -114,6 +120,9 @@ impl OperationalGraph {
     /// - the edge is not declared in the manifest
     ///
     /// An audit event is always emitted to `audit` regardless of outcome.
+    ///
+    /// # Errors
+    /// Returns `Err(TopologyViolation)` if either node is inactive, out of range, or the edge is undeclared.
     pub fn traverse(&self, src: NodeId, dst: NodeId, audit: &mut AuditLog) -> Result<()> {
         let actor = src.get();
         let result = self.traverse_inner(src, dst);
@@ -143,7 +152,7 @@ impl OperationalGraph {
     /// Returns `true` if `id` was declared active before sealing.
     #[must_use]
     pub fn is_active(&self, id: NodeId) -> bool {
-        node_idx(id).map_or(false, |i| (self.active_nodes >> i) & 1 == 1)
+        node_idx(id).is_ok_and(|i| (self.active_nodes >> i) & 1 == 1)
     }
 }
 
@@ -152,7 +161,7 @@ impl OperationalGraph {
 /// Converts a `NodeId` to a zero-based array index, or returns
 /// `TopologyViolation` if the ID is out of bounds.
 #[inline]
-fn node_idx(id: NodeId) -> Result<usize> {
+const fn node_idx(id: NodeId) -> Result<usize> {
     let idx = (id.get() as usize).saturating_sub(1);
     if idx >= MAX_NODES {
         Err(Error::TopologyViolation { src: id.get(), dst: 0 })

@@ -1,4 +1,4 @@
-//! PyO3 Python extension module — `lux_kernel`.
+//! `PyO3` Python extension module — `lux_kernel`.
 //!
 //! Exposes two Python classes:
 //!   - `PyAuditLog`   — SHA-256 hash-chained audit log (wraps `AuditLog`)
@@ -14,9 +14,9 @@
 //!   maturin develop --features python
 //!   ```
 //!
-//! # EDGE H resolution: unsafe_code
+//! # EDGE H resolution: `unsafe_code`
 //!
-//! PyO3's `#[pymodule]` macro generates an `unsafe extern "C"` entry point
+//! `PyO3`'s `#[pymodule]` macro generates an `unsafe extern "C"` entry point
 //! (`PyInit_lux_kernel`) required by the Python C ABI.  The `#![allow(unsafe_code)]`
 //! below overrides the crate-level `#![deny(unsafe_code)]` for this module only.
 //! All enforcement logic in `audit.rs` and `policy.rs` is safe Rust.

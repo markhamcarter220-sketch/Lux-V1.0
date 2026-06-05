@@ -1,4 +1,4 @@
-//! PyPolicyGate — Python binding for the Lux kernel's capability-gated policy gate.
+//! `PyPolicyGate` — Python binding for the Lux kernel's capability-gated policy gate.
 //!
 //! # EDGE E+F resolution: dynamic feature names → static strings
 //!
@@ -8,7 +8,7 @@
 //! returns the corresponding `&'static str`.  Unknown strings raise `PyValueError`
 //! at construction time (fail-closed: unknown names are rejected, not ignored).
 //! At check time the gate works only with pre-validated `&'static str` values.
-//! heapless::Vec capacity is 16; the hiring pipeline needs 6 + 5 = 11.
+//! `heapless::Vec` capacity is 16; the hiring pipeline needs 6 + 5 = 11.
 //!
 //! # EDGE B resolution: static denial reasons
 //!
@@ -24,7 +24,7 @@
 //!   2. Substring scan against `self.blocked` — aliased protected attribute.
 //!   3. Membership check against `self.approved` — unapproved feature.
 //!
-//! All three pass → ALLOW.  Any fail → DENY (denial_class = "halt", I1/I2 enforced).
+//! All three pass → ALLOW.  Any fail → DENY (`denial_class` = "halt", I1/I2 enforced).
 
 use heapless::Vec as HVec;
 use pyo3::prelude::*;
@@ -33,7 +33,7 @@ use pyo3::types::PyDict;
 const MAX_GATE_FEATURES: usize = 16;
 
 /// Compile-time table of all valid approved feature names.
-static KNOWN_APPROVED: &[&'static str] = &[
+static KNOWN_APPROVED: &[&str] = &[
     "years_experience",
     "education_level",
     "technical_skills",
@@ -43,7 +43,7 @@ static KNOWN_APPROVED: &[&'static str] = &[
 ];
 
 /// Compile-time table of all valid blocked-attribute substrings.
-static KNOWN_BLOCKED_SUBSTRINGS: &[&'static str] = &[
+static KNOWN_BLOCKED_SUBSTRINGS: &[&str] = &[
     "age",
     "gender",
     "race",
@@ -51,7 +51,7 @@ static KNOWN_BLOCKED_SUBSTRINGS: &[&'static str] = &[
     "sex",
 ];
 
-/// Exact-match protected attribute names (subset of KNOWN_BLOCKED_SUBSTRINGS).
+/// Exact-match protected attribute names (subset of `KNOWN_BLOCKED_SUBSTRINGS`).
 /// Checked first to give the most precise denial reason.
 static PROTECTED_EXACT: &[&str] = &["age", "gender", "race"];
 
@@ -82,7 +82,7 @@ fn str_to_static_blocked(s: &str) -> Option<&'static str> {
 /// The gate is **stateless** for enforcement purposes; call-count statistics are
 /// tracked in the Python wrapper (`hiring-audit/policy_gate.py`).
 ///
-/// Capacity: each list holds up to 16 entries (heapless::Vec).
+/// Capacity: each list holds up to 16 entries (`heapless::Vec`).
 #[pyclass(name = "PyPolicyGate")]
 #[derive(Debug)]
 pub struct PyPolicyGate {
@@ -96,21 +96,25 @@ impl PyPolicyGate {
     ///
     /// Parameters
     /// ----------
-    /// approved_features : list[str]
+    /// `approved_features` : list[str]
     ///     Feature names that are permitted in a decision vector.
     ///     Each string must be one of the known approved features
-    ///     (see KNOWN_APPROVED).  Unknown strings raise ValueError.
+    ///     (see `KNOWN_APPROVED`).  Unknown strings raise `ValueError`.
     ///
-    /// blocked_attrs : list[str]
+    /// `blocked_attrs` : list[str]
     ///     Substrings whose presence in any feature name triggers a denial.
     ///     Each string must be one of the known blocked-attribute substrings
-    ///     (see KNOWN_BLOCKED_SUBSTRINGS).  Unknown strings raise ValueError.
+    ///     (see `KNOWN_BLOCKED_SUBSTRINGS`).  Unknown strings raise `ValueError`.
     ///
     /// Raises
     /// ------
     /// ValueError
     ///     If any string is unknown, or if either list exceeds 16 entries.
+    ///
+    /// # Errors
+    /// Returns `Err` if any feature/attribute string is unknown or a list exceeds capacity.
     #[new]
+    #[allow(clippy::needless_pass_by_value)]
     pub fn new(
         approved_features: Vec<String>,
         blocked_attrs:     Vec<String>,
@@ -121,8 +125,7 @@ impl PyPolicyGate {
         for feat in &approved_features {
             let s = str_to_static_approved(feat).ok_or_else(|| {
                 pyo3::exceptions::PyValueError::new_err(format!(
-                    "unknown approved feature {:?}; must be one of {:?}",
-                    feat, KNOWN_APPROVED
+                    "unknown approved feature {feat:?}; must be one of {KNOWN_APPROVED:?}"
                 ))
             })?;
             approved.push(s).map_err(|_| {
@@ -135,8 +138,7 @@ impl PyPolicyGate {
         for attr in &blocked_attrs {
             let s = str_to_static_blocked(attr).ok_or_else(|| {
                 pyo3::exceptions::PyValueError::new_err(format!(
-                    "unknown blocked attribute {:?}; must be one of {:?}",
-                    attr, KNOWN_BLOCKED_SUBSTRINGS
+                    "unknown blocked attribute {attr:?}; must be one of {KNOWN_BLOCKED_SUBSTRINGS:?}"
                 ))
             })?;
             blocked.push(s).map_err(|_| {
@@ -156,7 +158,7 @@ impl PyPolicyGate {
     ///
     /// Parameters
     /// ----------
-    /// feature_names : list[str]
+    /// `feature_names` : list[str]
     ///     The keys of the feature vector (dict keys, not values).
     ///
     /// Returns
@@ -164,7 +166,11 @@ impl PyPolicyGate {
     /// dict with keys:
     ///   "allowed"       : bool
     ///   "reason"        : str   (one of the four static reason strings)
-    ///   "denial_class"  : str | None  ("halt" on denial; None on allow)
+    ///   "`denial_class`"  : str | None  ("halt" on denial; None on allow)
+    ///
+    /// # Errors
+    /// Returns `Err` if Python dict construction fails.
+    #[allow(clippy::needless_pass_by_value)]
     pub fn check(&self, feature_names: Vec<String>) -> PyResult<PyObject> {
         Python::with_gil(|py| {
             let result = PyDict::new_bound(py);
@@ -192,7 +198,7 @@ impl PyPolicyGate {
 
             // Invariant 3: all features must be in the approved list.
             for name in &feature_names {
-                if !self.approved.iter().any(|&a| a == name.as_str()) {
+                if !self.approved.contains(&name.as_str()) {
                     result.set_item("allowed",      false)?;
                     result.set_item("reason",       REASON_UNAPPROVED)?;
                     result.set_item("denial_class", "halt")?;

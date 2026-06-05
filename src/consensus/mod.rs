@@ -35,10 +35,27 @@ pub use protocol::ConsensusMessage;
 use crate::{
     audit::{AuditLog, EventKind},
     error::{DenialClass, Error},
-    tpm::TpmQuote,
     types::NodeId,
     Result,
 };
+
+/// Proposal parameters for a single consensus round.
+///
+/// Groups the per-round arguments to [`run_consensus_proposal`], reducing the
+/// number of positional parameters below the `too_many_arguments` threshold.
+#[derive(Debug)]
+pub struct ConsensusProposal {
+    /// Monotonic round counter (caller-managed).
+    pub round_id: u64,
+    /// Source node of the proposed topology traversal.
+    pub src: NodeId,
+    /// Destination node of the proposed topology traversal.
+    pub dst: NodeId,
+    /// Whether the local sealed graph permits `(src, dst)`.
+    pub local_accept: bool,
+    /// The local node's TPM boot quote bytes.
+    pub local_attestation: [u8; 64],
+}
 
 /// Transport abstraction for consensus message exchange.
 ///
@@ -64,8 +81,8 @@ pub trait Transport {
 /// Broadcasts `Propose` to all declared peers, collects `Vote` responses,
 /// and commits or aborts based on quorum.
 ///
-/// The local node's verdict (`local_accept`) and attestation
-/// (`local_attestation`) count toward the tally alongside peer votes.
+/// The local node's verdict (`proposal.local_accept`) and attestation
+/// (`proposal.local_attestation`) count toward the tally alongside peer votes.
 ///
 /// # Fail-closed semantics
 ///
@@ -80,23 +97,24 @@ pub trait Transport {
 ///
 /// # Parameters
 ///
-/// - `peer_set`           — declared peers (from boot manifest).
-/// - `round_id`           — monotonic round counter (caller managed).
-/// - `src`, `dst`         — proposed topology traversal.
-/// - `local_accept`       — whether the local sealed graph permits `(src, dst)`.
-/// - `local_attestation`  — the local node's TPM boot quote.
-/// - `transport`          — send/recv implementation.
-/// - `audit`              — audit log to append the outcome event.
+/// - `peer_set`  — declared peers (from boot manifest).
+/// - `proposal`  — per-round parameters (see [`ConsensusProposal`]).
+/// - `transport` — send/recv implementation.
+/// - `audit`     — audit log to append the outcome event.
+///
+/// # Errors
+/// Returns `Err(TopologyViolation)` when the traversal is denied by quorum or the local graph.
 pub fn run_consensus_proposal<T: Transport>(
-    peer_set:          &PeerSet,
-    round_id:          u64,
-    src:               NodeId,
-    dst:               NodeId,
-    local_accept:      bool,
-    local_attestation: &TpmQuote,
-    transport:         &mut T,
-    audit:             &mut AuditLog,
+    peer_set:  &PeerSet,
+    proposal:  &ConsensusProposal,
+    transport: &mut T,
+    audit:     &mut AuditLog,
 ) -> Result<()> {
+    let round_id     = proposal.round_id;
+    let src          = proposal.src;
+    let dst          = proposal.dst;
+    let local_accept = proposal.local_accept;
+
     let threshold = peer_set.quorum_threshold();
 
     // ── Single-node fast path ─────────────────────────────────────────────────
@@ -121,8 +139,8 @@ pub fn run_consensus_proposal<T: Transport>(
     // ── Collect votes ─────────────────────────────────────────────────────────
     // Seed with the local vote.  The local attestation is held in memory; only
     // peer attestations arrive over the transport.
-    let mut accepts = if local_accept { 1usize } else { 0usize };
-    let peer_count  = peer_set.peers().len();
+    let mut accepts = usize::from(local_accept);
+    let peer_count   = peer_set.peers().len();
     let total_voters = peer_count + 1; // peers + self
     let mut votes_received = 1usize;
 
@@ -159,10 +177,10 @@ pub fn run_consensus_proposal<T: Transport>(
     let denial = (!committed).then_some((DenialClass::Halt, "topology consensus not reached"));
     audit.append(EventKind::TopologyChange, src.get(), 0, denial);
 
-    // Suppress the "unused variable" warning for the local_attestation parameter.
-    // In a production implementation this would be included in the Propose message
-    // so peers can verify the proposer's attestation before voting.
-    let _ = local_attestation;
+    // The local_attestation field would be included in the Propose message in a
+    // production implementation so peers can verify the proposer's attestation
+    // before voting.
+    let _ = proposal.local_attestation;
 
     if committed {
         Ok(())

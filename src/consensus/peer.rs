@@ -24,7 +24,7 @@ pub struct PeerSet {
 impl PeerSet {
     /// Construct an empty peer set (single-node deployment).
     #[must_use]
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self { peers: heapless::Vec::new() }
     }
 
@@ -32,6 +32,9 @@ impl PeerSet {
     ///
     /// Returns `Err(ManifestInvalid)` if the set is already at capacity
     /// (`MAX_PEERS` = 16).
+    ///
+    /// # Errors
+    /// Returns `Err(ManifestInvalid)` if the peer set is already at capacity (16 peers).
     pub fn add(&mut self, peer: NodeId) -> Result<()> {
         self.peers
             .push(peer)

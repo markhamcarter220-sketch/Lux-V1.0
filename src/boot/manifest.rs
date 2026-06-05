@@ -49,7 +49,10 @@ impl Manifest {
     ///
     /// In production this step also verifies a cryptographic signature over
     /// the manifest body.  The signature backend is a Tier 2 deliverable.
-    pub fn parse_and_verify(bytes: &[u8]) -> Result<Self> {
+    ///
+    /// # Errors
+    /// Returns `Err(ManifestInvalid)` if `bytes` is empty or the parser stub rejects it.
+    pub const fn parse_and_verify(bytes: &[u8]) -> Result<Self> {
         if bytes.is_empty() {
             return Err(Error::ManifestInvalid { detail: "zero-length manifest" });
         }
@@ -72,7 +75,7 @@ impl Manifest {
 
     /// Wire-format version of this manifest.
     #[must_use]
-    pub fn version(&self) -> u32 {
+    pub const fn version(&self) -> u32 {
         self.version
     }
 }

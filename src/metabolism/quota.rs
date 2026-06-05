@@ -19,6 +19,9 @@ impl QuotaEnforcer {
     /// Returns `Err(QuotaExceeded)` if the deduction would underflow the
     /// remaining balance — the ledger is **not** modified on failure.
     /// An audit event is always emitted to `audit` regardless of outcome.
+    ///
+    /// # Errors
+    /// Returns `Err(QuotaExceeded)` if `amount` exceeds the node's current balance or the node is undeclared.
     pub fn deduct(
         &self,
         ledger: &mut Ledger,

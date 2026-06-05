@@ -71,7 +71,7 @@ pub struct AuditEvent {
 impl AuditEvent {
     /// Returns a short string label for the event kind, suitable for JSON export.
     #[must_use]
-    pub fn kind_str(&self) -> &'static str {
+    pub const fn kind_str(&self) -> &'static str {
         match self.kind {
             EventKind::CapabilityCheck   => "cap_check",
             EventKind::CapabilityRevoked => "cap_revoked",
@@ -86,7 +86,7 @@ impl AuditEvent {
     /// Returns a string label for the denial class, suitable for JSON export.
     /// Returns `None` for permitted events.
     #[must_use]
-    pub fn denial_class_str(&self) -> Option<&'static str> {
+    pub const fn denial_class_str(&self) -> Option<&'static str> {
         match self.denial_class {
             Some(DenialClass::Halt)    => Some("halt"),
             Some(DenialClass::Failure) => Some("failure"),

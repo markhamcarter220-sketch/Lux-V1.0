@@ -27,12 +27,12 @@ pub use manifest::Manifest;
 use crate::{
     audit::AuditLog,
     auth::policy::Policy,
-    consensus::{PeerSet, Transport, run_consensus_proposal},
+    consensus::{ConsensusProposal, PeerSet, Transport, run_consensus_proposal},
     hsm::HsmProvider,
     metabolism::ledger::Ledger,
     topology::graph::{BootingGraph, OperationalGraph},
     tpm::{NullTpm, TpmProvider, TpmQuote},
-    types::{Generation, NodeId},
+    types::Generation,
     Result,
 };
 
@@ -53,13 +53,13 @@ pub struct BootState {
 impl BootState {
     /// Returns a shared reference to the sealed topology graph.
     #[must_use]
-    pub fn graph(&self) -> &OperationalGraph {
+    pub const fn graph(&self) -> &OperationalGraph {
         &self.graph
     }
 
     /// Returns a shared reference to the resource ledger.
     #[must_use]
-    pub fn ledger(&self) -> &Ledger {
+    pub const fn ledger(&self) -> &Ledger {
         &self.ledger
     }
 
@@ -73,7 +73,7 @@ impl BootState {
     ///
     /// The quote is all-zeros when [`NullTpm`] was used (default).
     #[must_use]
-    pub fn attestation_quote(&self) -> &TpmQuote {
+    pub const fn attestation_quote(&self) -> &TpmQuote {
         &self.attestation
     }
 
@@ -100,24 +100,20 @@ impl BootState {
     /// denied by quorum or the local graph.
     pub fn run_topology_consensus<T: Transport>(
         &mut self,
-        peer_set:   &PeerSet,
-        round_id:   u64,
-        src:        NodeId,
-        dst:        NodeId,
-        transport:  &mut T,
-        audit:      &mut AuditLog,
+        peer_set:  &PeerSet,
+        proposal:  &ConsensusProposal,
+        transport: &mut T,
+        audit:     &mut AuditLog,
     ) -> Result<()> {
-        let local_accept = self.graph.traverse(src, dst, audit).is_ok();
-        run_consensus_proposal(
-            peer_set,
-            round_id,
-            src,
-            dst,
+        let local_accept = self.graph.traverse(proposal.src, proposal.dst, audit).is_ok();
+        let full_proposal = ConsensusProposal {
+            round_id:          proposal.round_id,
+            src:               proposal.src,
+            dst:               proposal.dst,
             local_accept,
-            &self.attestation,
-            transport,
-            audit,
-        )
+            local_attestation: *self.attestation.as_bytes(),
+        };
+        run_consensus_proposal(peer_set, &full_proposal, transport, audit)
     }
 
     /// Decode and verify `raw_manifest`, run the full boot sequence with a

@@ -70,6 +70,7 @@ pub struct WasmShim {
 
 impl WasmShim {
     /// Construct a shim from a sealed [`BootState`].
+    #[must_use]
     pub fn from_boot_state(boot: BootState) -> Self {
         Self {
             policy:    boot.policy,
@@ -84,7 +85,8 @@ impl WasmShim {
     ///
     /// Useful in tests and in embeddings where the caller already holds the
     /// individual subsystem objects rather than a `BootState`.
-    pub fn from_parts(policy: Policy, ledger: Ledger, graph: OperationalGraph) -> Self {
+    #[must_use]
+    pub const fn from_parts(policy: Policy, ledger: Ledger, graph: OperationalGraph) -> Self {
         Self {
             policy,
             ledger,
@@ -98,13 +100,14 @@ impl WasmShim {
     ///
     /// Returns `None` if the table is full (`>= 64` entries).
     pub fn register_cap(&mut self, cap: Capability) -> Option<u32> {
-        let idx = self.cap_table.len() as u32;
+        let idx = u32::try_from(self.cap_table.len()).unwrap_or(u32::MAX);
         self.cap_table.push(Some(cap)).ok()?;
         Some(idx)
     }
 
     /// Borrow the audit log for inspection.
-    pub fn audit(&self) -> &AuditLog {
+    #[must_use]
+    pub const fn audit(&self) -> &AuditLog {
         &self.audit
     }
 
@@ -114,10 +117,7 @@ impl WasmShim {
         if idx >= self.cap_table.len() {
             return RC_INVALID_HANDLE;
         }
-        let cap = match self.cap_table[idx].as_ref() {
-            Some(c) => c,
-            None    => return RC_INVALID_HANDLE,
-        };
+        let Some(cap) = self.cap_table[idx].as_ref() else { return RC_INVALID_HANDLE };
         let required = CapabilitySet::from_bits_truncate(right_bits);
         match self.policy.check(cap, required, &mut self.audit) {
             Ok(())  => RC_PERMITTED,
@@ -127,10 +127,7 @@ impl WasmShim {
 
     /// Implementation of [`host::lux_ledger_deduct`].
     pub fn ledger_deduct(&mut self, node_id: u32, amount: u64) -> i32 {
-        let node = match core::num::NonZeroU32::new(node_id) {
-            Some(n) => n,
-            None    => return RC_INVALID_HANDLE,
-        };
+        let Some(node) = core::num::NonZeroU32::new(node_id) else { return RC_INVALID_HANDLE };
         let enforcer = QuotaEnforcer;
         match enforcer.deduct(&mut self.ledger, node, amount, "wasm", &mut self.audit) {
             Ok(_)  => RC_PERMITTED,
@@ -140,14 +137,8 @@ impl WasmShim {
 
     /// Implementation of [`host::lux_topology_traverse`].
     pub fn topology_traverse(&mut self, src_id: u32, dst_id: u32) -> i32 {
-        let src = match core::num::NonZeroU32::new(src_id) {
-            Some(n) => n,
-            None    => return RC_INVALID_HANDLE,
-        };
-        let dst = match core::num::NonZeroU32::new(dst_id) {
-            Some(n) => n,
-            None    => return RC_INVALID_HANDLE,
-        };
+        let Some(src) = core::num::NonZeroU32::new(src_id) else { return RC_INVALID_HANDLE };
+        let Some(dst) = core::num::NonZeroU32::new(dst_id) else { return RC_INVALID_HANDLE };
         match self.graph.traverse(src, dst, &mut self.audit) {
             Ok(())  => RC_PERMITTED,
             Err(_)  => RC_TOPO_VIOLATION,

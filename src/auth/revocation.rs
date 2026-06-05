@@ -33,7 +33,7 @@ pub struct RevocationLedger {
 impl RevocationLedger {
     /// Constructs an empty ledger.
     #[must_use]
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             revoked: FnvIndexSet::new(),
             epoch:   0,
@@ -69,7 +69,7 @@ impl RevocationLedger {
 
     /// Number of tokens revoked in the current generation.
     #[must_use]
-    pub fn epoch(&self) -> u64 {
+    pub const fn epoch(&self) -> u64 {
         self.epoch
     }
 }

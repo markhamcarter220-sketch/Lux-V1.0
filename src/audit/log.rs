@@ -95,7 +95,7 @@ pub struct AuditLog {
 impl AuditLog {
     /// Construct an empty log.  The genesis hash is all-zeros.
     #[must_use]
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             events:         heapless::Vec::new(),
             last_hash:      [0u8; 32],
@@ -206,7 +206,7 @@ impl AuditLog {
 
     /// Returns the hash of the most recent event, or all-zeros for an empty log.
     #[must_use]
-    pub fn head_hash(&self) -> [u8; 32] {
+    pub const fn head_hash(&self) -> [u8; 32] {
         self.last_hash
     }
 
@@ -223,6 +223,9 @@ impl AuditLog {
     /// ```json
     /// [{"seq":0,"kind":"cap_check","actor":1,"ts":0,"ok":true,"class":null,"reason":null}]
     /// ```
+    ///
+    /// # Errors
+    /// Returns `Err` if the underlying `Write` implementation returns an error.
     pub fn export_json<W: core::fmt::Write>(&self, writer: &mut W) -> core::fmt::Result {
         writer.write_char('[')?;
         for (i, ev) in self.events.iter().enumerate() {
@@ -241,14 +244,14 @@ impl AuditLog {
                 None    => write!(writer, r#""class":null,"reason":null,"#)?,
                 Some(c) => {
                     let reason = ev.denial_reason.unwrap_or("");
-                    write!(writer, r#""class":"{}","reason":"{}","#, c, reason)?;
+                    write!(writer, r#""class":"{c}","reason":"{reason}","#)?;
                 }
             }
 
             // Hash field — 32 bytes as 64 lowercase hex chars.
             writer.write_str(r#""hash":""#)?;
             for byte in &ev.hash {
-                write!(writer, "{:02x}", byte)?;
+                write!(writer, "{byte:02x}")?;
             }
             writer.write_str(r#""}"#)?;
         }

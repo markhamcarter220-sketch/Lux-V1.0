@@ -73,19 +73,19 @@ impl Capability {
     /// The kernel never allows privilege amplification — this is enforced
     /// algebraically by the `contains` check.
     #[must_use]
-    pub fn delegate(
+    pub const fn delegate(
         &self,
         new_target: NodeId,
         subset: CapabilitySet,
         nonce: u64,
-    ) -> Option<Capability> {
+    ) -> Option<Self> {
         if !self.rights.contains(CapabilitySet::DELEGATE) {
             return None;
         }
         if !self.rights.contains(subset) {
             return None;
         }
-        Some(Capability {
+        Some(Self {
             issuer:     self.target,
             target:     new_target,
             rights:     subset,
@@ -96,13 +96,13 @@ impl Capability {
 
     /// Returns the node that issued this token.
     #[must_use]
-    pub fn issuer(&self) -> NodeId {
+    pub const fn issuer(&self) -> NodeId {
         self.issuer
     }
 
     /// Returns the node to which this token is bound.
     #[must_use]
-    pub fn target(&self) -> NodeId {
+    pub const fn target(&self) -> NodeId {
         self.target
     }
 
@@ -112,7 +112,7 @@ impl Capability {
     /// separate crates and would not see `cfg(test)` items.  The `new_for_`
     /// prefix and this doc comment are the canonical signal.
     #[must_use]
-    pub fn new_for_test(
+    pub const fn new_for_test(
         issuer: NodeId,
         target: NodeId,
         rights: CapabilitySet,

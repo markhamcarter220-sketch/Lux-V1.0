@@ -74,12 +74,12 @@ impl HsmProvider for SoftwareHsm {
 
     fn sign(&self, payload: &[u8]) -> Result<[u8; 64]> {
         use ed25519_dalek::Signer as _;
-        match &self.signing_key {
-            Some(sk) => Ok(sk.sign(payload).to_bytes()),
-            None     => Err(Error::CapabilityDenied {
+        self.signing_key.as_ref().map_or(
+            Err(Error::CapabilityDenied {
                 reason: "SoftwareHsm: no signing key configured (verify-only mode)",
             }),
-        }
+            |sk| Ok(sk.sign(payload).to_bytes()),
+        )
     }
 
     fn verify(&self, payload: &[u8], sig: &[u8; 64]) -> Result<()> {

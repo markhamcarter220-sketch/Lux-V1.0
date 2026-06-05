@@ -41,7 +41,7 @@ pub struct Policy {
 impl Policy {
     /// Construct a `Policy` anchored at `generation`.
     #[must_use]
-    pub fn new(generation: Generation) -> Self {
+    pub const fn new(generation: Generation) -> Self {
         Self {
             current_generation: generation,
             used_nonces: HVec::new(),
@@ -54,6 +54,9 @@ impl Policy {
     /// Returns `Ok(())` iff all four checks pass (generation, rights,
     /// revocation, replay).  Every other path returns `Err(CapabilityDenied)`.
     /// An audit event is always emitted to `audit` regardless of outcome.
+    ///
+    /// # Errors
+    /// Returns `Err(CapabilityDenied)` if generation, rights, revocation, or nonce checks fail.
     pub fn check(
         &mut self,
         cap: &Capability,
@@ -118,7 +121,7 @@ impl Policy {
 
     /// Returns the current generation value.
     #[must_use]
-    pub fn generation(&self) -> Generation {
+    pub const fn generation(&self) -> Generation {
         self.current_generation
     }
 }
