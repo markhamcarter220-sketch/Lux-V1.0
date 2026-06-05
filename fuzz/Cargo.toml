@@ -1,0 +1,24 @@
+[package]
+name    = "lux-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+lux_kernel    = { path = "..", features = [] }
+
+[[bin]]
+name = "manifest_decode"
+path = "fuzz_targets/manifest_decode.rs"
+test = false
+doc  = false
+
+[[bin]]
+name = "ledger_arithmetic"
+path = "fuzz_targets/ledger_arithmetic.rs"
+test = false
+doc  = false

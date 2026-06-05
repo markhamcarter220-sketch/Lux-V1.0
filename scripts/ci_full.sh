@@ -16,6 +16,7 @@ bash "${SCRIPT_DIR}/lint.sh"
 echo ""
 echo "--- Phase 2: Supply-Chain Audit ---"
 bash "${SCRIPT_DIR}/audit.sh"
+cargo deny check
 
 echo ""
 echo "--- Phase 3: Unit & Integration Tests ---"

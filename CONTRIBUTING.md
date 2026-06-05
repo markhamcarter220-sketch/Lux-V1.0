@@ -237,3 +237,12 @@ For reviewers of PRs touching `src/auth/`, `src/boot/`, `src/topology/`, or
 - [ ] `docs/SECURITY.md` updated if a new vulnerability class is addressed
 - [ ] `docs/ARCHITECTURE.md` updated if module responsibilities change
 - [ ] CI gate green (all phases)
+
+---
+
+## Dependencies
+
+All dependencies must pass `cargo deny check` before merge.
+New crypto dependencies require an Architecture Decision Record (ADR)
+in `docs/adr/` before any implementation begins.
+Run `cargo deny check` locally before opening a PR.

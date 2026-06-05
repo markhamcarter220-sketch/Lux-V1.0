@@ -162,7 +162,8 @@ Tier 2.9 — COMPLETE (gap closures)
       on every entry, enabling external hash-chain verification without
       re-computing from raw fields.
 
-Open items — none at this time.
+Open items:
+  [ ] Independent security audit — requires a third-party security firm
 ```
 
 ---

@@ -1,0 +1,4 @@
+Contact: https://github.com/markhamcarter220-sketch/lux-v1.0/issues
+Preferred-Languages: en
+Policy: https://github.com/markhamcarter220-sketch/lux-v1.0/blob/main/docs/SECURITY.md
+Acknowledgments: https://github.com/markhamcarter220-sketch/lux-v1.0/blob/main/CHANGELOG.md

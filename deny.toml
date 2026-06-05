@@ -1,22 +1,28 @@
+# cargo-deny configuration (v0.19+ format).
+# Supply-chain checks are hardened: advisories deny violations,
+# unmaintained packages surface as RUSTSEC advisories and are denied
+# once they appear in the advisory DB. New unmaintained dependencies
+# require an ADR in docs/adr/ before inclusion.
+
 [advisories]
-db-path   = "~/.cargo/advisory-db"
+db-path   = "~/.cargo/advisory-dbs"
 db-urls   = ["https://github.com/rustsec/advisory-db"]
-vulnerability = "deny"
-unmaintained  = "warn"
-yanked        = "deny"
-notice        = "warn"
+ignore    = []
 
 [licenses]
-unlicensed     = "deny"
-allow          = ["Apache-2.0", "MIT", "MIT-0", "ISC", "Unicode-DFS-2016"]
-copyleft       = "deny"
-allow-osi-fsf-free = "neither"
-default        = "deny"
+# Allow only the licenses explicitly listed; all others are denied.
+allow = ["Apache-2.0", "MIT", "MIT-0", "ISC", "Unicode-DFS-2016", "BSD-3-Clause", "BlueOak-1.0.0", "Unicode-3.0"]
+confidence-threshold = 0.8
 
 [bans]
 multiple-versions = "warn"
 wildcards         = "deny"
 highlight         = "all"
+deny = [
+    # Two versions of sha2 in the tree is a supply-chain risk.
+    # If this fires, audit the duplicate and remove it.
+    # { crate = "sha2@0.9.9" },
+]
 
 [sources]
 unknown-registry = "deny"

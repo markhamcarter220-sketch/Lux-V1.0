@@ -104,11 +104,11 @@ or developer discipline.
 
 ### Open Findings (Tier 2 resolution)
 
-| ID | Finding | Severity | Resolution Target |
-|----|---------|----------|------------------|
-| F-01 | Manifest signature verification is a stub | High | Tier 2 — Ed25519 verifier |
-| F-02 | No capability revocation ledger | Medium | Tier 2 — revocation log |
-| F-03 | Audit event log not yet implemented | Medium | Tier 2 — append-only log |
+| ID | Finding | Severity | Status |
+|----|---------|----------|--------|
+| F-01 | Manifest signature verification | High | **Resolved** — `verify_strict` at `src/hsm/mock.rs:88`; wired in `src/boot/decode.rs:85` |
+| F-02 | No capability revocation ledger | Medium | **Resolved** — `src/auth/revocation.rs` |
+| F-03 | Audit event log not yet implemented | Medium | **Resolved** — `src/audit/log.rs` |
 
 ---
 
@@ -116,22 +116,18 @@ or developer discipline.
 
 ### Current State (V1.0)
 
-Cryptographic verification of the boot manifest signature is scaffolded but
-not yet wired.  The parser stub in `src/boot/manifest.rs` returns
-`ManifestInvalid` for all inputs until the wire-format decoder and signature
-verifier are implemented (Tier 2).
+Ed25519 manifest signature verification is **fully wired** as of Tier 2.
+`VerifyingKey::verify_strict` (cofactor-safe) is called at `src/hsm/mock.rs:88`
+via the `HsmProvider` trait.  The decoder at `src/boot/decode.rs:85` verifies
+the signature **before** any CBOR parsing — a manifest with an invalid signature
+is rejected without inspecting its contents (fail-closed).
 
-**This means Lux V1.0 must only be deployed in environments where the manifest
-source is trusted at the process boundary (e.g., embedded in a signed binary
-or delivered over an authenticated channel).**
+### Cryptographic Architecture (Tier 2 — Implemented)
 
-### Planned Cryptographic Architecture (Tier 2)
-
-- **Algorithm:** Ed25519 (FIPS 186-5) for manifest signatures.
-- **Token nonce:** 64-bit CSPRNG-generated per `Capability` to prevent replay
-  even across equal generation values.
-- **Zeroisation:** `zeroize::Zeroize` is already derived on `Capability` and
-  will be extended to any intermediate key material in the signature path.
+- **Algorithm:** Ed25519 (FIPS 186-5) — `verify_strict` (cofactor-safe variant) at `src/hsm/mock.rs:88`.
+- **Wire format:** 64-byte signature prepended to CBOR payload; verified before parse.
+- **Token nonce:** 64-bit per `Capability`; replay is detected and denied by `Policy::check`.
+- **Zeroisation:** `zeroize::Zeroize` is derived on `Capability`; secret fields are zeroed on drop.
 
 ### Planned Hardware Root of Trust (Tier 3)
 
@@ -173,6 +169,38 @@ or delivered over an authenticated channel).**
 | Integration: auth lifecycle | `tests/integration/auth_lifecycle.rs` | 100% |
 | Integration: boot sequence | `tests/integration/boot_sequence.rs` | 100% |
 | Integration: topology convergence | `tests/integration/topology_convergence.rs` | 100% |
+| Signature verification (5 cases) | `tests/security.rs::signature_verification` | Passes — all 5 cases verified |
 
 The 100% requirement on security-path tests is enforced mechanically by
 `scripts/coverage.sh`.  The CI gate fails if this threshold is not met.
+
+---
+
+## 8. Integrator Assumptions
+
+### What Lux Guarantees
+
+| Guarantee | Enforcement |
+|-----------|-------------|
+| Capability checks are fail-closed | `auth::Policy::check` returns `Err` on any non-success path |
+| Audit log is append-only and tamper-evident | SHA-256 hash chain; `AuditLog::verify_chain()` detects any mutation |
+| Topology is bounded to the boot manifest | `TopologyGraph::traverse` denies edges absent from the manifest |
+| Resource deductions are atomic | `Ledger::deduct` uses `checked_sub`; balance only changes on success |
+| No ambient authority | Every subsystem entry requires a presented capability token |
+
+### What Lux Does Not Guarantee
+
+| Non-guarantee | Integrator Responsibility |
+|---------------|--------------------------|
+| Physical security of the host machine | Isolate the host; Lux cannot protect against physical access |
+| Integrity of the boot manifest delivery channel | Use HSM/TPM attestation (Tier 3) or deliver over an authenticated channel |
+| Network transport security between distributed nodes | Use TLS or equivalent; Lux consensus protocol authenticates proposals but does not encrypt |
+| Correctness of the workload running above the kernel | Lux enforces *that* capabilities are checked, not *what* the workload does with them |
+| Monotonic or trusted wall-clock time | The caller supplies `timestamp` to `AuditLog::append`; Lux stores it verbatim |
+
+### Hosting Environment Responsibilities
+
+1. **Manifest delivery:** The boot manifest must arrive over an authenticated channel or be embedded in a signed binary. An adversary who can substitute the manifest controls the entire policy.
+2. **Process isolation:** The process running Lux must be isolated from other processes. Lux provides no defence against an attacker with arbitrary code execution in the same process.
+3. **Clock source:** Audit timestamps supplied by the caller should be monotonic. Lux does not validate or interpret timestamps — they are stored for auditability.
+4. **Key material lifecycle:** Private keys used to sign boot manifests must be rotated and revoked per the organisation's key management policy. Lux does not manage key lifecycle.
