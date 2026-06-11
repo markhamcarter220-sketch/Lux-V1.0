@@ -155,8 +155,12 @@ Tier 3 — IN PROGRESS (2/5 complete; 3 pending hardware deployment or toolchain
     Pending: real YubiHSM or PKCS#11 hardware deployment
 [~] TPM-anchored boot attestation — BootAttestation + TssTpm stub (src/tpm/, tests/tpm.rs)
     Pending: physical TPM chip + TSS stack
-[~] Formal cost model — Lean 4 proof of 7 ledger invariants (lean/LuxCostModel.lean)
-    See docs/FORMAL_COST_MODEL.md for theorem statements and TLA+ relationship.
+[~] Formal proofs — Lean 4 four-file proof suite (lean/)
+    LuxSpec.lean: abstract ideal-system specification (I2 + I3)
+    LuxCostModel.lean: concrete model of src/metabolism/ledger.rs (7 ledger theorems)
+    LuxRefinement.lean: refinement proofs — concreteDeductSpec, delegate_non_amplification
+    LuxCapabilityBridge.lean: u32 bitfield ↔ Finset Right isomorphism (bitsContainsIffSubset)
+    See docs/FORMAL_COST_MODEL.md and docs/FORMAL_VERIFICATION.md §6 for theorem index.
     Pending: mechanical verification requires Lean 4 toolchain (lake build in lean/)
 
 AUDIT & VERIFICATION STATUS:
@@ -325,8 +329,11 @@ lux-v1.0/
 │   ├── output/             # Generated decisions, audit log, fairness report
 │   └── docs/               # demo_proof_statement.md
 ├── lean/
-│   ├── LuxCostModel.lean       # Lean 4 formal proof of 7 ledger invariants (I3)
-│   └── lakefile.lean           # Lake build file (lake build to verify)
+│   ├── LuxSpec.lean            # Abstract ideal-system specification (I2 + I3)
+│   ├── LuxCostModel.lean       # Concrete model of ledger.rs — 7 ledger invariants (I3)
+│   ├── LuxRefinement.lean      # Refinement proofs (spec ← concrete model)
+│   ├── LuxCapabilityBridge.lean# u32 bitfield ↔ Finset Right isomorphism (I2 bridge)
+│   └── lakefile.lean           # Lake build file (lake build to verify all four modules)
 ├── docs/
 │   ├── ARCHITECTURE.md         # Conceptual model → implementation bridge
 │   ├── ADVERSARIAL_TESTING.md  # 63-attack test methodology

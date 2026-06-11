@@ -32,3 +32,6 @@ lean_lib «LuxCostModel»
 
 -- Refinement proofs: LuxSpec ← LuxRefinement → LuxCostModel.
 lean_lib «LuxRefinement»
+
+-- Bitfield ↔ Finset Right bridge: closes representational gap to Rust u32.
+lean_lib «LuxCapabilityBridge»

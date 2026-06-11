@@ -1,9 +1,24 @@
-# Lux Kernel — Formal Cost Model
+# Lux Kernel — Lean 4 Formal Proofs
 
-**Location:** `lean/LuxCostModel.lean`  
-**Proof assistant:** Lean 4 + Mathlib (Lake build system)  
-**Status:** Proof written; mechanical verification requires Lean 4 toolchain  
+**Proof assistant:** Lean 4 + Lake build system  
+**Status:** Proofs written; mechanical verification requires Lean 4 toolchain (`lake build` in `lean/`)  
 **Complements:** TLA+ model in `tla/LuxKernel.tla` (state-machine level)
+
+## Lean 4 file overview
+
+| File | Purpose | Imports |
+|------|---------|---------|
+| `LuxSpec.lean` | Abstract ideal-system specification (pure math) | — |
+| `LuxCostModel.lean` | Concrete model of `src/metabolism/ledger.rs` | — |
+| `LuxRefinement.lean` | Refinement proofs: spec ← model | `LuxSpec`, `LuxCostModel` |
+| `LuxCapabilityBridge.lean` | Bitfield ↔ `Finset Right` bridge (Rust u32 ↔ Lean) | `LuxRefinement` |
+
+The dependency chain runs bottom-up: `LuxSpec` and `LuxCostModel` are leaf
+modules; `LuxRefinement` packages the refinement proofs; `LuxCapabilityBridge`
+closes the representational gap between the `Finset Right` model and the Rust
+`u32` bitfield encoding.
+
+---
 
 ---
 
@@ -217,12 +232,81 @@ would produce a `sorry`-containing goal error or a type-mismatch error.
 
 ---
 
+## LuxSpec — abstract specification
+
+`lean/LuxSpec.lean` states what the ledger and capability primitives **must do**
+without reference to any implementation.
+
+`AbstractLedger.Spec` requires four properties of any deduction function:
+
+| Property | Statement |
+|----------|-----------|
+| `undeclared` | Undeclared node → always `none` |
+| `over_quota` | `amount > balance` → `none` |
+| `exact_amount` | Returns `(l', balance − amount)`; `l'` differs from `l` only at `node` |
+| `atomic` | `none` result ⇒ no output ledger exists |
+
+`AbstractCapability.DelegateSpec` requires three properties of any delegation
+function (the formal statement of Invariant I2):
+
+| Property | Statement |
+|----------|-----------|
+| `requires_delegate` | No `Right.Delegate` in cap → always `none` |
+| `non_amplification` | `delegated.rights ⊆ cap.rights` on every success |
+| `rejects_superset` | `subset ⊄ cap.rights` → `none` |
+
+---
+
+## LuxRefinement — bridging spec to model
+
+`lean/LuxRefinement.lean` proves that the concrete functions in `LuxCostModel`
+and `LuxCapabilityBridge` satisfy the abstract specifications in `LuxSpec`.
+
+Key theorems:
+
+| Theorem | Statement |
+|---------|-----------|
+| `concreteDeductSpec` | `deduct` satisfies `AbstractLedger.Spec` (all 4 properties) |
+| `delegate_non_amplification` | `concreteDelegateCap` never amplifies rights |
+| `concreteDelegateSpec` | `concreteDelegateCap` satisfies `AbstractCapability.DelegateSpec` |
+
+The `delegate_non_amplification` proof proceeds by `split_ifs` on the two
+guard conditions in `concreteDelegateCap`. The failure branches produce
+`none = some delegated` (contradiction); the success branch has
+`h2 : ¬¬(subset ⊆ cap.rights)`, closed by `Decidable.of_not_not h2`.
+
+---
+
+## LuxCapabilityBridge — closing the u32 gap
+
+`lean/LuxCapabilityBridge.lean` proves the `Finset Right` model used throughout
+`LuxRefinement` is isomorphic to the `u32` bitfield used in `src/auth/capability.rs`.
+
+| Theorem | Statement |
+|---------|-----------|
+| `mem_bitsToRights` | `r ∈ bitsToRights n ↔ n &&& rightMask r ≠ 0` |
+| `bitsToRights_empty` | `bitsToRights 0 = ∅` |
+| `bitsToRights_full` | `bitsToRights 31 = Finset.univ` |
+| `bitsContainsIffSubset` | `(a &&& b = b) ↔ bitsToRights b ⊆ bitsToRights a` |
+| `bitsToRights_rightsToBits` | `bitsToRights (rightsToBits s) = s` (roundtrip) |
+| `rightsToBits_bitsToRights` | `rightsToBits (bitsToRights n) = n &&& fullMask` |
+| `delegate_guards_correspond` | Both delegation guards match between Rust and Lean |
+
+`bitsContainsIffSubset` is the central bridge. Its proof is by `decide` —
+exhaustive case analysis over all 1024 pairs in `Fin 32 × Fin 32`.
+
+---
+
 ## Correspondence checklist
 
-Before claiming the formal cost model represents the implementation:
+Before claiming the formal proofs represent the implementation:
 
 - [ ] `lean/LuxCostModel.lean` compiles under `lake build` with 0 errors
+- [ ] `lean/LuxSpec.lean` compiles under `lake build` with 0 errors
+- [ ] `lean/LuxRefinement.lean` compiles under `lake build` with 0 errors
+- [ ] `lean/LuxCapabilityBridge.lean` compiles under `lake build` with 0 errors
 - [ ] Every `theorem` statement corresponds to a named invariant in this document
 - [ ] The `deduct` Lean definition matches `Ledger::deduct` line-by-line
   (undeclared-node path, `checked_sub` guard, exact subtraction, no mutation on failure)
 - [ ] Any change to `src/metabolism/ledger.rs` is reflected in `LuxCostModel.lean`
+- [ ] Any change to `src/auth/capability.rs` rights encoding is reflected in `LuxCapabilityBridge.lean`

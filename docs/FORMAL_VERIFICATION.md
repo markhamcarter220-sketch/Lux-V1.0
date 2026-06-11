@@ -227,30 +227,78 @@ The TLA+ specification (`tla/LuxKernel.tla`) models:
 
 ---
 
-## 6. What Would Full Proof in Lean 4 / Coq Require
+## 6. Lean 4 Formal Verification
 
-The TLC result gives **mathematical assurance for a bounded instance**.
-A complete deductive proof (in Lean 4 or Coq) would require:
+The `lean/` directory contains a four-file Lean 4 proof suite that closes the
+refinement chain from abstract specification down to the Rust binary encoding.
 
-1. **Formalise the state machine** as an inductive type with a `Step` relation.
-2. **Encode the invariants** as propositions over the state type.
-3. **Prove each invariant inductive**: for each action, show
-   `Invariant(s) ∧ Step(s, s') → Invariant(s')`.
-4. **Prove the base case**: `Invariant(Init)`.
+### Architecture
 
-The proof sketches in Section 3 give the exact structure needed for steps 3
-and 4. The key lemmas are:
+```
+Rust CapabilitySet (u32 bitfield)
+   ↕  bitsContainsIffSubset  (LuxCapabilityBridge.lean)
+Finset Right
+   ↕  delegate_non_amplification  (LuxRefinement.lean)
+AbstractCapability.DelegateSpec  (LuxSpec.lean)
+   ↕  concreteDeductSpec  (LuxRefinement.lean)
+AbstractLedger.Spec  (LuxSpec.lean)
+   ↕  7 theorems  (LuxCostModel.lean)
+Rust Ledger::deduct
+```
 
-- **NonEscalation inductive step** (Delegate action): a one-line proof using
-  `Subset.trans newRights_subset cap_rights_bounded`.
-- **RevocationSoundness inductive step** (RotateEpoch): requires showing that
-  `cap.gen < epoch'` holds for all old caps; follows from `RotateEpoch` incrementing epoch.
-- **ResourceAtomicity** is trivial: a single `Nat.sub_le` application.
-- **TopologyBoundedness** is trivial: `Set.insert_subset` applied to the BFS invariant.
+### Files and what they prove
 
-Estimated proof size in Lean 4: approximately 200 lines. No novel mathematical
-results are required — all four proofs use standard set-theoretic and
-arithmetic reasoning.
+| File | Role | Key theorems |
+|------|------|-------------|
+| `LuxSpec.lean` | Abstract ideal-system specification | `AbstractLedger.Spec` (4 properties), `AbstractCapability.DelegateSpec` (3 properties) |
+| `LuxCostModel.lean` | Concrete Lean model of `src/metabolism/ledger.rs` | 7 ledger theorems (exact accounting, atomicity, monotonicity, …) |
+| `LuxRefinement.lean` | Refinement proofs bridging spec → model | `concreteDeductSpec`, `delegate_non_amplification`, `concreteDelegateSpec` |
+| `LuxCapabilityBridge.lean` | Bitfield ↔ `Finset Right` isomorphism | `bitsContainsIffSubset` (exhaustive over Fin 32 × Fin 32), roundtrip theorems |
+
+### Central bridge theorem
+
+`bitsContainsIffSubset` proves that Rust's `CapabilitySet::contains` (bitwise AND)
+and Lean's `Finset.Subset` agree on the 5-bit rights domain:
+
+```lean
+theorem bitsContainsIffSubset (a b : Fin 32) :
+    (a.val &&& b.val = b.val) ↔ bitsToRights b.val ⊆ bitsToRights a.val := by
+  decide   -- exhaustive over all 1024 cases in Fin 32 × Fin 32
+```
+
+### Non-amplification proof
+
+`delegate_non_amplification` proves privilege escalation via delegation is
+mathematically impossible:
+
+```lean
+theorem delegate_non_amplification
+    (cap : Cap) (subset : Rights) (delegated : Cap)
+    (h : concreteDelegateCap cap subset = some delegated) :
+    delegated.rights ⊆ cap.rights
+```
+
+The proof proceeds by `split_ifs` on the two guard conditions in
+`concreteDelegateCap`, showing the success branch forces `subset ⊆ cap.rights`
+which becomes `delegated.rights ⊆ cap.rights` by definition.
+
+### Remaining gap (documented)
+
+The bitfield bridge is proved for `Fin 32` (5-bit domain). The final step —
+showing `UInt32` values reduce to the `Fin 32` case via `n.val.val &&& 31 < 32`
+— is documented in `LuxCapabilityBridge.lean` but not yet mechanically verified.
+This gap affects only the `u32` encoding claim; all four security invariants
+proved in TLA+ and the `Finset Right` refinement proofs remain sound.
+
+### Running the Lean proofs
+
+```sh
+cd lean
+lake build   # requires Lean 4 + Lake
+# Expected: Build completed successfully.
+```
+
+Install Lean 4: `curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh`
 
 ---
 

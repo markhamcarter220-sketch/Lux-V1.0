@@ -39,13 +39,13 @@ fi
 echo ""
 echo "--- Phase 6: Formal Verification (Lean 4) ---"
 if command -v lake &>/dev/null; then
-  echo "==> lake build (LuxSpec + LuxCostModel + LuxRefinement)"
+  echo "==> lake build (LuxSpec + LuxCostModel + LuxRefinement + LuxCapabilityBridge)"
   (cd "${LEAN_DIR}" && lake build)
   echo "formal: PASSED"
 else
   echo "==> lake not installed; skipping formal verification"
   echo "==> Install Lean 4 + Lake: https://leanprover.github.io/lean4/doc/quickstart.html"
-  echo "==> Modules to verify: LuxSpec, LuxCostModel, LuxRefinement"
+  echo "==> Modules to verify: LuxSpec, LuxCostModel, LuxRefinement, LuxCapabilityBridge"
   echo "formal: SKIPPED"
 fi
 
