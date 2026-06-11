@@ -56,7 +56,7 @@ fn inv2_delegation_never_amplifies() {
 #[test]
 fn inv3_quota_overflow_is_rejected() {
     let mut ledger = Ledger::default();
-    ledger.seed(node(1), Quota::new(100));
+    ledger.seed(node(1), Quota::new(100)).expect("test node count within MAX_NODES");
     let enforcer = QuotaEnforcer;
     let result = enforcer.deduct(&mut ledger, node(1), 200, "compute", &mut AuditLog::new());
     assert_eq!(
@@ -72,7 +72,7 @@ fn inv3_quota_overflow_is_rejected() {
 #[test]
 fn inv3_ledger_unchanged_after_failed_deduction() {
     let mut ledger = Ledger::default();
-    ledger.seed(node(1), Quota::new(50));
+    ledger.seed(node(1), Quota::new(50)).expect("test node count within MAX_NODES");
     let enforcer = QuotaEnforcer;
     let _ = enforcer.deduct(&mut ledger, node(1), 999, "memory", &mut AuditLog::new());
     assert_eq!(

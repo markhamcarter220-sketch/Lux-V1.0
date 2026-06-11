@@ -45,7 +45,7 @@ fn attack_5_1_sustained_10k_operations_no_panic() {
     let gen = Generation(0);
     let mut policy = Policy::new(gen);
     let mut ledger = Ledger::new();
-    ledger.seed(nz(1), Quota::new(u64::MAX));
+    ledger.seed(nz(1), Quota::new(u64::MAX)).expect("test node count within MAX_NODES");
 
     for i in 0u64..10_000 {
         let cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, i);
@@ -62,7 +62,7 @@ fn attack_5_1_sustained_10k_operations_no_panic() {
 #[test]
 fn attack_5_2_quota_saturation_produces_clean_denial() {
     let mut ledger = Ledger::new();
-    ledger.seed(nz(1), Quota::new(10_000));
+    ledger.seed(nz(1), Quota::new(10_000)).expect("test node count within MAX_NODES");
 
     // Drain in chunks of 100.
     loop {
@@ -204,8 +204,8 @@ fn attack_5_5_failed_boot_leaves_no_partial_state_recovery_succeeds() {
 #[test]
 fn attack_5_6_quota_exhaustion_does_not_cascade_to_peer_nodes() {
     let mut ledger = Ledger::new();
-    ledger.seed(nz(1), Quota::new(10));
-    ledger.seed(nz(2), Quota::new(10));
+    ledger.seed(nz(1), Quota::new(10)).expect("test node count within MAX_NODES");
+    ledger.seed(nz(2), Quota::new(10)).expect("test node count within MAX_NODES");
 
     // Exhaust node 1.
     for _ in 0..10 {

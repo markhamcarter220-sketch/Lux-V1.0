@@ -36,7 +36,7 @@ fn make_shim() -> WasmShim {
     let graph = booting.seal();
 
     let mut ledger = Ledger::new();
-    ledger.seed(node(1), Quota::new(1_000));
+    ledger.seed(node(1), Quota::new(1_000)).expect("test node count within MAX_NODES");
 
     let policy = Policy::new(Generation(0));
 

@@ -20,7 +20,7 @@ fn nz(n: u32) -> NonZeroU32 {
 fn attack_3_1_over_quota_hard_reject_balance_preserved() {
     let mut ledger = Ledger::new();
     let n = nz(1);
-    ledger.seed(n, Quota::new(100));
+    ledger.seed(n, Quota::new(100)).expect("test node count within MAX_NODES");
 
     assert!(
         ledger.deduct(n, 101).is_none(),
@@ -51,7 +51,7 @@ fn attack_3_1_over_quota_hard_reject_balance_preserved() {
 fn attack_3_2_zero_deduction_does_not_drain_balance() {
     let mut ledger = Ledger::new();
     let n = nz(2);
-    ledger.seed(n, Quota::new(50));
+    ledger.seed(n, Quota::new(50)).expect("test node count within MAX_NODES");
 
     // Deducting 0 is a no-op: 50 - 0 = 50. Returns Some(50).
     let result = ledger.deduct(n, 0);
@@ -70,7 +70,7 @@ fn attack_3_2_zero_deduction_does_not_drain_balance() {
 fn attack_3_3_sequential_deductions_exhaust_to_zero_no_wrap() {
     let mut ledger = Ledger::new();
     let n = nz(3);
-    ledger.seed(n, Quota::new(100));
+    ledger.seed(n, Quota::new(100)).expect("test node count within MAX_NODES");
 
     for i in 0u64..10 {
         let result = ledger.deduct(n, 10);
@@ -104,7 +104,7 @@ fn attack_3_3_sequential_deductions_exhaust_to_zero_no_wrap() {
 fn attack_3_4_double_charge_second_is_rejected() {
     let mut ledger = Ledger::new();
     let n = nz(4);
-    ledger.seed(n, Quota::new(100));
+    ledger.seed(n, Quota::new(100)).expect("test node count within MAX_NODES");
 
     // First charge of 60 succeeds.
     assert!(ledger.deduct(n, 60).is_some());
@@ -130,7 +130,7 @@ fn attack_3_4_double_charge_second_is_rejected() {
 fn attack_3_5_concurrent_pressure_cannot_exceed_quota() {
     let mut ledger = Ledger::new();
     let n = nz(5);
-    ledger.seed(n, Quota::new(100));
+    ledger.seed(n, Quota::new(100)).expect("test node count within MAX_NODES");
 
     let mut successes = 0u32;
     let mut total_deducted = 0u64;
@@ -160,7 +160,7 @@ fn attack_3_5_concurrent_pressure_cannot_exceed_quota() {
 fn attack_3_6_failed_deduction_is_completely_atomic() {
     let mut ledger = Ledger::new();
     let n = nz(6);
-    ledger.seed(n, Quota::new(30));
+    ledger.seed(n, Quota::new(30)).expect("test node count within MAX_NODES");
 
     assert!(ledger.deduct(n, 10).is_some()); // 20 left
     assert!(ledger.deduct(n, 10).is_some()); // 10 left
@@ -183,7 +183,7 @@ fn attack_3_6_failed_deduction_is_completely_atomic() {
 fn attack_3_7_integer_arithmetic_prevents_rounding_exploitation() {
     let mut ledger = Ledger::new();
     let n = nz(7);
-    ledger.seed(n, Quota::new(10));
+    ledger.seed(n, Quota::new(10)).expect("test node count within MAX_NODES");
 
     for i in 0..10u64 {
         assert!(ledger.deduct(n, 1).is_some(), "deduction {i} must succeed");
@@ -206,7 +206,7 @@ fn attack_3_8_quota_is_node_bound_no_lateral_transfer() {
     let mut ledger = Ledger::new();
     let a = nz(8);
     let b = nz(9);
-    ledger.seed(a, Quota::new(100));
+    ledger.seed(a, Quota::new(100)).expect("test node count within MAX_NODES");
     // B is unseeded — it has no quota.
 
     assert!(ledger.deduct(a, 50).is_some());
@@ -230,7 +230,7 @@ fn attack_3_8_quota_is_node_bound_no_lateral_transfer() {
 fn attack_3_9_no_negative_balance_possible() {
     let mut ledger = Ledger::new();
     let n = nz(10);
-    ledger.seed(n, Quota::new(5));
+    ledger.seed(n, Quota::new(5)).expect("test node count within MAX_NODES");
 
     // Attempts that would produce negative balance — all rejected.
     assert!(ledger.deduct(n, 10).is_none());
@@ -250,7 +250,7 @@ fn attack_3_9_no_negative_balance_possible() {
 fn attack_3_10_quota_exhaustion_under_sustained_load() {
     let mut ledger = Ledger::new();
     let n = nz(11);
-    ledger.seed(n, Quota::new(1000));
+    ledger.seed(n, Quota::new(1000)).expect("test node count within MAX_NODES");
 
     let mut succeeded = 0u32;
     let mut denied = 0u32;
@@ -275,8 +275,8 @@ fn attack_3_11_quota_exhaustion_does_not_cascade_to_other_nodes() {
     let mut ledger = Ledger::new();
     let a = nz(12);
     let b = nz(13);
-    ledger.seed(a, Quota::new(10));
-    ledger.seed(b, Quota::new(100));
+    ledger.seed(a, Quota::new(10)).expect("test node count within MAX_NODES");
+    ledger.seed(b, Quota::new(100)).expect("test node count within MAX_NODES");
 
     // Exhaust A.
     for _ in 0..10 {
@@ -303,7 +303,7 @@ fn attack_3_12_full_ledger_capacity_all_nodes_independent() {
 
     for i in 1u32..=u32::try_from(MAX_NODES).expect("constant fits in u32") {
         let n = nz(i);
-        ledger.seed(n, Quota::new(100));
+        ledger.seed(n, Quota::new(100)).expect("test node count within MAX_NODES");
     }
 
     // Every node can independently deduct.

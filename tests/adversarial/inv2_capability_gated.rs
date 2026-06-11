@@ -257,7 +257,7 @@ fn attack_2_8_same_nonce_can_only_be_used_once_per_generation() {
 fn attack_2_9_zero_balance_denies_any_deduction() {
     let mut ledger = Ledger::new();
     let n = nz(10);
-    ledger.seed(n, Quota::new(0));
+    ledger.seed(n, Quota::new(0)).expect("test node count within MAX_NODES");
 
     assert!(
         ledger.deduct(n, 1).is_none(),

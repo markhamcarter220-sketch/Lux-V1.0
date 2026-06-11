@@ -2,10 +2,17 @@
 //!
 //! ## Check order (fail-closed at each step)
 //!
-//! 1. **Generation + rights** — token expired or insufficient rights → deny.
-//! 2. **Revocation** — token explicitly revoked before use → deny.
-//! 3. **Nonce replay** — token already consumed this generation → deny.
-//! 4. **Nonce recording** — record nonce as consumed (window exhaustion → deny).
+//! | Step | Check | Data structure | Complexity |
+//! |------|-------|----------------|------------|
+//! | 1 | Generation ≥ current + rights bitmask | integer comparison | O(1) |
+//! | 2 | Explicit revocation (`RevocationLedger`) | FNV-1a hash set | O(1) amortised |
+//! | 3 | Nonce replay detection (`used_nonces`) | linear scan of `Vec` | O(N), N ≤ `NONCE_WINDOW` = 256 |
+//! | 4 | Nonce recording (window exhaustion → deny) | `Vec::push` | O(1) |
+//!
+//! The overall worst-case complexity of `Policy::check` is **O(`NONCE_WINDOW`)**
+//! due to step 3.  Calling `rotate_generation` resets the nonce window and
+//! keeps the window depth low in practice.  The O(1) revocation claim in
+//! `RevocationLedger`'s documentation refers to step 2 in isolation.
 //!
 //! `check` requires `&mut self` because steps 3–4 mutate state.
 //!

@@ -1,22 +1,28 @@
-//! Capability revocation ledger — O(1) per-generation token invalidation.
+//! Capability revocation ledger — O(1) explicit pre-use token denial.
 //!
 //! The revocation ledger records token IDs (capability nonces) that have been
-//! explicitly invalidated before use.  It complements the nonce replay window:
+//! explicitly invalidated before use.  It is one of three invalidation
+//! mechanisms exercised by `Policy::check`:
 //!
-//! | Mechanism       | Use case                                  | Complexity |
-//! |-----------------|-------------------------------------------|------------|
-//! | Nonce replay    | Detect re-presentation of a used token    | O(N) scan  |
-//! | Revocation ledger | Deny a token before it is used (pre-use) | O(1) hash  |
+//! | Mechanism | Use case | Location | Complexity |
+//! |-----------|----------|----------|------------|
+//! | Generation check | Deny stale-generation tokens | `Policy::check` step 1 | O(1) |
+//! | Revocation ledger | Deny a specific token before it is used | `Policy::check` step 2 | O(1) amortised |
+//! | Nonce replay window | Detect re-presentation of an already-used token | `Policy::check` step 3 | O(N), N ≤ 256 |
 //!
-//! Both are cleared on `rotate_generation`.
+//! All three are cleared on `rotate_generation`.
 //!
-//! # O(1) guarantee
+//! # O(1) guarantee (this module)
 //!
 //! Backed by `heapless::FnvIndexSet` (open-addressed hash map with FNV-1a).
 //! Both `revoke` and `is_revoked` are O(1) amortised.  The capacity is
 //! bounded by `MAX_REVOCATIONS` (a compile-time constant and a power of two).
 //! When the set is full, `revoke` returns `false` — the caller must rotate
 //! the generation to clear space.
+//!
+//! Note: the O(1) guarantee applies to this struct's operations in isolation.
+//! The overall `Policy::check` call has `O(NONCE_WINDOW)` worst-case complexity
+//! due to the nonce replay linear scan; see `src/auth/policy.rs` for details.
 
 use heapless::FnvIndexSet;
 

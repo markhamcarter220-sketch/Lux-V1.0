@@ -227,7 +227,7 @@ fn attack_1_7_revocation_takes_priority_over_full_rights() {
 fn attack_1_8_over_quota_deduction_is_atomic() {
     let mut ledger = Ledger::new();
     let n = nz(5);
-    ledger.seed(n, Quota::new(50));
+    ledger.seed(n, Quota::new(50)).expect("test node count within MAX_NODES");
 
     assert_eq!(ledger.balance(n), Some(50));
 
@@ -268,7 +268,7 @@ fn attack_1_9_error_paths_never_panic() {
     let mut ledger = Ledger::new();
     let _ = ledger.balance(nz(99));
     let _ = ledger.deduct(nz(99), 1);
-    ledger.seed(nz(1), Quota::new(0));
+    ledger.seed(nz(1), Quota::new(0)).expect("test node count within MAX_NODES");
     let _ = ledger.deduct(nz(1), u64::MAX);
 
     // Policy: exhausted generation, empty rights.

@@ -284,7 +284,7 @@ impl BootState {
         }
 
         for q in &manifest.quotas {
-            ledger.seed(q.node, q.ceiling);
+            ledger.seed(q.node, q.ceiling)?;
         }
 
         let graph = booting.seal();

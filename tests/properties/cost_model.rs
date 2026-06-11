@@ -31,7 +31,7 @@ proptest! {
     ) {
         let enforcer = QuotaEnforcer;
         let mut ledger = Ledger::new();
-        ledger.seed(node(1), Quota::new(initial_quota));
+        ledger.seed(node(1), Quota::new(initial_quota)).expect("test node count within MAX_NODES");
 
         for amount in deductions {
             // Each individual deduction may fail — that is correct behaviour.
@@ -54,7 +54,7 @@ proptest! {
     ) {
         let enforcer = QuotaEnforcer;
         let mut ledger = Ledger::new();
-        ledger.seed(node(1), Quota::new(initial_quota));
+        ledger.seed(node(1), Quota::new(initial_quota)).expect("test node count within MAX_NODES");
 
         let balance_before = ledger.balance(node(1)).unwrap();
         let _ = enforcer.deduct(&mut ledger, node(1), amount, "compute", &mut AuditLog::new());
@@ -72,7 +72,7 @@ proptest! {
     ) {
         let enforcer = QuotaEnforcer;
         let mut ledger = Ledger::new();
-        ledger.seed(node(1), Quota::new(initial_quota));
+        ledger.seed(node(1), Quota::new(initial_quota)).expect("test node count within MAX_NODES");
 
         let balance_before = ledger.balance(node(1)).unwrap();
         // Request one more than available.
@@ -95,7 +95,7 @@ proptest! {
     ) {
         let enforcer = QuotaEnforcer;
         let mut ledger = Ledger::new();
-        ledger.seed(node(1), Quota::new(initial_quota));
+        ledger.seed(node(1), Quota::new(initial_quota)).expect("test node count within MAX_NODES");
 
         let mut total_deducted: u64 = 0;
         for amount in deductions {

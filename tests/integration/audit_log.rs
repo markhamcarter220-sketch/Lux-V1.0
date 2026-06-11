@@ -420,7 +420,7 @@ fn quota_deduct_over_limit_emits_failure_event() {
     let enforcer = QuotaEnforcer;
     let mut ledger = Ledger::new();
     let mut log = AuditLog::new();
-    ledger.seed(nz(1), Quota::new(5));
+    ledger.seed(nz(1), Quota::new(5)).expect("test node count within MAX_NODES");
     // Deduct more than available → Err(QuotaExceeded) → FAILURE class
     assert!(enforcer
         .deduct(&mut ledger, nz(1), 10, "compute", &mut log)
@@ -437,7 +437,7 @@ fn quota_deduct_within_limit_emits_permitted_event() {
     let enforcer = QuotaEnforcer;
     let mut ledger = Ledger::new();
     let mut log = AuditLog::new();
-    ledger.seed(nz(1), Quota::new(100));
+    ledger.seed(nz(1), Quota::new(100)).expect("test node count within MAX_NODES");
     assert!(enforcer
         .deduct(&mut ledger, nz(1), 10, "compute", &mut log)
         .is_ok());

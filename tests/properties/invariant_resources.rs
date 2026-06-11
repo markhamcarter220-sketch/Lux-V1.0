@@ -27,7 +27,7 @@ proptest! {
     ) {
         let amount = ceiling.saturating_add(excess);
         let mut ledger = Ledger::default();
-        ledger.seed(node(1), Quota::new(ceiling));
+        ledger.seed(node(1), Quota::new(ceiling)).expect("test node count within MAX_NODES");
 
         let enforcer = QuotaEnforcer;
         let result = enforcer.deduct(&mut ledger, node(1), amount, "compute", &mut AuditLog::new());
@@ -49,7 +49,7 @@ proptest! {
         if amount > ceiling { return Ok(()); } // skip over-quota cases
 
         let mut ledger = Ledger::default();
-        ledger.seed(node(1), Quota::new(ceiling));
+        ledger.seed(node(1), Quota::new(ceiling)).expect("test node count within MAX_NODES");
 
         let enforcer  = QuotaEnforcer;
         let result    = enforcer.deduct(&mut ledger, node(1), amount, "compute", &mut AuditLog::new());
@@ -70,7 +70,7 @@ proptest! {
         b       in 0u64..=500_000u64,
     ) {
         let mut ledger = Ledger::default();
-        ledger.seed(node(1), Quota::new(ceiling));
+        ledger.seed(node(1), Quota::new(ceiling)).expect("test node count within MAX_NODES");
         let enforcer = QuotaEnforcer;
 
         let r1 = enforcer.deduct(&mut ledger, node(1), a, "compute", &mut AuditLog::new());

@@ -6,7 +6,11 @@
 
 use heapless::LinearMap;
 
-use crate::types::{NodeId, Quota, MAX_NODES};
+use crate::{
+    error::Error,
+    types::{NodeId, Quota, MAX_NODES},
+    Result,
+};
 
 /// Live accounting ledger for all registered nodes.
 #[derive(Debug)]
@@ -24,8 +28,19 @@ impl Ledger {
     }
 
     /// Seed the ledger with `node`'s initial quota from the manifest.
-    pub fn seed(&mut self, node: NodeId, ceiling: Quota) {
-        let _ = self.balances.insert(node.get(), ceiling.get());
+    ///
+    /// Returns `Err(ManifestInvalid)` if the node table is already at
+    /// `MAX_NODES` capacity and the new node cannot be inserted.
+    ///
+    /// # Errors
+    /// Returns `Err(ManifestInvalid)` if the ledger node table is full.
+    pub fn seed(&mut self, node: NodeId, ceiling: Quota) -> Result<()> {
+        self.balances
+            .insert(node.get(), ceiling.get())
+            .map(|_| ())
+            .map_err(|_| Error::ManifestInvalid {
+                detail: "ledger node capacity exceeded (MAX_NODES)",
+            })
     }
 
     /// Attempt a deduction.  Returns the new balance on success, `None` if
@@ -68,7 +83,7 @@ mod proofs {
 
         let node = NonZeroU32::new(1).unwrap();
         let mut ledger = Ledger::default();
-        ledger.seed(node, Quota::new(ceiling));
+        ledger.seed(node, Quota::new(ceiling)).expect("single node within capacity");
 
         let before = ledger.balance(node).unwrap();
         let result = ledger.deduct(node, amount);
@@ -92,7 +107,7 @@ mod proofs {
 
         let node = NonZeroU32::new(1).unwrap();
         let mut ledger = Ledger::default();
-        ledger.seed(node, Quota::new(ceiling));
+        ledger.seed(node, Quota::new(ceiling)).expect("single node within capacity");
 
         let before = ledger.balance(node).unwrap();
         let new_bal = ledger.deduct(node, amount);
