@@ -4,6 +4,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LEAN_DIR="$(cd "${SCRIPT_DIR}/../lean" && pwd)"
 
 echo "========================================"
 echo "  Lux Kernel — Full CI Gate"
@@ -33,6 +34,19 @@ if cargo llvm-cov --version &>/dev/null; then
 else
   echo "==> cargo-llvm-cov not installed; skipping coverage (install with: cargo install cargo-llvm-cov)"
   echo "coverage: SKIPPED"
+fi
+
+echo ""
+echo "--- Phase 6: Formal Verification (Lean 4) ---"
+if command -v lake &>/dev/null; then
+  echo "==> lake build (LuxSpec + LuxCostModel + LuxRefinement)"
+  (cd "${LEAN_DIR}" && lake build)
+  echo "formal: PASSED"
+else
+  echo "==> lake not installed; skipping formal verification"
+  echo "==> Install Lean 4 + Lake: https://leanprover.github.io/lean4/doc/quickstart.html"
+  echo "==> Modules to verify: LuxSpec, LuxCostModel, LuxRefinement"
+  echo "formal: SKIPPED"
 fi
 
 echo ""
