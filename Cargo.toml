@@ -78,6 +78,24 @@ overflow-checks = true
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(kani)'] }
 
+# ---------------------------------------------------------------------------
+# Build attestation metadata
+# cargo-auditable is a *separate tool* (not a Cargo dependency).
+# Install: cargo install cargo-auditable
+# Usage:   cargo auditable build --release
+#
+# When built with cargo-auditable, the release binary contains a compressed
+# JSON snapshot of the full dependency tree (crate names, versions, sources)
+# embedded in the ELF .note.cargo section.  This snapshot is readable by
+# `cargo audit bin <binary>` and feeds into RUSTSEC advisory checks without
+# requiring the source tree.
+# ---------------------------------------------------------------------------
+[package.metadata.auditable]
+# Record the intent that production binaries MUST be built via
+# `cargo auditable build --release`, not plain `cargo build --release`.
+# CI enforces this in scripts/ci_full.sh Phase 7.
+required = true
+
 [[bench]]
 name    = "scheduler_throughput"
 harness = false

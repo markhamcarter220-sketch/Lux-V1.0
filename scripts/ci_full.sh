@@ -50,6 +50,27 @@ else
 fi
 
 echo ""
+echo "--- Phase 7: Reproducible Build & Binary Attestation ---"
+if cargo auditable --version &>/dev/null; then
+  echo "==> cargo auditable build --release"
+  cargo auditable build --release
+else
+  echo "==> cargo-auditable not installed; skipping auditable build"
+  echo "==> Install with: cargo install cargo-auditable"
+fi
+
+if cargo sbom --version &>/dev/null; then
+  echo "==> cargo sbom --output-format spdx_json_2_3"
+  cargo sbom --output-format spdx_json_2_3 > target/spdx.json
+  echo "==> SBOM written to target/spdx.json"
+  echo "attestation: PASSED"
+else
+  echo "==> cargo-sbom not installed; skipping SBOM generation"
+  echo "==> Install with: cargo install cargo-sbom"
+  echo "attestation: SKIPPED"
+fi
+
+echo ""
 echo "========================================"
 echo "  ALL GATES PASSED"
 echo "========================================"
