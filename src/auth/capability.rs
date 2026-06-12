@@ -78,6 +78,28 @@ impl Capability {
     ///
     /// The kernel never allows privilege amplification — this is enforced
     /// algebraically by the `contains` check.
+    ///
+    /// # Caller obligation — nonce uniqueness
+    ///
+    /// The caller **must** supply a `nonce` that is unique within the current
+    /// generation.  Reusing a nonce across delegated tokens causes one of two
+    /// failure modes:
+    ///
+    /// 1. If a token with the same nonce was already checked by `Policy::check`
+    ///    (step 3 — replay detection), the delegated token will be denied as a
+    ///    replay.
+    /// 2. If a revoked token shares the same nonce, the new delegated token
+    ///    will also be denied (step 2 — explicit revocation by nonce).
+    ///
+    /// The kernel cannot generate nonces in `no_std` without an RNG dependency;
+    /// nonce sourcing is therefore an application-layer responsibility.  A
+    /// hardware counter, CSPRNG output, or monotonically-incrementing per-issuer
+    /// counter are all suitable sources.
+    ///
+    /// Nonce uniqueness is **scoped per generation**: `Policy::rotate_generation`
+    /// clears the replay window, so a nonce that was used in generation N may be
+    /// safely reused in generation N+1.  See `Policy::check` step 3 for the
+    /// replay detection logic.
     #[must_use]
     pub const fn delegate(
         &self,

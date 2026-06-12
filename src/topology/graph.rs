@@ -18,7 +18,7 @@
 //! Both existence and active-state checks are therefore O(1) bitwise ops.
 
 use crate::{
-    audit::{AuditLog, EventKind},
+    audit::{AuditLog, EventKind, UNTIMED},
     error::Error,
     types::{NodeId, MAX_NODES},
     Result,
@@ -136,7 +136,7 @@ impl OperationalGraph {
             .as_ref()
             .err()
             .map(|e| (e.denial_class(), e.denial_reason_str()));
-        let appended = audit.append(EventKind::TopologyTraverse, actor, 0, denial);
+        let appended = audit.append(EventKind::TopologyTraverse, actor, UNTIMED, denial);
         // Fail-closed: deny an otherwise-permitted traversal when it cannot be
         // logged.  Pre-existing TopologyViolation errors pass through unchanged.
         if !appended && result.is_ok() {

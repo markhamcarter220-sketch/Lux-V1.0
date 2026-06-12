@@ -29,12 +29,22 @@ impl Ledger {
 
     /// Seed the ledger with `node`'s initial quota from the manifest.
     ///
-    /// Returns `Err(ManifestInvalid)` if the node table is already at
-    /// `MAX_NODES` capacity and the new node cannot be inserted.
+    /// Returns `Err(ManifestInvalid)` if:
+    /// - `node` has already been seeded (duplicate manifest entry), or
+    /// - the node table is already at `MAX_NODES` capacity.
+    ///
+    /// Rejecting duplicates prevents a manifest with two entries for the same
+    /// node from silently overwriting the first quota with the second.
     ///
     /// # Errors
-    /// Returns `Err(ManifestInvalid)` if the ledger node table is full.
+    /// Returns `Err(ManifestInvalid)` if the node is already seeded or the
+    /// ledger node table is full.
     pub fn seed(&mut self, node: NodeId, ceiling: Quota) -> Result<()> {
+        if self.balances.contains_key(&node.get()) {
+            return Err(Error::ManifestInvalid {
+                detail: "duplicate node quota in manifest",
+            });
+        }
         self.balances
             .insert(node.get(), ceiling.get())
             .map(|_| ())
@@ -65,6 +75,51 @@ impl Ledger {
 impl Default for Ledger {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+// ── Unit tests ────────────────────────────────────────────────────────────────
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use core::num::NonZeroU32;
+
+    fn nz(n: u32) -> NonZeroU32 {
+        NonZeroU32::new(n).unwrap()
+    }
+
+    #[test]
+    fn seed_duplicate_node_is_rejected() {
+        let mut ledger = Ledger::new();
+        let node = nz(1);
+        ledger
+            .seed(node, Quota::new(100))
+            .expect("first seed must succeed");
+        assert!(
+            matches!(
+                ledger.seed(node, Quota::new(200)),
+                Err(Error::ManifestInvalid {
+                    detail: "duplicate node quota in manifest"
+                })
+            ),
+            "re-seeding same node must be rejected"
+        );
+        // Original balance must be unchanged — no silent overwrite.
+        assert_eq!(
+            ledger.balance(node),
+            Some(100),
+            "balance must not be overwritten by rejected duplicate seed"
+        );
+    }
+
+    #[test]
+    fn seed_distinct_nodes_succeeds() {
+        let mut ledger = Ledger::new();
+        ledger.seed(nz(1), Quota::new(100)).expect("node 1");
+        ledger.seed(nz(2), Quota::new(200)).expect("node 2");
+        assert_eq!(ledger.balance(nz(1)), Some(100));
+        assert_eq!(ledger.balance(nz(2)), Some(200));
     }
 }
 

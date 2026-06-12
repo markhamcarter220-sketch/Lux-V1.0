@@ -27,7 +27,7 @@ pub use manifest::Manifest;
 use sha2::{Digest, Sha256};
 
 use crate::{
-    audit::{AuditLog, EventKind},
+    audit::{AuditLog, EventKind, UNTIMED},
     auth::policy::Policy,
     consensus::{PeerSet, RaftNode, RaftTransport},
     error::{DenialClass, Error},
@@ -191,7 +191,7 @@ impl BootState {
             audit.append(
                 EventKind::TopologyChange,
                 src.get(),
-                0,
+                UNTIMED,
                 Some((DenialClass::Halt, "topology consensus not reached")),
             );
             return Err(Error::TopologyViolation {
@@ -213,7 +213,7 @@ impl BootState {
         }
 
         let denial = (!committed).then_some((DenialClass::Halt, "topology consensus not reached"));
-        audit.append(EventKind::TopologyChange, src.get(), 0, denial);
+        audit.append(EventKind::TopologyChange, src.get(), UNTIMED, denial);
 
         if committed {
             Ok(())

@@ -12,3 +12,17 @@ pub mod log;
 pub use crate::error::DenialClass;
 pub use event::{AuditEvent, EventKind, Outcome};
 pub use log::AuditLog;
+
+/// Sentinel timestamp for audit events emitted without a caller-supplied clock.
+///
+/// The kernel is `no_std` and does not own a monotonic timer.  Callers of the
+/// three enforcement gates ([`Policy::check`], [`OperationalGraph::traverse`],
+/// [`QuotaEnforcer::deduct`]) do not currently thread a timestamp into those
+/// calls.  Events marked `UNTIMED` are correctly sequenced (via `seq`) and
+/// hash-chained, but carry no wall-time or monotonic dimension.
+///
+/// Replacing `UNTIMED` with a real counter requires adding a `timestamp: u64`
+/// parameter to every gate signature and all their callers (Python, WASM,
+/// tests, boot path).  That is a coordinated API-change design, not a one-line
+/// fix — track it as a dedicated work item.
+pub const UNTIMED: u64 = 0;

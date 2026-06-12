@@ -1,7 +1,7 @@
 //! Quota enforcer — single-call entry point for resource checks.
 
 use crate::{
-    audit::{AuditLog, EventKind},
+    audit::{AuditLog, EventKind, UNTIMED},
     error::Error,
     metabolism::ledger::Ledger,
     types::NodeId,
@@ -46,7 +46,7 @@ impl QuotaEnforcer {
             .err()
             .map(|e| (e.denial_class(), e.denial_reason_str()));
         // append succeeds: capacity was confirmed by is_full() above.
-        audit.append(EventKind::ResourceDeduction, node.get(), 0, denial);
+        audit.append(EventKind::ResourceDeduction, node.get(), UNTIMED, denial);
         result
     }
 }
