@@ -76,7 +76,13 @@ impl Policy {
             .as_ref()
             .err()
             .map(|e| (e.denial_class(), e.denial_reason_str()));
-        audit.append(EventKind::CapabilityCheck, actor, 0, denial);
+        let appended = audit.append(EventKind::CapabilityCheck, actor, 0, denial);
+        // Fail-closed: an otherwise-permitted operation that cannot be logged
+        // must be denied.  Pre-existing denials are returned unchanged — the
+        // original reason takes precedence and must not be masked by AuditFull.
+        if !appended && result.is_ok() {
+            return Err(Error::AuditFull);
+        }
         result
     }
 

@@ -136,7 +136,12 @@ impl OperationalGraph {
             .as_ref()
             .err()
             .map(|e| (e.denial_class(), e.denial_reason_str()));
-        audit.append(EventKind::TopologyTraverse, actor, 0, denial);
+        let appended = audit.append(EventKind::TopologyTraverse, actor, 0, denial);
+        // Fail-closed: deny an otherwise-permitted traversal when it cannot be
+        // logged.  Pre-existing TopologyViolation errors pass through unchanged.
+        if !appended && result.is_ok() {
+            return Err(Error::AuditFull);
+        }
         result
     }
 

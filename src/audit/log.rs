@@ -208,6 +208,13 @@ impl AuditLog {
         self.events.is_empty()
     }
 
+    /// Returns `true` if the log is at capacity; the next `append` call will
+    /// return `false` without recording the event.
+    #[must_use]
+    pub fn is_full(&self) -> bool {
+        self.events.len() >= MAX_AUDIT_EVENTS
+    }
+
     /// Returns the hash of the most recent event, or all-zeros for an empty log.
     #[must_use]
     pub const fn head_hash(&self) -> [u8; 32] {

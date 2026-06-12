@@ -105,6 +105,21 @@ pub enum Error {
         /// Static description of the fault category.
         detail: &'static str,
     },
+
+    /// The audit log is at capacity; the operation is denied because it cannot
+    /// be recorded (fail-closed: no unlogged enforcement decisions).
+    ///
+    /// Maps to [`DenialClass::Halt`] — the operation is stopped *before*
+    /// execution.  Only otherwise-permitted operations synthesize this error;
+    /// pre-existing denials are returned unchanged (the original error reason
+    /// is preserved and takes precedence).
+    ///
+    /// Note: this denial itself also cannot be appended to the log (the log is
+    /// full).  That is acceptable — the point is that the *operation* is
+    /// refused, not that the refusal is recorded.  Call `rotate_generation` or
+    /// drain the log to reclaim capacity.
+    #[error("audit log full: operation denied (fail-closed)")]
+    AuditFull,
 }
 
 impl Error {
@@ -124,6 +139,7 @@ impl Error {
             | Self::SchedulerInvariant { detail }
             | Self::WasmFault { detail } => detail,
             Self::UndefinedState { context } => context,
+            Self::AuditFull => "audit log full; rotate to reclaim",
         }
     }
 
@@ -147,11 +163,14 @@ impl Error {
             // UndefinedState: the state machine reached an unrecognised
             //   transition.  The fail-closed contract requires halting the
             //   sub-system rather than proceeding in an unknown state.
+            // AuditFull: stopped before execution because the audit record
+            // cannot be maintained.  No kernel state is modified.
             Self::CapabilityDenied { .. }
             | Self::TopologyViolation { .. }
             | Self::ManifestInvalid { .. }
             | Self::UndefinedState { .. }
-            | Self::WasmFault { .. } => DenialClass::Halt,
+            | Self::WasmFault { .. }
+            | Self::AuditFull => DenialClass::Halt,
 
             // ── FAILURE: authorization passed, execution failed ───────────────
             //

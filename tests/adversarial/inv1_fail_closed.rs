@@ -5,7 +5,7 @@
 
 use core::num::NonZeroU32;
 use ed25519_dalek::{Signer, SigningKey};
-use lux_kernel::audit::AuditLog;
+use lux_kernel::audit::{AuditLog, EventKind};
 use lux_kernel::{
     auth::{
         capability::{Capability, CapabilitySet},
@@ -13,9 +13,9 @@ use lux_kernel::{
     },
     boot::{BootCredentials, ManifestDecoder},
     error::Error,
-    metabolism::ledger::Ledger,
-    topology::BootingGraph,
-    types::{Generation, Quota},
+    metabolism::{ledger::Ledger, quota::QuotaEnforcer},
+    topology::{BootingGraph, OperationalGraph},
+    types::{Generation, Quota, MAX_AUDIT_EVENTS},
 };
 
 fn nz(n: u32) -> NonZeroU32 {
@@ -321,4 +321,107 @@ fn attack_1_10_check_revoke_sequence_is_consistent() {
     assert!(policy
         .check(&cap_b2_retry, CapabilitySet::SCHEDULE, &mut AuditLog::new())
         .is_err());
+}
+
+// ── Attack 1.11 ───────────────────────────────────────────────────────────────
+// Audit-full on policy gate: an otherwise-permitted capability check is denied
+// when the audit log is saturated.
+//
+// Masking-regression: a pre-existing CapabilityDenied must NOT be replaced by
+// AuditFull — the original denial reason is preserved.
+
+fn saturated_audit() -> AuditLog {
+    let mut audit = AuditLog::new();
+    for i in 0..MAX_AUDIT_EVENTS as u64 {
+        let appended = audit.append(EventKind::CapabilityCheck, 0, i, None);
+        assert!(appended, "pre-saturation append must succeed at seq {i}");
+    }
+    // Confirm full.
+    assert!(
+        !audit.append(EventKind::CapabilityCheck, 0, 0, None),
+        "log must be full after MAX_AUDIT_EVENTS appends"
+    );
+    audit
+}
+
+#[test]
+fn attack_1_11_policy_check_denied_when_audit_full() {
+    let gen = Generation(0);
+    let mut policy = Policy::new(gen);
+    let mut audit = saturated_audit();
+
+    // Otherwise-valid capability → must be denied because it cannot be logged.
+    let valid_cap =
+        Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, 0xA001);
+    assert_eq!(
+        policy.check(&valid_cap, CapabilitySet::SCHEDULE, &mut audit),
+        Err(Error::AuditFull),
+        "valid cap must be denied (not silently permitted) when audit is full"
+    );
+
+    // Masking-regression: an INVALID capability (wrong generation) presented to
+    // the saturated gate must return the original CapabilityDenied, NOT AuditFull.
+    // This proves the constraint: pre-existing denials are never overwritten.
+    let invalid_cap =
+        Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, Generation(99), 0xA002);
+    assert_eq!(
+        policy.check(&invalid_cap, CapabilitySet::SCHEDULE, &mut audit),
+        Err(Error::CapabilityDenied {
+            reason: "token expired, insufficient rights, or wrong generation",
+        }),
+        "pre-existing denial reason must not be masked by AuditFull"
+    );
+}
+
+// ── Attack 1.12 ───────────────────────────────────────────────────────────────
+// Audit-full on topology gate: an otherwise-permitted traversal is denied when
+// the audit log is saturated.
+
+fn single_edge_graph(src: u32, dst: u32) -> OperationalGraph {
+    let mut g = BootingGraph::new();
+    g.activate(nz(src)).unwrap();
+    g.activate(nz(dst)).unwrap();
+    g.permit_edge(nz(src), nz(dst)).unwrap();
+    g.seal()
+}
+
+#[test]
+fn attack_1_12_topology_traverse_denied_when_audit_full() {
+    let graph = single_edge_graph(1, 2);
+    let mut audit = saturated_audit();
+
+    assert_eq!(
+        graph.traverse(nz(1), nz(2), &mut audit),
+        Err(Error::AuditFull),
+        "permitted traversal must be denied when audit is full"
+    );
+}
+
+// ── Attack 1.13 ───────────────────────────────────────────────────────────────
+// Audit-full on quota gate: an otherwise-successful deduction is denied when
+// the audit log is saturated.
+
+#[test]
+fn attack_1_13_quota_deduct_denied_when_audit_full() {
+    let mut ledger = Ledger::new();
+    let node = nz(3);
+    ledger
+        .seed(node, Quota::new(1_000))
+        .expect("single node within MAX_NODES");
+
+    let enforcer = QuotaEnforcer;
+    let mut audit = saturated_audit();
+
+    assert_eq!(
+        enforcer.deduct(&mut ledger, node, 1, "compute", &mut audit),
+        Err(Error::AuditFull),
+        "permitted deduction must be denied when audit is full"
+    );
+
+    // Balance must be unchanged — the operation was refused, not partially applied.
+    assert_eq!(
+        ledger.balance(node),
+        Some(1_000),
+        "balance must be unchanged after AuditFull denial"
+    );
 }

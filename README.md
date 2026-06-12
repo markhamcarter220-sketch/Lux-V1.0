@@ -53,6 +53,16 @@ is a P0 regression, regardless of its other merits.
 | 3 | **Accountable Resources** — every allocation is charged; over-quota requests are hard-rejected | `metabolism::ledger::Ledger::deduct` |
 | 4 | **Topology-Bounded** — execution is confined to the boot-manifest graph; undeclared edges are denied | `topology::graph::OperationalGraph::traverse` |
 
+**Audit-completeness (I1 extension):** Any otherwise-permitted operation that
+cannot be written to the audit log is denied rather than silently permitted.
+Three enforcement gates (`Policy::check`, `OperationalGraph::traverse`,
+`QuotaEnforcer::deduct`) return `Error::AuditFull` when the log is saturated
+and the operation would have succeeded.  Pre-existing denials are returned
+unchanged — audit saturation never masks a legitimate rejection.
+**Availability tradeoff:** a saturated audit log denies new operations until
+`rotate_generation()` or a log drain is called.  This is a deliberate
+fail-closed design choice.
+
 All four invariants are verified by the adversarial test suite (63 attacks,
 zero successful privilege escalations — see `tests/adversarial/`) and
 formally verified by TLC model checking across 322,560 distinct states
