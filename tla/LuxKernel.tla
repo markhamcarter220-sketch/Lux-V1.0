@@ -91,6 +91,13 @@ TypeOK ==
 \*   (1) generation must match current epoch
 \*   (2) nonce must not be in the revocation set
 \*   (3) rights set must be non-empty
+\*
+\* Refinement note (2026-06-12): Rust authorises() previously used >= instead
+\* of = for the generation check, diverging from this spec.  A token minted
+\* with a future generation (e.g. u64::MAX) would pass >= permanently and
+\* survive every rotate_generation() call.  The fix changed authorises() to
+\* require exact equality, bringing the implementation in line with cap.gen = epoch.
+\* Regression test: tests/security/privilege_escalation.rs::future_generation_token_is_denied
 IsValidCap(cap) ==
     /\ cap.gen    = epoch
     /\ cap.nonce \notin revokedNonces

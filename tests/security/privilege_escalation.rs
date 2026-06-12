@@ -75,6 +75,44 @@ fn nonce_replay_is_denied() {
     );
 }
 
+// Attempt: future-generation token must be denied at the current epoch.
+//
+// A token minted with generation u64::MAX passes `>= current_gen` permanently,
+// surviving every rotate_generation() call and defeating the kill switch.
+// The fix changes authorises() to require exact equality (`==`), matching
+// the TLA+ spec (IsValidCap: cap.gen = epoch).
+#[test]
+fn future_generation_token_is_denied() {
+    let mut policy = Policy::new(Generation(0));
+    let future_cap = Capability::new_for_test(
+        node(1),
+        node(2),
+        CapabilitySet::SHUTDOWN,
+        Generation(u64::MAX), // forward-dated: should never be valid at epoch 0
+        77,
+    );
+
+    // Must be denied at epoch 0 — future gen != current gen.
+    assert_eq!(
+        policy.check(&future_cap, CapabilitySet::SHUTDOWN, &mut AuditLog::new()),
+        Err(Error::CapabilityDenied {
+            reason: "token expired, insufficient rights, or wrong generation",
+        }),
+        "Future-generation token must be denied at the current epoch"
+    );
+
+    // Rotate; token STILL denied — rotation cannot be exploited via
+    // forward-dating even after the revocation ledger is cleared.
+    policy.rotate_generation();
+    assert_eq!(
+        policy.check(&future_cap, CapabilitySet::SHUTDOWN, &mut AuditLog::new()),
+        Err(Error::CapabilityDenied {
+            reason: "token expired, insufficient rights, or wrong generation",
+        }),
+        "Future-generation token must remain denied after rotation"
+    );
+}
+
 // Attempt: nonce replay cleared after generation rotation.
 #[test]
 fn nonce_window_clears_on_rotation() {

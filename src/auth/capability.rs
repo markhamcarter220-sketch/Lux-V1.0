@@ -57,11 +57,17 @@ impl Drop for Capability {
 }
 
 impl Capability {
-    /// Returns `true` if this token grants the requested right and has not
-    /// been superseded by a newer generation.
+    /// Returns `true` if this token grants the requested right and its
+    /// generation matches the current epoch exactly.
+    ///
+    /// Equality is required (not `>=`) so that tokens minted with a future
+    /// generation cannot bypass `rotate_generation()`.  A token with
+    /// `generation > current_gen` would permanently pass a `>=` check and
+    /// survive rotation, defeating the kill switch.  The TLA+ spec
+    /// (`IsValidCap`) requires `cap.gen = epoch`; this method enforces it.
     #[must_use]
     pub fn authorises(&self, right: CapabilitySet, current_gen: Generation) -> bool {
-        self.generation >= current_gen && self.rights.contains(right)
+        self.generation == current_gen && self.rights.contains(right)
     }
 
     /// Delegate a strict subset of rights to `new_target`.
