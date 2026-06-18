@@ -1,7 +1,16 @@
 # ADR 0004 — Distributed Topology Consensus Protocol
 
-**Status:** Accepted  
+**Status:** Superseded  
 **Date:** 2026-Q2
+
+> **Superseded notice:** The single-round quorum-vote protocol described in
+> this ADR (no leader election, no log replication) was replaced by a full
+> Raft implementation (leader election + log replication) in
+> `src/consensus/raft.rs`. `src/consensus/mod.rs`'s module doc is the
+> current authoritative description of the distributed topology consensus
+> mechanism — see that file rather than the protocol described below. This
+> ADR is retained unmodified below as historical record of the original
+> design.
 
 ## Context
 

@@ -449,3 +449,25 @@ source (`src/boot/credentials.rs`, `src/boot/mod.rs`, `src/tpm/tss.rs`,
 `src/hsm/pkcs11.rs`, `src/wasm/host.rs`, `src/consensus/mod.rs`) and
 `docs/adr/0004-distributed-topology-consensus.md` before assigning a single
 bucket per function. No Lean or Rust source file was modified by this pass.
+
+---
+
+## Scope boundary: key management
+
+Lux's formal verification coverage for key management (`lean/FunctionSpecs/Hsm.lean`)
+is currently scoped to `SoftwareKeyStore` only. Even within that scope, every
+`SoftwareKeyStore`/`SoftwareHsm` function is itself `BELOW-BOUNDARY` (see the
+triage above) — its cryptographic primitives are not formally modelled, only
+covered by a best-effort, possibly-weak spec.
+
+`PKCS11HsmProvider` and `YubiHsmProvider` are unconditional stubs: every
+method on both types returns a hardcoded error today, with no real PKCS#11
+or YubiHSM FFI integration designed yet. This accounts for 16 of the 22
+`SPEC-GAP` entries in the triage above (8 `pkcs11HsmProvider*` methods +
+8 `yubiHsmProvider*` methods — see `Hsm.lean`'s table). There is no design to
+verify against, formally or adversarially, until that FFI work happens.
+
+**Any deployment relying on a real hardware HSM (PKCS#11 or YubiHSM) is
+outside the current formally specified boundary.** Only the software-backed
+key store has any spec-layer coverage at all, and that coverage is itself
+unproved (see the toolchain-status disclosure in `docs/FUNCTION_SPECS.md`).
