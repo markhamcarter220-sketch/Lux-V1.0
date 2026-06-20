@@ -52,7 +52,7 @@
 │                Bounded         declared graph               │
 │                                                             │
 │   (Rust no_std kernel; formal adversarial test suite:       │
-│    63 attacks, 0 successful privilege escalations)          │
+│    66 attacks, 0 successful privilege escalations)          │
 └─────────────────────────────────────────────────────────────┘
 ```
 

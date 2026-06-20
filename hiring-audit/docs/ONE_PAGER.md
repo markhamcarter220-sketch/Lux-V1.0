@@ -164,4 +164,4 @@ able to prove what they are.
 ---
 
 *Reference implementation: Lux-V1.0 repository, `hiring-audit/`*  
-*Lux Kernel adversarial test suite: 63 attacks, 0 successful privilege escalations*
+*Lux Kernel adversarial test suite: 66 attacks, 0 successful privilege escalations*

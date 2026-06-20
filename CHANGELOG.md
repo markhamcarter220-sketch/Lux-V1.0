@@ -9,8 +9,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Summary
 
-Initial stable release following independent A+ audit.  All Tier 1 security
-invariants are implemented and verified.
+Initial stable release.  All Tier 1 security invariants are implemented and
+verified by the adversarial test suite and TLA+ model checking.  Internal
+security review is complete; third-party security audit has not yet been
+performed — see [`AUDIT_ROADMAP.md`](AUDIT_ROADMAP.md) for the audit timeline.
+Do not characterise this release as "audited."
 
 ### Added
 
@@ -27,7 +30,6 @@ invariants are implemented and verified.
 - `error` module: exhaustive, `#[non_exhaustive]` kernel error taxonomy.
 - `types` module: `NodeId`, `Quota`, `Generation` domain primitives.
 - Security test suite: invariant enforcement + privilege escalation paths.
-- CI scripts: `lint.sh`, `audit.sh`, `coverage.sh`, `ci_full.sh`.
 - `deny.toml`: license allowlist and supply-chain policy.
 - ADRs: 0001 (fail-closed design), 0002 (capability-based auth).
 

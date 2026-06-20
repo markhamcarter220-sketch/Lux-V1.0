@@ -14,7 +14,7 @@ This is a step beyond empirical testing:
 | Method | What it proves |
 |---|---|
 | Unit tests (`cargo test`) | Specific inputs produce correct outputs |
-| Adversarial tests (63 attacks) | Known attack vectors are blocked |
+| Adversarial tests (66 attacks) | Known attack vectors are blocked |
 | TLC model checking | **All reachable states** satisfy the security invariants |
 
 TLA+ describes a state machine and the properties it must satisfy. TLC

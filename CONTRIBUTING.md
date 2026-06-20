@@ -116,9 +116,13 @@ This is enforced by the PR review checklist, not by CI.
 
 Every code path in `src/auth/`, `src/boot/`, and the security-relevant
 branches of `src/metabolism/` and `src/topology/` must be exercised by a test
-in `tests/security/`.  The coverage threshold is enforced by `scripts/coverage.sh`.
+in `tests/security/`.
 
-A PR that reduces security-path coverage below 100% will be blocked.
+**Current status:** there is no `scripts/coverage.sh` and no automated
+coverage gate in this repository yet — this requirement is enforced by
+manual review of new `tests/security/` coverage, not by a measured
+percentage. A PR that adds a security-path code path without a corresponding
+test in `tests/security/` will be blocked in review.
 
 ### 3.2 New Denial Paths
 
@@ -187,22 +191,31 @@ cargo test --test invariant_enforcement --test privilege_escalation -- --nocaptu
 
 ### 4.5 Coverage Report
 
+**Not yet implemented.** There is no `scripts/coverage.sh` in this
+repository. To generate a coverage report manually:
+
 ```sh
 # Requires: cargo install cargo-llvm-cov
-./scripts/coverage.sh
+cargo llvm-cov --all-features --html
 ```
 
-The HTML report is written to `coverage/`.  Open `coverage/index.html` in a
-browser to inspect line-level coverage.
+The HTML report is written to `target/llvm-cov/html/`. Open
+`target/llvm-cov/html/index.html` in a browser to inspect line-level coverage.
 
 ### 4.6 Full CI Gate (one command)
 
-```sh
-./scripts/ci_full.sh
-```
+**Not yet implemented.** There is no `scripts/ci_full.sh` and no GitHub
+Actions workflow in this repository — `.github/workflows/` does not exist.
+Run each check manually before opening a PR:
 
-This runs all phases in the same order as the GitHub Actions pipeline.  Run
-this before opening a PR.
+```sh
+cargo fmt --check
+cargo clippy --all-features -- -D warnings
+cargo deny check
+cargo audit
+cargo test --all-features
+cargo test --test security -- --nocapture
+```
 
 ---
 

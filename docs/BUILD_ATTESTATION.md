@@ -1,5 +1,16 @@
 # Build Attestation and Reproducible Builds
 
+**Status: specification, not yet implemented.** This document describes the
+*intended* supply-chain evidence chain. As of this revision, `scripts/`
+(including `scripts/ci_full.sh` and `scripts/attest.sh`, referenced
+throughout below) does not exist in this repository, no CI workflow runs any
+of these steps automatically, and no `Cargo.lock.sha256` or `target/spdx.json`
+artifact has been committed or generated. Every command below is runnable
+manually if you install the listed tools yourself, but none of it currently
+runs as part of this project's build or release process. Treat this as a
+design document for what an auditor should ask for, not as a description of
+artifacts that already exist.
+
 This document describes the supply-chain evidence chain for Lux Kernel release
 binaries, the tools that generate it, and the exact commands an auditor should
 run to verify each link.

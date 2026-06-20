@@ -2,7 +2,6 @@
 
 **A fail-closed, capability-authenticated governance microkernel.**
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/markhamcarter220-sketch/lux-v1.0/actions)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![Rust 1.78+](https://img.shields.io/badge/rust-1.78%2B-orange)](https://www.rust-lang.org)
 [![no_std](https://img.shields.io/badge/no__std-yes-blue)](#)
@@ -75,6 +74,20 @@ for the threat model. Note: Third-party security audit is not yet complete (see 
 ---
 
 ## Formal Verification
+
+**Note on terminology:** This project has two independent formal verification
+layers. **TLA+/TLC** (below) exhaustively model-checks the four invariants
+over a bounded state space and is re-run to produce the numbers quoted here.
+**Lean 4** (`lean/`) mechanically proves the four core modules
+(`LuxSpec.lean`, `LuxCostModel.lean`, `LuxRefinement.lean`,
+`LuxCapabilityBridge.lean`) via `lake build`, with zero `sorry`. A fifth
+file, `lean/Refinement.lean`, layers system-level I1–I4 obligations on top of
+that proof tree; 2 of its 9 theorems (the I3 obligations) are not yet closed
+and remain `sorry` — see [Project Maturity](#project-maturity) and
+`docs/REFINEMENT_GAPS.md`. Neither layer subsumes the other: TLA+/TLC checks
+system behaviour across a bounded model; Lean proves properties of the
+ledger/capability model in unbounded arithmetic but does not yet model the
+full topology/typestate layer (I4).
 
 The four core security theorems are formally verified using
 **TLA+ (Temporal Logic of Actions)** with the **TLC model checker**.
@@ -157,7 +170,7 @@ Tier 2.5 — COMPLETE (compliance demonstrations)
 [x] Fair lending reference implementation (ECOA/FHA) — lending-audit/
 [x] Criminal justice governance demonstration — recidivism-demo/
 
-Tier 3 — IN PROGRESS (2/5 complete; 3 pending hardware deployment or toolchain)
+Tier 3 — IN PROGRESS (3/5 complete; 2 pending hardware deployment)
 [x] WASM execution substrate — Wasmtime-backed executor, 3 host functions, 12 integration tests (src/wasm/, tests/wasm_executor.rs)
 [x] Distributed topology consensus — full Raft state machine, 21 unit tests + integration tests (src/consensus/, tests/raft.rs)
 [~] HSM-backed capability minting — SoftwareKeyStore + YubiHSM/PKCS#11 stubs (src/hsm/);
@@ -165,13 +178,16 @@ Tier 3 — IN PROGRESS (2/5 complete; 3 pending hardware deployment or toolchain
     Pending: real YubiHSM or PKCS#11 hardware deployment
 [~] TPM-anchored boot attestation — BootAttestation + TssTpm stub (src/tpm/, tests/tpm.rs)
     Pending: physical TPM chip + TSS stack
-[~] Formal proofs — Lean 4 four-file proof suite (lean/)
+[x] Formal proofs — Lean 4 four-file proof suite (lean/), lake build-verified,
+    zero `sorry`
     LuxSpec.lean: abstract ideal-system specification (I2 + I3)
     LuxCostModel.lean: concrete model of src/metabolism/ledger.rs (7 ledger theorems)
     LuxRefinement.lean: refinement proofs — concreteDeductSpec, delegate_non_amplification
     LuxCapabilityBridge.lean: u32 bitfield ↔ Finset Right isomorphism (bitsContainsIffSubset)
     See docs/FORMAL_COST_MODEL.md and docs/FORMAL_VERIFICATION.md §6 for theorem index.
-    Pending: mechanical verification requires Lean 4 toolchain (lake build in lean/)
+    A fifth file, lean/Refinement.lean, scaffolds system-level I1–I4 obligations
+    above this proof tree; 7 of its 9 theorems are proved, 2 (I3-A, I3-B) remain
+    `sorry`. See docs/REFINEMENT_GAPS.md for the per-theorem closure plan.
 
 AUDIT & VERIFICATION STATUS:
 [x] Internal security review (Lux Project Contributors)
@@ -282,18 +298,24 @@ java -XX:+UseParallelGC -jar tla2tools.jar MC.tla -config MC.cfg -workers 4
 
 ### Full CI Gate (mirrors the pipeline)
 
+**Status: not yet implemented.** `scripts/ci_full.sh` and the rest of
+`scripts/` do not exist in this repository, and there is no GitHub Actions
+workflow under `.github/workflows/`. The intended pipeline below is a
+specification of what CI should run, not a description of what currently
+runs. Run each step manually until the orchestrator script and CI workflow
+are added:
+
 ```sh
-./scripts/ci_full.sh
+cargo fmt --check
+cargo clippy --all-features -- -D warnings
+cargo deny check
+cargo audit
+cargo test --all-features
+cargo test --test security -- --nocapture
 ```
 
-This runs, in order:
-1. `rustfmt` format check
-2. `clippy` with pedantic + cargo lints
-3. `cargo deny` (license + supply-chain)
-4. `cargo audit`
-5. Unit and integration test suite
-6. Security path tests
-7. LLVM coverage threshold check
+LLVM coverage (`cargo-llvm-cov`) is listed as a prerequisite above but has no
+script or enforced threshold in this repo yet.
 
 ### As a Dependency
 
@@ -353,16 +375,14 @@ lux-v1.0/
 │   ├── SECURITY.md             # Threat model and audit findings
 │   └── adr/                    # Architecture Decision Records (0001–0005)
 ├── benches/                # Criterion throughput benchmarks
-├── scripts/
-│   ├── ci_full.sh          # Local CI gate orchestrator
-│   ├── lint.sh             # Format + clippy + deny
-│   ├── audit.sh            # Supply-chain audit
-│   └── coverage.sh         # LLVM coverage report + threshold
 ├── Cargo.toml
 ├── deny.toml               # cargo-deny policy
 ├── rustfmt.toml
 └── clippy.toml
 ```
+
+Note: `scripts/` (a CI gate orchestrator) does not exist yet in this
+repository — see [Full CI Gate](#full-ci-gate-mirrors-the-pipeline) above.
 
 ---
 

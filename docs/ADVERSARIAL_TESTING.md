@@ -1,6 +1,6 @@
 # Adversarial Testing Report — Lux Kernel v1.0
 
-**Verdict: Zero successful privilege escalations in 63 adversarial attack scenarios.**
+**Verdict: Zero successful privilege escalations in 66 adversarial attack scenarios.**
 
 All four security invariants hold under adversarial conditions.  Every attack
 was implemented as a deterministic, repeatable test.  Every test asserts a
@@ -21,7 +21,7 @@ Test file: `tests/adversarial.rs` (driver) → `tests/adversarial/*.rs` (6 modul
 
 ---
 
-## Part 1 — Invariant 1: Fail-Closed (10 attacks)
+## Part 1 — Invariant 1: Fail-Closed (13 attacks)
 
 *Ambiguity and error states must produce DENIAL, never ACCESS.*
 
@@ -37,6 +37,9 @@ Test file: `tests/adversarial.rs` (driver) → `tests/adversarial/*.rs` (6 modul
 | 1.8 | Over-quota deduction — atomicity | Deduct 100 from balance=50; deduct u64::MAX | `checked_sub` returns None; ledger state unchanged | **DENY** |
 | 1.9 | Panic on error paths | OOB traversal, unseeded ledger, max-gen policy, garbage manifest | All paths return `Err`; no panics in 12 distinct boundary probes | **DENY** |
 | 1.10 | Check/revoke sequence consistency | Used nonce replayed; revoked nonce reused | Nonce window records consumed nonces; revocation is persistent | **DENY** |
+| 1.11 | Policy check denied when audit full | `policy.check()` on an otherwise-valid capability while the audit log is saturated; also an invalid (wrong-generation) capability under the same full-audit condition | Saturated audit returns `Err(AuditFull)` for the valid case; the invalid case still returns its original `CapabilityDenied`, not masked by `AuditFull` | **DENY** |
+| 1.12 | Topology traverse denied when audit full | `graph.traverse()` on an otherwise-permitted edge while the audit log is saturated | Saturated audit returns `Err(AuditFull)` instead of permitting the traversal | **DENY** |
+| 1.13 | Quota deduct denied when audit full | `enforcer.deduct()` on an otherwise-successful deduction while the audit log is saturated | Saturated audit returns `Err(AuditFull)` instead of completing the deduction | **DENY** |
 
 ---
 
@@ -138,13 +141,13 @@ Test file: `tests/adversarial.rs` (driver) → `tests/adversarial/*.rs` (6 modul
 
 | Test Module | Tests | Attacks Denied | Notes |
 |---|---|---|---|
-| `inv1_fail_closed` | 10 | 10 | All 10 produce Err |
+| `inv1_fail_closed` | 13 | 13 | All 13 produce Err (includes 3 audit-full denial paths) |
 | `inv2_capability_gated` | 12 | 12 | All 12 produce Err |
 | `inv3_accountable_resources` | 12 | 11 deny + 1 harmless | Zero-cost deduct is a no-op, not a bypass |
 | `inv4_topology_bounded` | 12 | 12 | All 12 produce Err |
 | `stress_chaos` | 10 | 10 | Load + failure scenarios pass cleanly |
 | `byzantine` | 7 | 7 | Coordinated-attack scenarios |
-| **Total** | **63** | **63** | **Zero successful privilege escalations** |
+| **Total** | **66** | **66** | **Zero successful privilege escalations** |
 
 ---
 
@@ -178,15 +181,15 @@ All checks are O(1) or O(N) where N is a fixed kernel constant:
 | `revocation.is_revoked()` | O(1) FNV hash | — |
 | `audit.verify_chain()` | O(N) SHA-256 recompute | N = MAX_AUDIT_EVENTS = 512 |
 
-The 63-test adversarial suite runs in under 100 ms.
+The 66-test adversarial suite runs in under 100 ms.
 
 ---
 
 ## Conclusion
 
 ```
-63 adversarial attack scenarios executed.
-63 attacks denied.
+66 adversarial attack scenarios executed.
+66 attacks denied.
 0 successful privilege escalations.
 0 panics.
 0 silent failures (every denial produces Err with a precise reason).
