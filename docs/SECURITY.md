@@ -1,24 +1,33 @@
 # Security — Lux Kernel
 
-**Audit Rating:** A+  
-**Last Audit:** 2026-Q2  
-**Maintained by:** Lux Security Team  
-**Disclosure:** security@lux-kernel.dev  
+**Audit Status:** No third-party audit complete. OSTIF engagement initiated 2026-Q2.  
+**Internal review only:** TLA+ model checking (bounded) + 63-vector adversarial suite.  
+**Maintained by:** Lux Project Contributors  
+**Disclosure:** see Responsible Disclosure below
 
 ---
 
 ## Responsible Disclosure
 
+**Status: Planned disclosure process — not yet operational.** There is no
+confirmed monitored inbox or published PGP key for the address below as of
+this writing. Treat the timeline that follows as the *intended* process, not
+an SLA the project can currently honor.
+
 If you discover a security vulnerability in Lux, please do **not** file a
-public GitHub issue.  Send a PGP-encrypted report to
-`security@lux-kernel.dev`.  We commit to:
+public GitHub issue. Once this process is live, reports will go to a
+PGP-encrypted channel at `security@lux-kernel.dev`. The target timeline,
+once operational, is:
 
 - Acknowledgement within 48 hours.
 - A preliminary assessment within 7 days.
 - A patch and public advisory within 90 days, or an agreed extension.
 
-We follow a coordinated disclosure model.  Researchers who report valid
-vulnerabilities are acknowledged in the advisory unless they prefer anonymity.
+Until operational status is confirmed (a published PGP key and a
+demonstrated response), any report to this address should be treated as
+best-effort. We intend to follow a coordinated disclosure model once live;
+researchers who report valid vulnerabilities will be acknowledged in the
+advisory unless they prefer anonymity.
 
 ---
 
@@ -90,7 +99,7 @@ or developer discipline.
 |----|---------------------|--------------|------------|------------------------|
 | V-01 | Capability forgery | Caller constructs a `Capability` with arbitrary rights | `Capability` fields are `pub(crate)` — callers cannot construct without the boot path | `src/auth/capability.rs` |
 | V-02 | Privilege amplification via delegation | Caller delegates a superset of held rights | `Capability::delegate` requires `self.rights.contains(subset)` — returns `None` on violation | `src/auth/capability.rs:delegate` |
-| V-03 | Token replay after revocation | Caller reuses a token after generation rotation | `Capability::authorises` requires `self.generation >= current_gen` | `src/auth/capability.rs:authorises` |
+| V-03 | Token replay after revocation | Caller reuses a token after generation rotation | `Capability::authorises` requires `self.generation == current_gen` — rotation invalidates all prior-generation tokens; there is no forward validity | `src/auth/capability.rs:authorises` |
 | V-04 | Ambient authority bypass | Caller invokes operation without presenting a token | Policy check is mandatory at every subsystem entry; there is no unauthenticated path | `src/auth/policy.rs:check` |
 | V-05 | Topology escape / lateral movement | Caller traverses an undeclared edge | `TopologyGraph::traverse` denies any edge absent from the manifest | `src/topology/graph.rs:traverse` |
 | V-06 | Resource over-commit | Caller allocates beyond declared quota | `Ledger::deduct` uses `checked_sub` — returns `None` (→ `QuotaExceeded`) on underflow | `src/metabolism/ledger.rs:deduct` |
@@ -106,7 +115,7 @@ or developer discipline.
 
 | ID | Finding | Severity | Status |
 |----|---------|----------|--------|
-| F-01 | Manifest signature verification | High | **Resolved** — `verify_strict` at `src/hsm/mock.rs:88`; wired in `src/boot/decode.rs:85` |
+| F-01 | Manifest signature verification | High | **Resolved** — genuine Ed25519 `verify_strict` (not a stub) at `src/hsm/mock.rs:94`, called via `HsmProvider::verify` from `src/boot/decode.rs:88`; see naming caveat in §3 |
 | F-02 | No capability revocation ledger | Medium | **Resolved** — `src/auth/revocation.rs` |
 | F-03 | Audit event log not yet implemented | Medium | **Resolved** — `src/audit/log.rs` |
 
@@ -117,14 +126,22 @@ or developer discipline.
 ### Current State (V1.0)
 
 Ed25519 manifest signature verification is **fully wired** as of Tier 2.
-`VerifyingKey::verify_strict` (cofactor-safe) is called at `src/hsm/mock.rs:88`
-via the `HsmProvider` trait.  The decoder at `src/boot/decode.rs:85` verifies
-the signature **before** any CBOR parsing — a manifest with an invalid signature
-is rejected without inspecting its contents (fail-closed).
+The decoder at `src/boot/decode.rs:88` calls `HsmProvider::verify` **before**
+any CBOR parsing — a manifest with an invalid signature is rejected without
+inspecting its contents (fail-closed). The default production implementation
+of `HsmProvider::verify` is `SoftwareHsm::verify` (`src/hsm/mock.rs:91-98`),
+which performs a genuine `VerifyingKey::verify_strict` (cofactor-safe) check
+via `ed25519-dalek` — real cryptographic verification, not a stub.
+
+**Naming caveat:** the module is named `mock.rs` because it is a *software*
+(non-hardware) implementation, not because verification is faked. The name
+reads as a stub to a reader skimming file paths; renaming it (e.g. to
+`software.rs`) is recommended but is a code change outside the scope of this
+documentation pass.
 
 ### Cryptographic Architecture (Tier 2 — Implemented)
 
-- **Algorithm:** Ed25519 (FIPS 186-5) — `verify_strict` (cofactor-safe variant) at `src/hsm/mock.rs:88`.
+- **Algorithm:** Ed25519 (FIPS 186-5) — `verify_strict` (cofactor-safe variant) at `src/hsm/mock.rs:94`.
 - **Wire format:** 64-byte signature prepended to CBOR payload; verified before parse.
 - **Token nonce:** 64-bit per `Capability`; replay is detected and denied by `Policy::check`.
 - **Zeroisation:** `zeroize::Zeroize` is derived on `Capability`; secret fields are zeroed on drop.
@@ -140,11 +157,12 @@ is rejected without inspecting its contents (fail-closed).
 
 ### Tier 2 (next release)
 
+Ed25519 manifest signature verification, the capability revocation ledger,
+and the audit log (F-01, F-02, F-03) have already shipped in V1.0 and are no
+longer pending — see §2 Open Findings. They are removed from this table.
+
 | Item | Rationale |
 |------|-----------|
-| Ed25519 manifest signature verification | Closes F-01; establishes cryptographic root of trust for policy |
-| Capability revocation ledger | Closes F-02; enables immediate token invalidation without generation rotation |
-| Append-only audit log | Closes F-03; provides forensic trail for all denied operations |
 | Property-based tests via `proptest` | Exhaustive fuzz of invariant boundaries (quota arithmetic, delegation algebra) |
 | `cargo-fuzz` targets for manifest parser | Coverage of malformed wire-format inputs |
 
@@ -176,7 +194,7 @@ The 100% requirement on security-path tests is enforced mechanically by
 
 ---
 
-## 8. Integrator Assumptions
+## 6. Integrator Assumptions
 
 ### What Lux Guarantees
 
