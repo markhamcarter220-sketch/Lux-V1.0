@@ -192,6 +192,7 @@ until that tooling exists and has been run.
 | Topology is bounded to the boot manifest | `TopologyGraph::traverse` denies edges absent from the manifest |
 | Resource deductions are atomic | `Ledger::deduct` uses `checked_sub`; balance only changes on success |
 | No ambient authority | Every subsystem entry requires a presented capability token |
+| Single-threaded execution is structurally enforced | The V1.0 kernel is single-threaded by construction — `AuditLog` is `!Send`/`!Sync`, so cross-thread sharing is rejected by the compiler, not by runtime checks. Multi-threaded use requires one kernel instance per thread. |
 
 ### What Lux Does Not Guarantee
 

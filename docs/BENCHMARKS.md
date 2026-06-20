@@ -1,9 +1,9 @@
 # Lux Kernel — Benchmark Documentation
 
 **Benchmark suite:** Criterion 0.5 (statistical, 100 samples per benchmark)  
-**CPU:** Intel(R) Xeon(R) Processor @ 2.80 GHz (reported by `/proc/cpuinfo`)  
+**CPU:** Intel(R) Xeon(R) Processor @ 2.10GHz (reported by `/proc/cpuinfo`)  
 **Profile:** `cargo bench` (release profile: `opt-level=3`, LTO=fat, `overflow-checks=true`)  
-**Last run:** 2026-Q2
+**Last run:** 2026-06-20 (confirmed `cargo bench` run; see [Raw Criterion Output](#raw-criterion-output))
 
 ---
 
@@ -89,14 +89,14 @@ perf report
 ## Performance Targets
 
 These are the Tier 1 latency SLAs — the maximum acceptable median time for
-each operation on the reference hardware (x86_64, 2.80 GHz).
+each operation on the reference hardware (x86_64, 2.10 GHz).
 
 | Operation | Target (median) | Rationale |
 |-----------|----------------|-----------|
 | `Policy::check` | ≤ 10 µs | Policy gate on every capability-gated call; must not dominate workload |
 | `Ledger::deduct` | ≤ 100 ns | Per-operation accounting; called at every resource deduction |
 | `OperationalGraph::traverse` | ≤ 10 µs | Per-hop topology check; must be negligible vs. routed operation |
-| `AuditLog::append` | ≤ 10 µs | Included in every policy-check path; SHA-256 is the bottleneck |
+| `AuditLog::append` | ≤ 10 µs | Included in every policy-check path; the audit log append (hash computation + bookkeeping) is the bottleneck |
 | `WorkQueue::enqueue` + `dequeue` (256 items) | ≤ 50 µs | Full cycle for a maximal queue; used in throughput-sensitive paths |
 
 **Overflow-checks are ON in all benchmark profiles** (`overflow-checks = true`
@@ -107,44 +107,49 @@ checks enabled, not only in unsafe-arithmetic builds.
 
 ## Current Baseline Results
 
-Measured on Intel Xeon @ 2.80 GHz, Linux 6.18, `cargo bench` with the release
-profile.
+Measured on Intel(R) Xeon(R) Processor @ 2.10GHz, Linux 6.18.5, `cargo bench`
+with the release profile. This is a confirmed run (`cargo bench`, captured to
+`/tmp/bench_real_output.txt`), not an estimate — see the raw output below.
 
 ### Summary Table
 
 | Benchmark | Median | Lower Bound | Upper Bound | Notes |
 |-----------|--------|-------------|-------------|-------|
-| `queue_enqueue_dequeue_256` | 5.127 µs | 5.105 µs | 5.150 µs | 256-item full cycle |
-| `policy_check` | 970 ns | 963 ns | 979 ns | Includes audit append |
-| `ledger_deduct` | 13.9 ns | 13.9 ns | 14.0 ns | Pure accounting, no audit |
-| `topology_traverse` | 1.006 µs | 981 ns | 1.033 µs | 2-node graph, includes audit |
-| `audit_append` | 1.031 µs | 1.018 µs | 1.045 µs | SHA-256 hash-chain append |
+| `queue_enqueue_dequeue_256` | 3.4836 µs | 3.4746 µs | 3.4946 µs | 256-item full cycle |
+| `policy_check` | 275.37 ns | 271.73 ns | 280.27 ns | Includes audit append |
+| `ledger_deduct` | 10.501 ns | 10.469 ns | 10.531 ns | Pure accounting, no audit |
+| `topology_traverse` | 266.47 ns | 266.08 ns | 266.91 ns | 2-node graph, includes audit |
+| `audit_append` | 270.66 ns | 270.07 ns | 271.32 ns | SHA-256 hash-chain append + bookkeeping |
 
 All five benchmarks are **within their SLA targets**.
 
 ### Raw Criterion Output
 
+This is the actual `cargo bench` output from this run (no prior baseline was
+saved on this machine, so Criterion does not print a `change:`/p-value line —
+those lines only appear when comparing against a saved `--baseline`):
+
 ```
 queue_enqueue_dequeue_256
-                        time:   [5.1054 µs 5.1274 µs 5.1498 µs]
-                        change: [-0.1234% +0.0421% +0.2187%] (p = 0.68 > 0.05)
-                        No change in performance detected.
+                        time:   [3.4746 µs 3.4836 µs 3.4946 µs]
+Found 2 outliers among 100 measurements (2.00%)
+  2 (2.00%) high mild
 
-policy_check            time:   [963.30 ns 970.10 ns 978.61 ns]
-                        change: [-0.4521% +0.1023% +0.6213%] (p = 0.72 > 0.05)
-                        No change in performance detected.
+policy_check            time:   [271.73 ns 275.37 ns 280.27 ns]
+Found 11 outliers among 100 measurements (11.00%)
+  4 (4.00%) high mild
+  7 (7.00%) high severe
 
-ledger_deduct           time:   [13.884 ns 13.940 ns 14.003 ns]
-                        change: [-0.2341% +0.0812% +0.3821%] (p = 0.64 > 0.05)
-                        No change in performance detected.
+ledger_deduct           time:   [10.469 ns 10.501 ns 10.531 ns]
 
-topology_traverse       time:   [981.26 ns 1.0056 µs 1.0328 µs]
-                        change: [-0.8932% +0.2134% +1.2341%] (p = 0.71 > 0.05)
-                        No change in performance detected.
+topology_traverse       time:   [266.08 ns 266.47 ns 266.91 ns]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high mild
 
-audit_append            time:   [1.0183 µs 1.0308 µs 1.0449 µs]
-                        change: [-0.3412% +0.1234% +0.5921%] (p = 0.68 > 0.05)
-                        No change in performance detected.
+audit_append            time:   [270.07 ns 270.66 ns 271.32 ns]
+Found 9 outliers among 100 measurements (9.00%)
+  7 (7.00%) high mild
+  2 (2.00%) high severe
 ```
 
 ---
@@ -162,7 +167,7 @@ work queue — enqueue all 256 items, then drain them all.
 dispatch governance decisions. A slow queue means governance latency becomes
 visible at the application layer.
 
-**Interpretation:** 5.1 µs for 256 items = ~20 ns per item. The queue is
+**Interpretation:** 3.48 µs for 256 items ≈ 13.6 ns per item. The queue is
 backed by a `heapless::BinaryHeap`, giving O(log n) enqueue and O(log n)
 dequeue with no heap allocations.
 
@@ -198,9 +203,11 @@ nonce recording, and audit log append — on the success path.
 **Why this matters:** `Policy::check` is called at every capability-gated
 operation. It is the primary enforcement hot path.
 
-**Interpretation:** 970 ns includes the SHA-256 hash-chain append (~1 µs).
-The raw capability check without audit is approximately 10–50 ns. The audit
-overhead is intentional and non-negotiable (fail-closed audit contract).
+**Interpretation:** 275 ns includes the audit log append — measured standalone
+at ~271 ns in the `audit_append` benchmark below, which accounts for nearly
+all of this cost. The raw capability check without audit is the remainder,
+roughly 5–10 ns. The audit overhead is intentional and non-negotiable
+(fail-closed audit contract).
 
 **Success path only:** This benchmark measures a valid capability being
 accepted. The denial path is faster (returns immediately on first failed check)
@@ -217,9 +224,9 @@ single deduction. Both operations together represent the hot path for
 resource accounting.
 
 **Why this matters:** `Ledger::deduct` is called on every resource allocation.
-At 14 ns, it contributes negligibly to governance latency.
+At 10.5 ns, it contributes negligibly to governance latency.
 
-**Interpretation:** 14 ns is a single `heapless::LinearMap` lookup plus a
+**Interpretation:** 10.5 ns is a single `heapless::LinearMap` lookup plus a
 `checked_sub`. No heap allocation, no audit append (the caller is responsible
 for audit recording at a higher level).
 
@@ -240,7 +247,10 @@ graph with one declared edge. Includes the audit log append.
 decision. It must be fast enough that topology enforcement does not dominate
 routing latency.
 
-**Interpretation:** 1.0 µs is primarily the audit log append (~1 µs). The
+**Interpretation:** 266 ns is comparable to the standalone `audit_append`
+cost (~271 ns, measured separately below) — the small difference is within
+typical Criterion measurement noise across separate benchmark binaries
+running on the same machine. The dominant cost is the audit log append; the
 bitset lookup for active nodes and declared edges is O(1) and sub-nanosecond.
 
 **Sealed graph:** The benchmark uses an `OperationalGraph` (sealed, immutable).
@@ -260,15 +270,24 @@ computation and hash-chain update.
 traverse appends to the audit log. This is the bottleneck for all governance
 operations that include auditing.
 
-**Interpretation:** 1.0 µs is dominated by the SHA-256 computation over the
-wire format:
+**Interpretation:** 271 ns is split between SHA-256 computation and
+bookkeeping over the wire format:
 ```
 prev_hash(32) || kind_u8 || actor_le32 || seq_le64 || ts_le64
 || outcome_u8 || denial_class_u8 || denial_reason_bytes
 ```
+For the permitted event this benchmark records, that wire format is 55 bytes
+(32+1+4+8+8+1+1+0; `denial_reason_bytes` is empty for permitted events).
+With SHA-NI acceleration at roughly 1–4 cycles/byte, the hash computation
+itself is estimated at ~25–105 ns on this 2.10 GHz CPU. The remaining
+~165–245 ns of the measured ~271 ns total is the `heapless::Vec::push` of the
+new event and the `last_hash` field update — at this scale, that bookkeeping
+is not negligible relative to the hash computation; it is a comparable or
+larger share of the total, not a rounding error.
 
-The `sha2` crate uses SIMD acceleration on x86_64 where available. On
-platforms without SHA-NI, the time will be higher.
+The `sha2` crate uses SIMD acceleration on x86_64 where available (confirmed
+present: `sha_ni` in `/proc/cpuinfo` on this machine). On platforms without
+SHA-NI, the hash-computation share of this time will be higher.
 
 **Capacity:** `AuditLog` holds up to 512 events (a `heapless::Vec`). The
 benchmark measures a fresh log (append #1), which is the best case. Append
@@ -300,9 +319,9 @@ cargo test --test adversarial stress_chaos -- --nocapture
 
 ### x86_64 (primary — benchmarked)
 
-- **Reference:** Intel Xeon @ 2.80 GHz
-- **Expected:** All benchmarks within SLA (see [Current Baseline Results](#current-baseline-results))
-- **Notes:** SHA-256 benefits from SHA-NI extension on Icelake and later
+- **Reference:** Intel(R) Xeon(R) Processor @ 2.10GHz
+- **Confirmed:** All five benchmarks measured within SLA (see [Current Baseline Results](#current-baseline-results))
+- **Notes:** SHA-256 benefits from SHA-NI extension on Icelake and later; `sha_ni` is present on the reference machine
 
 ### ARM64 (Cortex-A55 and above)
 
@@ -417,8 +436,11 @@ fn audit_chain_verify(c: &mut Criterion) {
 }
 ```
 
-**Expected:** ~512 µs (512 × ~1 µs per SHA-256). This is a one-time cost
-at the end of a session, not a per-operation cost.
+**Expected:** ~140 µs (512 × ~271 ns measured `audit_append` cost, see
+[Current Baseline Results](#current-baseline-results)). This template is not
+wired into the benchmark binary, so this figure is a projection from the
+measured per-append cost, not an independent measurement. This is a one-time
+cost at the end of a session, not a per-operation cost.
 
 ### Template: Topology Traversal — Dense Graph
 
@@ -673,13 +695,15 @@ criterion_group!(
 `Ledger::deduct` is a single `heapless::LinearMap` lookup plus a `checked_sub`.
 It does not append to the audit log — the caller is responsible for that.
 `Policy::check` appends to the audit log as part of its fail-closed contract,
-which adds ~1 µs of SHA-256 computation.
+which adds ~271 ns (measured `audit_append` cost — SHA-256 computation plus
+`heapless::Vec` bookkeeping, see the `audit_append` breakdown above).
 
-**Q: Why does `topology_traverse` take ~1 µs when the bitset check is O(1)?**
+**Q: Why does `topology_traverse` take ~266 ns when the bitset check is O(1)?**
 
 Same reason: `OperationalGraph::traverse` appends to the audit log on both
-permit and deny. The ~1 µs is entirely the SHA-256 hash-chain append. The
-bitset check itself is sub-nanosecond.
+permit and deny. The ~266 ns is essentially the audit log append cost
+(measured standalone at ~271 ns in the `audit_append` benchmark — see the
+breakdown there). The bitset check itself is sub-nanosecond.
 
 **Q: Will performance degrade as the audit log fills?**
 
@@ -694,12 +718,15 @@ No. The SLAs are specified with `overflow-checks = true`. A benchmark that
 only passes SLAs without overflow checks does not represent production
 behaviour.
 
-**Q: The benchmarks show ~1 µs for audit_append. Is SHA-256 the bottleneck?**
+**Q: The benchmarks show ~271 ns for audit_append. Is SHA-256 the bottleneck?**
 
-Yes. On x86_64 with SHA-NI, SHA-256 runs at approximately 1–4 cycles/byte.
-The audit event wire format is ~100 bytes, giving ~100–400 cycles of SHA-256.
-At 2.80 GHz, that is ~35–140 ns — plus memory writes to the `heapless::Vec`
-and the `last_hash` field. The full ~1 µs includes all of that.
+Partially. On x86_64 with SHA-NI, SHA-256 runs at approximately 1–4
+cycles/byte. The audit event wire format for a permitted event is 55 bytes,
+giving ~55–220 cycles of SHA-256. At the reference machine's 2.10 GHz, that
+is ~25–105 ns — the remaining ~165–245 ns of the measured ~271 ns total is
+memory writes to the `heapless::Vec` and the `last_hash` field update. That
+bookkeeping is a comparable or larger share of the cost than the hash
+computation itself, not a rounding error on top of it.
 
 **Q: How do I know if SHA-NI is active?**
 

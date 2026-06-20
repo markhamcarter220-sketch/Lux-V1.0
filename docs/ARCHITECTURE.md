@@ -211,6 +211,10 @@ The topology graph is derived from the manifest and enforced at traversal time. 
 
 ### 4.2 Resource Ledger — State and Concurrency Semantics
 
+The V1.0 kernel is single-threaded by construction — `AuditLog` is
+`!Send`/`!Sync`, so cross-thread sharing is rejected by the compiler, not by
+runtime checks. Multi-threaded use requires one kernel instance per thread.
+
 The ledger in `metabolism::Ledger` tracks quota balances per node. Its state model is as follows:
 
 **Stateless vs. Stateful:** The ledger is stateful. The quota *ceilings* are derived from the manifest and immutable (set at boot). The quota *balances* are mutable runtime state, decremented by each `deduct()` call and never replenished except at reboot. There is no "reset to ceiling" operation.
