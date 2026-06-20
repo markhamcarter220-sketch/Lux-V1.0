@@ -1,3 +1,6 @@
+import LuxCostModel
+import LuxSpec
+
 /-!
 # Lux Kernel — Refinement Proofs (Lean 4)
 
@@ -44,9 +47,6 @@ lake build   # requires Lean 4 + Lake
 Install Lean 4: https://leanprover.github.io/lean4/doc/quickstart.html
 -/
 
-import LuxCostModel
-import LuxSpec
-
 -- ── §1  Deduction Refinement ──────────────────────────────────────────────────
 
 section DeductRefinement
@@ -68,7 +68,7 @@ lemma deduct_self_updated
     ∃ l', deduct l node amount = some (l', balance - amount) ∧
           l' node = some (balance - amount) := by
   unfold deduct
-  rw [h_decl, dif_pos h_ok]
+  simp only [h_decl, h_ok, ↓reduceDIte]
   exact ⟨_, rfl, by simp⟩
 
 /-- **Lemma: Other nodes are unaffected by deduction.**
@@ -80,7 +80,7 @@ lemma deduct_other_unchanged
     ∃ l', deduct l node amount = some (l', balance - amount) ∧
           l' other = l other := by
   unfold deduct
-  rw [h_decl, dif_pos h_ok]
+  simp only [h_decl, h_ok, ↓reduceDIte]
   exact ⟨_, rfl, by simp [h_neq]⟩
 
 /-- **Theorem: Deduction Refinement.**
@@ -109,7 +109,7 @@ theorem concreteDeductSpec :
   exact_amount := by
     intro l nd a b h_decl h_ok
     unfold deduct
-    rw [h_decl, dif_pos h_ok]
+    simp only [h_decl, h_ok, ↓reduceDIte]
     -- Goal: ∃ l', some (fun m => if m == nd then some (b-a) else l m, b-a)
     --              = some (l', b-a) ∧ l' nd = some (b-a) ∧ ∀ m ≠ nd, l' m = l m
     refine ⟨fun m => if m == nd then some (b - a) else l m, rfl, by simp, ?_⟩
@@ -208,29 +208,16 @@ theorem delegate_non_amplification
     (cap : Cap) (subset : Rights) (delegated : Cap)
     (h : concreteDelegateCap cap subset = some delegated) :
     delegated.rights ⊆ cap.rights := by
-  simp only [concreteDelegateCap] at h
-  -- Split on the two guard conditions.
+  unfold concreteDelegateCap at h
+  -- Split on the two guard conditions. The two `none`-producing branches
+  -- carry `h : none = some delegated`, a constructor mismatch that
+  -- `split_ifs`'s built-in `contradiction` cleanup discharges immediately —
+  -- only the success branch (both guards false, i.e. both rights held)
+  -- survives as a goal.
   split_ifs at h with h1 h2
-  · -- Guard 1 true: Right.Delegate ∉ cap.rights → result is `none`.
-    -- h : none = some delegated — contradiction.
-    simp at h
-  · -- Guard 1 false, Guard 2 true: ¬(subset ⊆ cap.rights) → result is `none`.
-    -- h : none = some delegated — contradiction.
-    simp at h
-  · -- Both guards false: result is `some { cap with rights := subset }`.
-    -- h1 : ¬(Right.Delegate ∉ cap.rights)  →  Right.Delegate ∈ cap.rights
-    -- h2 : ¬¬(subset ⊆ cap.rights)          →  subset ⊆ cap.rights
-    -- h  : some { cap with rights := subset } = some delegated
-    --
-    -- Extract: delegated = { cap with rights := subset }
-    have h_eq : delegated = { cap with rights := subset } :=
-      (Option.some.inj h).symm
-    -- Rewrite delegated in the goal and reduce the struct field access.
-    rw [h_eq]
-    -- Goal: { cap with rights := subset }.rights ⊆ cap.rights
-    -- = subset ⊆ cap.rights  (definitionally)
-    -- which follows from h2 : ¬¬(subset ⊆ cap.rights).
-    exact Decidable.of_not_not h2
+  -- h : some { cap with rights := subset } = some delegated
+  rw [← Option.some.inj h]
+  exact h2
 
 /-- **Theorem: Full Delegation Specification.**
 

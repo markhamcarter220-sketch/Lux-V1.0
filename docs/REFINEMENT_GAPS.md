@@ -1,17 +1,76 @@
 # Lux Kernel — Refinement Gaps
 
-**Status:** Lean 4 proofs in `lean/Refinement.lean` are scaffolded with named
-`sorry` placeholders.  **No invariant in that file is mechanically verified.**
+**Status:** The four Boolean-algebra `sorry`s in `lean/Refinement.lean` §I1–I2
+(`failClosed_generation`, `failClosed_revocation`, `failClosed_replay`,
+`capabilityGated_rightRequired`) are now **closed and `lake build`-verified**.
+The two §I3 gaps (`accountableResources_soleDeductionPath`,
+`accountableResources_ceilingBound`) and the two §I4 gaps remain `sorry` and
+are out of scope for this pass.
 
-This document gives a plain-language description of what each `sorry` represents,
-why it exists, and the estimated effort to close it.  It is intended as the
-primary briefing document for an independent proof engineer or OSTIF auditor.
+This document gives a plain-language description of what each remaining
+`sorry` represents, why it exists, and the estimated effort to close it.  It
+is intended as the primary briefing document for an independent proof
+engineer or OSTIF auditor.
+
+---
+
+## Infrastructure note: Mathlib was never wired in (found and fixed)
+
+Before this pass, `lean/lakefile.lean` declared **no dependency on Mathlib**,
+even though `LuxSpec.lean` defines `Rights := Finset Right` and
+`LuxCapabilityBridge.lean` derives a `Fintype Right` instance — both Mathlib
+types. `lake-manifest.json` had an empty package list. This means `lake build`
+could not have succeeded on this tree in its prior state: every file from
+`LuxSpec.lean` downward would fail to parse (`Finset` unresolved, and
+`lemma` — used in `LuxCostModel.lean` — is a Mathlib macro, not core Lean).
+Any prior "Build completed successfully" claim for this proof tree predates
+an actual working build.
+
+Fixed in this pass:
+- `lakefile.lean` now requires `mathlib4 @ v4.14.0` (the tag matching this
+  repo's pinned Lean toolchain, `leanprover/lean4:v4.14.0`).
+- Mathlib's prebuilt `.olean` cache is not reachable from this sandbox
+  (`lake exe cache get` → HTTP 403 on every file — the cache host is not
+  network-allowlisted here). The fallback is building a minimal slice from
+  source: `lake build Mathlib.Data.Fintype.Basic` and
+  `Mathlib.Data.Fintype.Powerset` (~580 files total, a few minutes), rather
+  than the full Mathlib library (5,685 files, hours). A CI runner with the
+  cache host allowlisted should prefer `lake exe cache get` instead.
+- `LuxSpec.lean`, `LuxCostModel.lean` needed missing imports
+  (`Mathlib.Data.Fintype.Basic`, `Mathlib.Tactic.Lemma`,
+  `Mathlib.Tactic.SplitIfs`) and one removed `deriving Repr` on `Cap` (its
+  `rights : Finset Right` field has no *safe* `Repr` instance in Mathlib —
+  `Finset.instRepr` is marked `unsafe`, so a safe `deriving Repr` cannot use
+  it; `Repr` was never used anywhere else in the tree, so dropping it is
+  side-effect-free).
+- `LuxCostModel.lean`'s `deduct_some_iff` and `deduct_monotone`, and
+  `LuxRefinement.lean`'s `deduct_self_updated` / `deduct_other_unchanged` /
+  `concreteDeductSpec.exact_amount` / `delegate_non_amplification`, and
+  `LuxCapabilityBridge.lean`'s `Fintype Right` instance and all four
+  `decide`-based bridge theorems — every one of these was previously marked
+  "proved" with **no `sorry`**, but had never actually been run through a
+  compiler and contained real tactic-script bugs (wrong `split_ifs` case
+  assumptions, `decide` invoked on goals with free variables, a missing
+  `Fintype (Finset Right)` instance). All are now genuinely `lake build`-green.
+  No theorem **statement** was changed — only proof tactics/imports.
+- `Refinement.lean` itself had three additional non-sorry build breaks
+  unrelated to the four target theorems: an unresolved `Rights.instDecidableMem`
+  constant (→ `decide (right ∈ cap.rights)`), a `seal` parameter name colliding
+  with a parser token introduced once Mathlib is in scope (→ renamed `sealFn`),
+  and `Ledger`/`NodeId`/`Balance` name collisions between the `AbstractLedger`
+  namespace and the root-level `LuxCostModel` types once `open AbstractLedger`
+  was live (→ fully qualified in the two I3 stub signatures).
+
+None of this touched any theorem statement, any Rust source, or any sorry
+outside the four named targets. See the commit history on this file's branch
+for the exact diff.
 
 ---
 
 ## Existing proved layer (do not re-prove)
 
-The following are fully proved (no `sorry`) in the existing Lean files:
+The following are fully proved (no `sorry`) in the existing Lean files —
+now confirmed by an actual `lake build`, not just by inspection:
 
 | Theorem | File | What it proves |
 |---------|------|---------------|
@@ -28,25 +87,24 @@ layer is sufficient to discharge the four system-level invariants.
 
 ## I1 — Fail-Closed
 
-### Gaps: `failClosed_generation`, `failClosed_revocation`, `failClosed_replay`
+### Gaps: `failClosed_generation`, `failClosed_revocation`, `failClosed_replay` — **CLOSED**
 
 **What these say in plain language:**
 If the generation check fails, or the nonce is revoked, or the nonce has been
 replayed, then `policyCheck` returns `false`.
 
-**Why they have `sorry`:**
-The `policyCheck` model in `Refinement.lean` is an `&&`-chain of four Boolean
-conditions.  Lean's `simp` needs to destructure `Bool.and_eq_false` across all
-four conjuncts to show that a single false conjunct makes the whole chain false.
-The tactic `simp [Bool.and_eq_false, Bool.not_true]` likely closes all three
-immediately, but it has not been attempted.
+**How they closed:**
+- `failClosed_generation`: `simp [policyCheck, Nat.not_le.mpr h]` alone — no
+  further tactic needed.
+- `failClosed_revocation` / `failClosed_replay`: `simp` alone left the goal in
+  `… → cap.nonce ∉ state.revokedNonces → …` form; closing it needed bridging
+  `List.contains _ _ = true` to `_ ∈ _` first via `List.mem_of_elem_eq_true h`
+  (`List.contains` is a reducible `abbrev` for `elem` with swapped argument
+  order), then `simp [policyCheck, hmem]`.
 
-**Prerequisite knowledge:**
-Basic Lean 4 `simp` lemma lookup; no mathematical content.
+All three are `lake build`-verified with zero `sorry`.
 
-**Estimated closure:** < 1 day.
-
-**Missing model element:**
+**Missing model element (still open, unrelated to the above):**
 `policyCheck` omits the *mutation* side of `Policy::check_inner` — namely,
 recording the nonce in `usedNonces` after a successful check.  The full
 fail-closed property includes "nonce window exhaustion → deny" (step 4 in
@@ -57,18 +115,18 @@ through `policyCheck`.  Estimated additional work: 1 day.
 
 ## I2 — Capability-Gated
 
-### Gap: `capabilityGated_rightRequired`
+### Gap: `capabilityGated_rightRequired` — **CLOSED**
 
 **What it says in plain language:**
 If `policyCheck` returns `true`, then the requested right is actually in the
 token's rights set.
 
-**Why it has `sorry`:**
-Same `Bool.and_eq_true` decomposition as the I1 gaps — the last conjunct of
-`policyCheck` is the rights check.  `simp [Bool.and_eq_true]` applied four
-times should extract it.
+**How it closed:**
+`simp [policyCheck] at h` normalizes `h` to a nested conjunction
+`((gen ∧ ¬revoked) ∧ ¬replayed) ∧ right ∈ cap.rights`; the goal is exactly the
+last conjunct, so `exact h.2` finishes it.
 
-**Estimated closure:** < 1 day.
+`lake build`-verified with zero `sorry`.
 
 ### Gap: `delegationNonAmplification` — **no sorry** (already closes)
 
@@ -224,8 +282,12 @@ See I2 section above.
 
 For an auditor closing these gaps top-down (highest value first):
 
-1. **Close I1-A, I2-A** (< 2 days combined): pure `simp` / `Bool` algebra.
-   These are the quickest wins and validate the `policyCheck` model.
+1. ~~**Close I1-A, I2-A**~~ — **done**: `failClosed_generation`,
+   `failClosed_revocation`, `failClosed_replay`, `capabilityGated_rightRequired`
+   are closed and `lake build`-verified (see §I1/§I2 above). Closing them also
+   required wiring Mathlib into `lakefile.lean` for the first time and fixing
+   several previously-unverified "proved" lemmas elsewhere in the tree that
+   blocked the build — see "Infrastructure note" above.
 
 2. **Write `OperationalGraph` Lean type** (1 day): prerequisite for I4-A and I4-B.
    Model `edge_matrix` as `Fin 64 → Fin 64 → Bool`.

@@ -1,3 +1,7 @@
+import LuxCapabilityBridge
+
+open AbstractLedger AbstractCapability
+
 /-!
 # Lux Kernel — Invariant Refinement Obligations (Lean 4)
 
@@ -29,10 +33,6 @@ at the system level.
 `LuxCapabilityBridge` transitively imports `LuxRefinement` → `LuxCostModel`
 and `LuxSpec`.  All definitions in those modules are in scope here.
 -/
-
-import LuxCapabilityBridge
-
-open AbstractLedger AbstractCapability
 
 -- ── Shared model types ────────────────────────────────────────────────────────
 -- These mirror the Rust types without duplicating the full implementation.
@@ -67,7 +67,7 @@ def policyCheck (state : PolicyState) (cap : RustCap) (right : Right) : Bool :=
   -- Step 3: nonce replay check
   !state.usedNonces.contains cap.nonce &&
   -- Step 4: rights check (modelled via Finset membership)
-  (Rights.instDecidableMem right cap.rights).decide
+  decide (right ∈ cap.rights)
 
 /-!
 ### Theorem I1-A: Fail-Closed — no ambiguous path returns `true`
@@ -89,24 +89,20 @@ theorem failClosed_generation
     (h : cap.generation < state.currentGeneration) :
     policyCheck state cap right = false := by
   simp [policyCheck, Nat.not_le.mpr h]
-  -- sorry: need to show the &&-chain short-circuits on the first false operand
-  sorry
 
 theorem failClosed_revocation
     (state : PolicyState) (cap : RustCap) (right : Right)
     (h : state.revokedNonces.contains cap.nonce = true) :
     policyCheck state cap right = false := by
-  simp [policyCheck, h]
-  -- sorry: Bool.and_false not yet in scope; needs simp lemma or omega
-  sorry
+  have hmem : cap.nonce ∈ state.revokedNonces := List.mem_of_elem_eq_true h
+  simp [policyCheck, hmem]
 
 theorem failClosed_replay
     (state : PolicyState) (cap : RustCap) (right : Right)
     (h : state.usedNonces.contains cap.nonce = true) :
     policyCheck state cap right = false := by
-  simp [policyCheck, h]
-  -- sorry: same Bool algebra gap as failClosed_revocation
-  sorry
+  have hmem : cap.nonce ∈ state.usedNonces := List.mem_of_elem_eq_true h
+  simp [policyCheck, hmem]
 
 -- ── I2 — Capability-Gated / Non-Amplification ────────────────────────────────
 
@@ -127,8 +123,7 @@ theorem capabilityGated_rightRequired
     (h : policyCheck state cap right = true) :
     right ∈ cap.rights := by
   simp [policyCheck] at h
-  -- sorry: need Bool.and_eq_true applied four times to extract the rights conjunct
-  sorry
+  exact h.2
 
 /-!
 ### Theorem I2-B: Delegation non-amplification (lift from LuxRefinement)
@@ -180,12 +175,13 @@ The `checked_sub` gate prevents underflow at the Rust level, but this Lean
 model does not represent the 2^64 ceiling.  See `docs/REFINEMENT_GAPS.md §I3`.
 -/
 theorem accountableResources_soleDeductionPath
-    {deductFn : Ledger → NodeId → Balance → Option (Ledger × Balance)}
+    {deductFn : AbstractLedger.Ledger → AbstractLedger.NodeId → AbstractLedger.Balance →
+      Option (AbstractLedger.Ledger × AbstractLedger.Balance)}
     (spec : AbstractLedger.Spec deductFn)
-    (l : Ledger) (n : NodeId) (b b' : Balance)
+    (l : AbstractLedger.Ledger) (n : AbstractLedger.NodeId) (b b' : AbstractLedger.Balance)
     (h_decl : l n = some b)
     (h_reduce : b' < b) :
-    ∃ (amount : Balance),
+    ∃ (amount : AbstractLedger.Balance),
       amount ≤ b ∧ b' = b - amount ∧
       ∃ l', deductFn l n amount = some (l', b') := by
   -- sorry: requires formalising that the only balance-reducing path through
@@ -206,11 +202,12 @@ showing the Spec's `exact_amount` and `over_quota` properties jointly imply
 the invariant.  Mechanical but not yet written.  Estimated closure: 1 day.
 -/
 theorem accountableResources_ceilingBound
-    {deductFn : Ledger → NodeId → Balance → Option (Ledger × Balance)}
+    {deductFn : AbstractLedger.Ledger → AbstractLedger.NodeId → AbstractLedger.Balance →
+      Option (AbstractLedger.Ledger × AbstractLedger.Balance)}
     (spec : AbstractLedger.Spec deductFn)
-    (l : Ledger) (n : NodeId) (ceiling : Balance)
+    (l : AbstractLedger.Ledger) (n : AbstractLedger.NodeId) (ceiling : AbstractLedger.Balance)
     (h_seed : l n = some ceiling) :
-    ∀ (amount : Balance) (l' : Ledger) (b : Balance),
+    ∀ (amount : AbstractLedger.Balance) (l' : AbstractLedger.Ledger) (b : AbstractLedger.Balance),
       deductFn l n amount = some (l', b) → b ≤ ceiling := by
   -- sorry: needs spec.exact_amount + spec.over_quota combined.
   -- The exact_amount property gives b = ceiling - amount;
@@ -280,7 +277,7 @@ to write the Lean type, plus the above I4-A obligation.
 theorem topologyBounded_sealingIrreversible
     -- Placeholder types representing the Rust typestate.
     (BootingGraphType OperationalGraphType : Type)
-    (seal : BootingGraphType → OperationalGraphType)
+    (sealFn : BootingGraphType → OperationalGraphType)
     (addEdge : BootingGraphType → Fin 64 × Fin 64 → BootingGraphType)
     -- Assumption encoding the typestate invariant: seal is total and consuming.
     -- After calling seal, addEdge is unreachable on the result type.

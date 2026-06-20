@@ -29,6 +29,11 @@ open Lake DSL
 
 package «lux-cost-model»
 
+-- Mathlib provides `Finset`/`Fintype`, used by `LuxSpec.Rights` and everything
+-- downstream of it.  Pinned to v4.14.0 to match this toolchain's Lean version.
+require mathlib from git
+  "https://github.com/leanprover-community/mathlib4" @ "v4.14.0"
+
 -- Abstract ideal-system specification (pure math, no implementation details).
 lean_lib «LuxSpec»
 

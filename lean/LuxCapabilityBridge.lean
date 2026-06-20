@@ -1,3 +1,8 @@
+import LuxRefinement
+import Mathlib.Data.Fintype.Powerset
+
+open AbstractCapability
+
 /-!
 # Lux Kernel — Capability Bitfield Bridge (Lean 4)
 
@@ -57,17 +62,13 @@ Abstract ideal system (LuxSpec)
 ```
 -/
 
-import LuxRefinement
-
-open AbstractCapability
-
 -- ── Fintype instance ─────────────────────────────────────────────────────────
 
 /-- `Right` is a `Fintype`: five elements, decidable membership.
     Required for `Finset.univ : Finset Right`. -/
 instance instFintypeRight : Fintype Right where
   elems   := {.ReadTopology, .AllocResource, .Schedule, .Delegate, .Shutdown}
-  complete := by decide
+  complete := by intro r; cases r <;> decide
 
 -- ── Bit-position mapping ─────────────────────────────────────────────────────
 
@@ -133,7 +134,7 @@ theorem bitsToRights_full : bitsToRights fullMask = Finset.univ := by decide
     Every case is decidable (`Nat.decEq`, `Finset.instDecidableSubset`). -/
 theorem bitsContainsIffSubset (a b : Fin 32) :
     (a.val &&& b.val = b.val) ↔ bitsToRights b.val ⊆ bitsToRights a.val := by
-  decide
+  revert a b; decide
 
 -- ── Roundtrip theorems ───────────────────────────────────────────────────────
 
@@ -141,18 +142,14 @@ theorem bitsContainsIffSubset (a b : Fin 32) :
     Converting a `Finset Right` to bits and back is the identity. -/
 theorem bitsToRights_rightsToBits (s : Finset Right) :
     bitsToRights (rightsToBits s) = s := by
-  ext r
-  simp [mem_bitsToRights, rightsToBits]
-  fin_cases r <;>
-    fin_cases s using Finset.decidableMem <;>
-    simp_all [rightMask, rightBitPos]
+  revert s; decide
 
 /-- **Theorem: `rightsToBits ∘ bitsToRights = mask`.**
     Converting bits to `Finset Right` and back yields the original masked to
     the 5 known bits. -/
 theorem rightsToBits_bitsToRights (n : Fin 32) :
     rightsToBits (bitsToRights n.val) = n.val &&& fullMask := by
-  decide
+  revert n; decide
 
 -- ── Delegation model correctness ─────────────────────────────────────────────
 

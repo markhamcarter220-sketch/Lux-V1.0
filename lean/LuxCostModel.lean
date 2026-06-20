@@ -1,3 +1,6 @@
+import Mathlib.Tactic.Lemma
+import Mathlib.Tactic.SplitIfs
+
 /-!
 # Lux Kernel — Formal Cost Model (Lean 4)
 
@@ -128,16 +131,17 @@ lemma seed_other (l : Ledger) (node : NodeId) (ceiling : Balance) (n : NodeId)
 lemma deduct_some_iff (l : Ledger) (node : NodeId) (amount : Balance) :
     (deduct l node amount).isSome ↔
     ∃ balance, l node = some balance ∧ amount ≤ balance := by
-  simp only [deduct]
-  split
-  · simp
-  · rename_i balance h_decl
-    simp only [Option.isSome]
-    split_ifs with h
-    · simp; exact ⟨balance, h_decl, h⟩
-    · simp
-      intro b h_eq
-      exact absurd h_eq (by simp [Nat.not_le.mpr (Nat.lt_of_not_le h)])
+  unfold deduct
+  constructor
+  · intro h
+    cases hl : l node with
+    | none => simp [hl] at h
+    | some balance =>
+      by_cases hle : amount ≤ balance
+      · exact ⟨balance, rfl, hle⟩
+      · simp [hl, hle] at h
+  · rintro ⟨balance, hl, hle⟩
+    simp [hl, hle]
 
 -- ── Core theorems ────────────────────────────────────────────────────────────
 
@@ -234,12 +238,13 @@ theorem deduct_monotone
     (h_decl : l node = some balance)
     (h_eq   : deduct l node amount = some (l', b)) :
     b ≤ balance := by
-  simp only [deduct, h_decl] at h_eq
-  split_ifs at h_eq with h
-  · simp only [Option.some.injEq, Prod.mk.injEq] at h_eq
+  unfold deduct at h_eq
+  rw [h_decl] at h_eq
+  by_cases hle : amount ≤ balance
+  · simp only [hle, ↓reduceDIte, Option.some.injEq, Prod.mk.injEq] at h_eq
     obtain ⟨_, rfl⟩ := h_eq
     exact Nat.sub_le balance amount
-  · exact absurd h_eq (by simp)
+  · simp [hle] at h_eq
 
 /-- **Corollary**: A seeded balance never exceeds its initial ceiling through
     any sequence of `deduct` calls.  The ledger can only go down, not up. -/

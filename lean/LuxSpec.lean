@@ -1,3 +1,6 @@
+import Mathlib.Data.Fintype.Basic
+import Mathlib.Data.Finset.Sort
+
 /-!
 # Lux Kernel — Abstract Formal Specification (Lean 4)
 
@@ -130,7 +133,6 @@ structure Cap where
   rights     : Rights
   /-- Generation epoch at which the token was issued. -/
   generation : Nat
-  deriving Repr
 
 /-- **Abstract delegation specification.**
 
