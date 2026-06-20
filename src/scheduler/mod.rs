@@ -22,7 +22,10 @@ pub use queue::{WorkItem, WorkQueue};
 
 use crate::{
     audit::AuditLog,
-    auth::{capability::{Capability, CapabilitySet}, policy::Policy},
+    auth::{
+        capability::{Capability, CapabilitySet},
+        policy::Policy,
+    },
     types::MAX_QUEUE,
     Result,
 };

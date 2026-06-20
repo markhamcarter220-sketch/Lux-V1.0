@@ -227,7 +227,9 @@ fn attack_1_7_revocation_takes_priority_over_full_rights() {
 fn attack_1_8_over_quota_deduction_is_atomic() {
     let mut ledger = Ledger::new();
     let n = nz(5);
-    ledger.seed(n, Quota::new(50)).expect("test node count within MAX_NODES");
+    ledger
+        .seed(n, Quota::new(50))
+        .expect("test node count within MAX_NODES");
 
     assert_eq!(ledger.balance(n), Some(50));
 
@@ -268,7 +270,9 @@ fn attack_1_9_error_paths_never_panic() {
     let mut ledger = Ledger::new();
     let _ = ledger.balance(nz(99));
     let _ = ledger.deduct(nz(99), 1);
-    ledger.seed(nz(1), Quota::new(0)).expect("test node count within MAX_NODES");
+    ledger
+        .seed(nz(1), Quota::new(0))
+        .expect("test node count within MAX_NODES");
     let _ = ledger.deduct(nz(1), u64::MAX);
 
     // Policy: exhausted generation, empty rights.
@@ -351,8 +355,7 @@ fn attack_1_11_policy_check_denied_when_audit_full() {
     let mut audit = saturated_audit();
 
     // Otherwise-valid capability → must be denied because it cannot be logged.
-    let valid_cap =
-        Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, 0xA001);
+    let valid_cap = Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, gen, 0xA001);
     assert_eq!(
         policy.check(&valid_cap, CapabilitySet::SCHEDULE, &mut audit),
         Err(Error::AuditFull),
@@ -362,8 +365,13 @@ fn attack_1_11_policy_check_denied_when_audit_full() {
     // Masking-regression: an INVALID capability (wrong generation) presented to
     // the saturated gate must return the original CapabilityDenied, NOT AuditFull.
     // This proves the constraint: pre-existing denials are never overwritten.
-    let invalid_cap =
-        Capability::new_for_test(nz(1), nz(2), CapabilitySet::SCHEDULE, Generation(99), 0xA002);
+    let invalid_cap = Capability::new_for_test(
+        nz(1),
+        nz(2),
+        CapabilitySet::SCHEDULE,
+        Generation(99),
+        0xA002,
+    );
     assert_eq!(
         policy.check(&invalid_cap, CapabilitySet::SCHEDULE, &mut audit),
         Err(Error::CapabilityDenied {

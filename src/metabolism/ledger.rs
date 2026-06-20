@@ -138,7 +138,9 @@ mod proofs {
 
         let node = NonZeroU32::new(1).unwrap();
         let mut ledger = Ledger::default();
-        ledger.seed(node, Quota::new(ceiling)).expect("single node within capacity");
+        ledger
+            .seed(node, Quota::new(ceiling))
+            .expect("single node within capacity");
 
         let before = ledger.balance(node).unwrap();
         let result = ledger.deduct(node, amount);
@@ -162,7 +164,9 @@ mod proofs {
 
         let node = NonZeroU32::new(1).unwrap();
         let mut ledger = Ledger::default();
-        ledger.seed(node, Quota::new(ceiling)).expect("single node within capacity");
+        ledger
+            .seed(node, Quota::new(ceiling))
+            .expect("single node within capacity");
 
         let before = ledger.balance(node).unwrap();
         let new_bal = ledger.deduct(node, amount);

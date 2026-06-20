@@ -52,7 +52,9 @@ fn ledger_deduct_throughput(c: &mut Criterion) {
     c.bench_function("ledger_deduct", |b| {
         b.iter(|| {
             let mut ledger = Ledger::new();
-            ledger.seed(node, Quota::new(1_000_000)).expect("single node within capacity");
+            ledger
+                .seed(node, Quota::new(1_000_000))
+                .expect("single node within capacity");
             let _ = ledger.deduct(black_box(node), black_box(1));
         });
     });
