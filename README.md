@@ -40,6 +40,62 @@ different security primitive.
 
 ---
 
+## Quick Demo
+
+The fastest way to see Lux enforce policy is to run the bundled tool-calling
+agent example. It mints a root capability for an orchestrator, delegates
+single-use tokens to an agent for two simulated tool calls (`web_search` and
+`calculator`), revokes the agent's authority mid-session, and then shows the
+exact same two tool calls being denied — with brand-new tokens that were
+never presented before, proving the denial is structural, not replay
+detection.
+
+```sh
+cargo run --example simple-agent
+```
+
+```
+------------------------------------------------------------------------
+ BEFORE REVOCATION  (generation 0)
+------------------------------------------------------------------------
+[TOOL]  web_search("lux kernel capability security")
+        requires: SCHEDULE   nonce: 101
+        gate(Policy::check) -> ALLOW
+        -> 3 results returned (simulated)
+...
+------------------------------------------------------------------------
+ OPERATOR ACTION: rotate_generation()
+ Reason: anomalous tool usage detected — kill switch engaged
+------------------------------------------------------------------------
+[KERNEL] generation 0 -> 1  (nonce window + revocation ledger cleared)
+
+------------------------------------------------------------------------
+ AFTER REVOCATION  (generation 1)
+------------------------------------------------------------------------
+[TOOL]  web_search("are there more papers like this")
+        requires: SCHEDULE   nonce: 103
+        gate(Policy::check) -> DENY (token expired, insufficient rights, or wrong generation)
+        -> BLOCKED. No fallback path. No partial execution.
+```
+
+What this demonstrates:
+
+- **No standing authority** — the agent never holds a reusable token; every
+  tool call is gated by a fresh, single-use capability minted by the
+  orchestrator on demand.
+- **Fail-closed revocation (I1)** — `Policy::rotate_generation()` is the
+  kernel's O(1) kill switch (see
+  [ADR-0003](docs/adr/0003-epoch-based-revocation.md)). Once it fires, every
+  capability issued in the prior generation is denied, including tokens the
+  revoker has never seen.
+- **A hash-chained audit trail** — every `ALLOW` and `DENY` decision is
+  appended to an `AuditLog` whose chain integrity (`verify_chain()`) and
+  JSON export are printed at the end of the run.
+
+Full source: [`examples/simple-agent.rs`](examples/simple-agent.rs).
+
+---
+
 ## Security Invariants
 
 These four invariants are non-negotiable.  Every line of code in this
