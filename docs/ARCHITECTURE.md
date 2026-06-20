@@ -68,8 +68,10 @@ I1 — Fail-Closed
 I2 — Capability-Gated
      ∀ operation O: O requires a token T where:
        T.rights ⊇ {right required by O}
-       T.generation ≥ current_generation
-     No token → denial.  Insufficient rights → denial.  Expired generation → denial.
+       T.generation = current_generation
+     No token → denial.  Insufficient rights → denial.  Wrong generation → denial.
+     Generation rotation invalidates all prior-generation capabilities; there is
+     no forward validity.
 
 I3 — Accountable Resources
      ∀ allocation A(node, amount):
@@ -112,7 +114,8 @@ pub fn check(&self, cap: &Capability, required_right: CapabilitySet) -> Result<(
 
 There is no overload and no optional parameter that widens the check.  The only
 path to `Ok(())` is a token that satisfies all three conditions simultaneously:
-valid generation, non-empty rights, and the specific required right present.
+generation equal to the current epoch (§2.3 — not merely current-or-later),
+non-empty rights, and the specific required right present.
 The function body is:
 
 ```rust
@@ -201,7 +204,10 @@ Fail-closed is defined by what it excludes. The following patterns violate fail-
 
 The topology graph is derived from the manifest and enforced at traversal time. The following boundary conditions are resolved as follows:
 
-**Self-loops (A → A):** Allowed. The kernel does not forbid a node declaring an edge to itself. The authorization check `I2` (capability-gated) still applies; the operation must be authorized regardless of graph shape.
+**Self-loops (A → A):** Allowed only when the self-edge is declared in the
+manifest. An undeclared self-loop is denied at traversal time with
+`TopologyViolation`, exactly like any other undeclared edge (see adversarial
+test 4.5). I2 (capability-gated) applies regardless of graph shape.
 
 **Missing nodes:** If the manifest declares an edge A → B but B is not in the quota table, this is caught at manifest parse time in `boot::Manifest::parse_and_verify()`. The manifest is rejected with `ManifestInvalid` before the kernel is initialized. No partial state is created.
 
@@ -215,7 +221,15 @@ The ledger in `metabolism::Ledger` tracks quota balances per node. Its state mod
 
 **Stateless vs. Stateful:** The ledger is stateful. The quota *ceilings* are derived from the manifest and immutable (set at boot). The quota *balances* are mutable runtime state, decremented by each `deduct()` call and never replenished except at reboot. There is no "reset to ceiling" operation.
 
-**Concurrent deductions:** If two requests attempt to deduct quota for the same node simultaneously, the ledger enforces atomicity via checked arithmetic in `Ledger::deduct()`. The first deduction that would cause `balance < 0` returns `Err(QuotaExceeded)`. The second deduction is evaluated independently against the updated balance. Both operations are fail-closed (no silent over-commit).
+**Concurrent deductions:** `Ledger::deduct` takes `&mut self` and has no internal
+locking, so two requests against the same node are evaluated sequentially
+(interleaved, not in parallel) — `checked_sub` gives single-call integrity, not
+coordination between genuinely concurrent callers. The first deduction that
+would cause `balance < 0` returns `Err(QuotaExceeded)`; the second is then
+evaluated against the balance the first one left behind. Both calls are
+fail-closed (no silent over-commit). The V1.0 kernel assumes single-threaded
+access to the ledger; true multi-threaded concurrent deduction is out of scope
+for V1.0 — see `docs/REFINEMENT_GAPS.md` ("Concurrent access").
 
 **Negative balance prevention:** The kernel prevents negative balance by design: `checked_sub()` returns `None` if the subtraction would underflow. The caller receives `Err(QuotaExceeded)` before any state mutation. This is not a matter of runtime validation alone; it is structural.
 
