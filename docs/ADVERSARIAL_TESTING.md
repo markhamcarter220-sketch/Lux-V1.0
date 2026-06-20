@@ -19,6 +19,16 @@ Each attack vector is:
 
 Test file: `tests/adversarial.rs` (driver) → `tests/adversarial/*.rs` (6 modules).
 
+**Scope:** these are deterministic, single-process tests. Concurrency is
+simulated sequentially (e.g. attack 3.5 — 10 actors are evaluated one after
+another, not from parallel threads). This suite does not exercise true
+concurrent execution. Per [ADR-0003](adr/0003-epoch-based-revocation.md) §3,
+the check-then-act revocation window is proven zero only under the kernel's
+current single-threaded execution model; multi-core or async execution
+(Tier 3) would require re-evaluating that proof. The Lean formalisation has
+the same boundary — see `docs/REFINEMENT_GAPS.md` ("Concurrent access"),
+intentionally out of scope pending the third-party audit.
+
 ---
 
 ## Part 1 — Invariant 1: Fail-Closed (10 attacks)
@@ -120,7 +130,12 @@ Test file: `tests/adversarial.rs` (driver) → `tests/adversarial/*.rs` (6 modul
 
 ---
 
-## Part 6 — Byzantine Fault Tolerance (7 attacks)
+## Part 6 — Coordinated & Forgery Attacks (7 attacks)
+
+*Forged and coordinated inputs against a single kernel instance — majority-malicious
+batches, cache-freshness, audit tamper-detection, and bulk revocation.  These tests
+do not exercise the Raft consensus layer (`src/consensus/`) under multi-node
+malicious behaviour, so this section is not a Byzantine-fault-tolerance claim.*
 
 | # | Attack | What Was Tried | What Stopped It | Result |
 |---|---|---|---|---|
@@ -144,7 +159,7 @@ Test file: `tests/adversarial.rs` (driver) → `tests/adversarial/*.rs` (6 modul
 | `inv4_topology_bounded` | 12 | 12 | All 12 produce Err |
 | `stress_chaos` | 10 | 10 | Load + failure scenarios pass cleanly |
 | `byzantine` | 7 | 7 | Coordinated-attack scenarios |
-| **Total** | **63** | **63** | **Zero successful privilege escalations** |
+| **Total** | **63** | **62 deny + 1 harmless** | **Zero successful privilege escalations** |
 
 ---
 
@@ -186,11 +201,13 @@ The 63-test adversarial suite runs in under 100 ms.
 
 ```
 63 adversarial attack scenarios executed.
-63 attacks denied.
+62 attacks denied, 1 confirmed harmless no-op (zero-cost deduction is not a bypass).
 0 successful privilege escalations.
 0 panics.
 0 silent failures (every denial produces Err with a precise reason).
 ```
 
-Lux Kernel v1.0 satisfies all four security invariants under adversarial conditions.
-The implementation is ready for Tier 2 production deployment.
+Lux Kernel v1.0 satisfies all four security invariants under adversarial
+conditions in the scenarios tested. Third-party security audit pending —
+not for production use until complete (see README "Project Origin and
+Verification Status").
