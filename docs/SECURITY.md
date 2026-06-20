@@ -162,7 +162,7 @@ is rejected without inspecting its contents (fail-closed).
 
 ## 5. Security Testing Matrix
 
-| Test Suite | Location | Coverage Requirement |
+| Test Suite | Location | Pass Requirement |
 |------------|----------|---------------------|
 | Invariant enforcement | `tests/security/invariant_enforcement.rs` | 100% — P0 on any failure |
 | Privilege escalation paths | `tests/security/privilege_escalation.rs` | 100% — P0 on any failure |
@@ -171,8 +171,13 @@ is rejected without inspecting its contents (fail-closed).
 | Integration: topology convergence | `tests/integration/topology_convergence.rs` | 100% |
 | Signature verification (5 cases) | `tests/security.rs::signature_verification` | Passes — all 5 cases verified |
 
-The 100% requirement on security-path tests is enforced mechanically by
-`scripts/coverage.sh`.  The CI gate fails if this threshold is not met.
+The 100% figure above is a test **pass rate** requirement (every test in these
+suites must pass; any failure is a P0), not a measured code-coverage
+percentage. No `scripts/coverage.sh` or LLVM-coverage CI gate currently exists
+in this repository — `cargo-llvm-cov` is listed as a prerequisite in
+`README.md`, but no coverage report or enforced threshold is checked in. This
+is a known gap; do not cite a numeric code-coverage figure for this codebase
+until that tooling exists and has been run.
 
 ---
 

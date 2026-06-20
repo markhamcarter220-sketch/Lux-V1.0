@@ -10,8 +10,8 @@ that earns each designation.
 
 | Tier | Label | Status | Evidence |
 |------|-------|--------|----------|
-| 1 | Core security invariants | **Production-ready** | 63 adversarial tests + TLA+ formal verification |
-| 2 | Cryptography, audit, revocation | **Complete** | 18 security tests + 247 total tests passing |
+| 1 | Core security invariants | **Production-ready** | 66 adversarial tests + TLA+ formal verification |
+| 2 | Cryptography, audit, revocation | **Complete** | 19 security tests + 318 total tests passing |
 | 2.5 | Compliance reference implementations | **Complete** | 3 domain demos with bias test reports |
 | 3 | Hardware integrations (HSM, TPM, WASM, consensus) | **Roadmap** | Interfaces defined; production drivers not yet integrated |
 
@@ -49,8 +49,8 @@ as the enforcement layer beneath systems where fail-closed behaviour is required
 | Topology graph | `src/topology/graph.rs` | Deny-by-default; 12 adversarial tests (inv4) |
 | Work queue | `src/scheduler/queue.rs` | Bounded capacity; `enqueue` returns `Err` at capacity |
 | Boot manifest framework | `src/boot/` | All inputs return `Ok` or `Err(ManifestInvalid)` |
-| Security-path test coverage | `tests/security/` | 18 tests; 100% pass required |
-| Adversarial test suite | `tests/adversarial/` | 63 attacks, 0 successful escalations |
+| Security-path test pass rate | `tests/security/` | 19 tests; 100% pass required |
+| Adversarial test suite | `tests/adversarial/` | 66 attacks, 0 successful escalations |
 | TLA+ formal verification | `tla/` | 322,560 states, 6 invariants, 0 violations |
 
 ---
@@ -68,7 +68,7 @@ is end-to-end authenticated with Ed25519 signatures.
   `verify_chain()` detects any mutation.
 - Capability revocation uses epoch-based generation numbers; a rotated generation
   immediately invalidates all tokens from the previous generation.
-- 247 tests pass across unit, integration, property, security, and adversarial
+- 318 tests pass across unit, integration, property, security, and adversarial
   suites.
 
 **What it does NOT mean:**
@@ -179,8 +179,8 @@ Before claiming any tier is "complete" for a deployment:
 
 ### Tier 1 Checklist
 - [ ] `cargo test --all-features` passes with 0 failures
-- [ ] `cargo test --test adversarial` — 63/63 attacks blocked
-- [ ] `cargo test --test security` — 18/18 invariant tests pass
+- [ ] `cargo test --test adversarial` — 66/66 attacks blocked
+- [ ] `cargo test --test security` — 19/19 invariant tests pass
 - [ ] `cargo clippy --all-features -- -D warnings` — 0 warnings
 - [ ] TLC model check completes with no violations
 

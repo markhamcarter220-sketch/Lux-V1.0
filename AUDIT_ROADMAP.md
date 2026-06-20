@@ -11,7 +11,7 @@
 Lux makes strong security claims. Those claims are backed by:
 
 1. Formal verification (TLA+, 322,560 states, 0 violations)
-2. Adversarial tests (63 named attack vectors, 0 successful escalations)
+2. Adversarial tests (66 named attack vectors, 0 successful escalations)
 3. Static analysis (`cargo clippy --all-features -- -D warnings`, 0 warnings)
 4. Supply-chain audit (`cargo audit`, `cargo deny check`, 0 vulnerabilities)
 

@@ -63,7 +63,7 @@ unchanged — audit saturation never masks a legitimate rejection.
 `rotate_generation()` or a log drain is called.  This is a deliberate
 fail-closed design choice.
 
-All four invariants are verified by the adversarial test suite (63 attacks,
+All four invariants are verified by the adversarial test suite (66 attacks,
 zero successful privilege escalations — see `tests/adversarial/`) and
 formally verified by TLC model checking across 322,560 distinct states
 (see [Formal Verification](#formal-verification) below).
@@ -141,8 +141,8 @@ Tier 1 — PRODUCTION-READY (core security enforced, tested, verified)
 [x] Topology graph (static, manifest-derived, deny-by-default)
 [x] Work queue (bounded capacity, priority-ordered)
 [x] Boot manifest validation framework
-[x] 100% security-path test coverage
-[x] Adversarial test suite (63 attacks, 0 escalations) — tests/adversarial/
+[x] 100% security-path test pass rate
+[x] Adversarial test suite (66 attacks, 0 escalations) — tests/adversarial/
 [x] TLA+ formal verification (322,560 states, 0 violations) — tla/
 
 Tier 2 — COMPLETE (cryptography, audit, revocation integrated)
@@ -176,7 +176,7 @@ Tier 3 — IN PROGRESS (2/5 complete; 3 pending hardware deployment or toolchain
 AUDIT & VERIFICATION STATUS:
 [x] Internal security review (Lux Project Contributors)
 [x] TLA+ formal model verification (322,560 states exhaustively checked)
-[x] Adversarial test suite (63 named attack vectors, 0 successful escalations)
+[x] Adversarial test suite (66 named attack vectors, 0 successful escalations)
 [ ] Third-party security audit — PLANNED (vendor selection in progress)
     Target: Q3 2026. See AUDIT_ROADMAP.md for timeline.
 ```
@@ -262,13 +262,14 @@ cargo build --release
 ### Test
 
 ```sh
-# All tests (312 total: unit, integration, property, security, adversarial)
+# All tests (318 total: 39 unit + 66 adversarial + 16 HSM + 3 HSM-disagreement
+# + 107 integration + 17 property + 21 raft + 19 security + 18 TPM + 12 WASM)
 cargo test --all-features
 
 # Security invariant tests only
 cargo test --test security -- --nocapture
 
-# Adversarial suite (63 attacks)
+# Adversarial suite (66 attacks)
 cargo test --test adversarial -- --nocapture
 ```
 
@@ -318,7 +319,7 @@ lux-v1.0/
 │   ├── scheduler/          # Bounded priority work queue
 │   └── topology/           # Directed execution graph enforcement
 ├── tests/
-│   ├── adversarial/        # 63 attack vectors, 0 successful escalations
+│   ├── adversarial/        # 66 attack vectors, 0 successful escalations
 │   ├── integration/        # Cross-subsystem integration tests
 │   ├── properties/         # Proptest invariant proofs
 │   └── security/           # Invariant regression tests (100% pass required)
@@ -346,7 +347,7 @@ lux-v1.0/
 │   └── lakefile.lean           # Lake build file (lake build to verify all four modules)
 ├── docs/
 │   ├── ARCHITECTURE.md         # Conceptual model → implementation bridge
-│   ├── ADVERSARIAL_TESTING.md  # 63-attack test methodology
+│   ├── ADVERSARIAL_TESTING.md  # 66-attack test methodology
 │   ├── FORMAL_VERIFICATION.md  # TLC results and inductive proof sketches
 │   ├── FORMAL_COST_MODEL.md    # Lean 4 theorems and TLA+ relationship
 │   ├── SECURITY.md             # Threat model and audit findings
@@ -384,7 +385,7 @@ calibrate their trust accordingly.
 - The architecture, invariants (I1–I4), and security contracts were designed
   by the project contributors and are documented in `docs/ARCHITECTURE.md`.
 - The implementation was produced with AI assistance and has undergone
-  internal review, adversarial testing (63 attack vectors), and TLA+ model
+  internal review, adversarial testing (66 attack vectors), and TLA+ model
   checking (322,560 states).
 - **Third-party security audit is not yet complete.**  Do not rely on this
   codebase in production until the external audit is finished
