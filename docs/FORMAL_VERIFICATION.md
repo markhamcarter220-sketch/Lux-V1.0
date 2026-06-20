@@ -1,6 +1,11 @@
 # Formal Verification Report — Lux Kernel v1.0
 
-**Verdict: All four security theorems hold. Zero invariant violations across 322,560 distinct states.**
+**Verdict: All four security theorems hold in the bounded model — 322,560
+distinct states, zero invariant violations under exhaustive TLC checking.
+Hand-written inductive proofs argue these invariants generalize beyond the
+bound; those inductive arguments are not themselves mechanically checked.
+Lean refinement proofs are written; one u32 encoding step and full mechanical
+Lean verification (`lake build`) remain pending.**
 
 ---
 
@@ -11,11 +16,13 @@ verify four security theorems about the Lux Kernel.
 
 This is a step beyond empirical testing:
 
-| Method | What it proves |
-|---|---|
-| Unit tests (`cargo test`) | Specific inputs produce correct outputs |
-| Adversarial tests (63 attacks) | Known attack vectors are blocked |
-| TLC model checking | **All reachable states** satisfy the security invariants |
+| Method | What it proves | Status |
+|---|---|---|
+| Unit tests (`cargo test`) | Specific inputs produce correct outputs | Executed |
+| Adversarial tests (63 scenarios) | Known attack vectors are blocked | Executed |
+| TLC model checking | All reachable states in the **bounded** model satisfy invariants | Executed (bounded) |
+| Hand-written inductive proofs (§3) | Invariants generalize to arbitrary parameters | Written, not mechanically checked |
+| Lean 4 refinement proofs (§6) | Spec ↔ Rust ledger/capability refinement | Written, `lake build` pending |
 
 TLA+ describes a state machine and the properties it must satisfy. TLC
 exhaustively enumerates every reachable state and checks that the invariants
@@ -115,6 +122,14 @@ Old-generation caps now fail `IsValidCap` at check 1 (`cap.gen = epoch`). ✓
 
 *TLC confirmation:* 322,560 states checked, zero violations. ✓
 
+**Bound caveat:** the model checks a single epoch rotation (`MaxEpoch=1`).
+Soundness across multiple rotations rests on the inductive argument above
+(the `RotateEpoch` case), not on TLC enumeration of repeated rotations.
+Re-evaluating that argument under concurrent/multi-core execution (Tier 3)
+is a deferred item pending the third-party audit — see ADR-0003 §3 and
+`docs/REFINEMENT_GAPS.md` ("Concurrent access"); it is out of scope for this
+TLA+ model, which models action interleaving, not shared-memory concurrency.
+
 ---
 
 ### Theorem 3: Resource Atomicity
@@ -173,9 +188,9 @@ Post-state: `executedTraversals' = executedTraversals ∪ {⟨src, dst⟩} ⊆ B
 
 ## 4. Model Bounds and Coverage
 
-The TLC run used a bounded model to keep the state space tractable. The
-bounds do not limit the proof's applicability — each theorem's inductive
-proof above holds for arbitrary values of the parameters.
+The TLC run used a bounded model to keep the state space tractable. Whether
+that bound limits the result's applicability depends on which of the two
+evidence sources below you are relying on.
 
 | Parameter | Model value | Meaning |
 |---|---|---|
@@ -187,10 +202,29 @@ proof above holds for arbitrary values of the parameters.
 | `MaxEpoch` | `1` | One epoch rotation |
 | `MaxCaps` | `3` | At most 3 simultaneous capabilities |
 
-**Why the bound is sufficient:** The four invariants are *inductive* — they
-are maintained by each individual action regardless of the specific values of
-the constants. TLC confirms the base case and each inductive step. The formal
-proof sketches above are valid for any finite values of the parameters.
+Two distinct evidence sources support these theorems:
+
+1. TLC exhaustively checked the BOUNDED model (2 principals, 2 nodes, 2 rights,
+   1 epoch rotation). Within that bound, every reachable state was examined and
+   no invariant was violated. This is a mechanical, executed result — but its
+   guarantee stops at the bound.
+
+2. The hand-written inductive proofs in §3 argue each invariant is maintained by
+   every individual action regardless of parameter values, and therefore
+   generalizes beyond the bound. These are PAPER proofs. They are not
+   mechanically verified — they have not been checked by TLAPS or any proof
+   assistant.
+
+The combination is strong: exhaustive checking of the small model plus a paper
+inductive argument for generalization. But the generality claim rests on the
+paper proofs, not on TLC. A reviewer should treat the unbounded claim as
+argued, not machine-verified.
+
+**MaxEpoch caveat:** `RevocationSoundness` (Theorem 2) depends on the
+`RotateEpoch` action, but the checked model used `MaxEpoch = 1` — a single
+rotation. TLC's exhaustive guarantee for that theorem therefore covers only
+one epoch transition; soundness across repeated rotations is argued by the
+inductive proof in §3, not enumerated by TLC.
 
 ---
 
@@ -268,8 +302,9 @@ theorem bitsContainsIffSubset (a b : Fin 32) :
 
 ### Non-amplification proof
 
-`delegate_non_amplification` proves privilege escalation via delegation is
-mathematically impossible:
+`delegate_non_amplification` is a written Lean proof — pending `lake build`,
+not yet mechanically checked — that the success branch of
+`concreteDelegateCap` forces `subset ⊆ cap.rights`:
 
 ```lean
 theorem delegate_non_amplification
