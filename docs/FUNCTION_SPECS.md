@@ -10,10 +10,10 @@ tree.** This is intentionally a much lighter layer than the rest of `lean/`:
 | Lean tree | What it contains | Proof status |
 |---|---|---|
 | `lean/LuxSpec.lean` | Abstract ideal-system specification | N/A (pure math, no implementation) |
-| `lean/LuxCostModel.lean` | Concrete model of `src/metabolism/ledger.rs` | **Proved** (7 theorems) |
-| `lean/LuxRefinement.lean` | Refinement: `LuxSpec` ↔ `LuxCostModel` | **Proved** |
-| `lean/LuxCapabilityBridge.lean` | `u32` bitfield ↔ `Finset Right` isomorphism | **Proved** |
-| `lean/Refinement.lean` | I1–I4 invariant obligations | Stated, `sorry`-stubbed (see `docs/REFINEMENT_GAPS.md`) |
+| `lean/LuxCostModel.lean` | Concrete model of `src/metabolism/ledger.rs` | **Written, not mechanically verified** (7 theorems; no `sorry` token found by source inspection) |
+| `lean/LuxRefinement.lean` | Refinement: `LuxSpec` ↔ `LuxCostModel` | **Written, not mechanically verified** (no `sorry` token found by source inspection) |
+| `lean/LuxCapabilityBridge.lean` | `u32` bitfield ↔ `Finset Right` isomorphism | **Written, not mechanically verified** (no `sorry` token found by source inspection) |
+| `lean/Refinement.lean` | I1–I4 invariant obligations | Stated, not mechanically verified; source inspection finds 2 of 9 theorems with literal `sorry` (I3) (see `docs/REFINEMENT_GAPS.md`) |
 | **`lean/FunctionSpecs/`** (this tree) | **Every production function in `src/`** | **Not attempted — contracts only** |
 
 Do not confuse this tree's `opaque`/`def` + `_pre`/`_post` triples with the

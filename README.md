@@ -76,18 +76,23 @@ for the threat model. Note: Third-party security audit is not yet complete (see 
 ## Formal Verification
 
 **Note on terminology:** This project has two independent formal verification
-layers. **TLA+/TLC** (below) exhaustively model-checks the four invariants
-over a bounded state space and is re-run to produce the numbers quoted here.
-**Lean 4** (`lean/`) mechanically proves the four core modules
-(`LuxSpec.lean`, `LuxCostModel.lean`, `LuxRefinement.lean`,
-`LuxCapabilityBridge.lean`) via `lake build`, with zero `sorry`. A fifth
-file, `lean/Refinement.lean`, layers system-level I1–I4 obligations on top of
-that proof tree; 2 of its 9 theorems (the I3 obligations) are not yet closed
-and remain `sorry` — see [Project Maturity](#project-maturity) and
-`docs/REFINEMENT_GAPS.md`. Neither layer subsumes the other: TLA+/TLC checks
-system behaviour across a bounded model; Lean proves properties of the
-ledger/capability model in unbounded arithmetic but does not yet model the
-full topology/typestate layer (I4).
+layers, at different stages of completion. **TLA+/TLC** (below) exhaustively
+model-checks the four invariants over a bounded state space and is re-run to
+produce the numbers quoted here — this layer is genuinely machine-checked.
+**Lean 4** (`lean/`) contains *written* proof terms for the four core
+modules (`LuxSpec.lean`, `LuxCostModel.lean`, `LuxRefinement.lean`,
+`LuxCapabilityBridge.lean`); mechanical verification via `lake build` has
+NOT been completed in this session and has not been independently witnessed
+since. Source inspection (grep, not a build) finds no `sorry` token in those
+four files. A fifth file, `lean/Refinement.lean`, layers system-level I1–I4
+obligations on top of that proof tree; the same inspection finds 2 of its 9
+theorems contain literal `sorry` placeholders (the I3 obligations) — see
+[Project Maturity](#project-maturity) and `docs/REFINEMENT_GAPS.md`. Neither
+layer subsumes the other: TLA+/TLC checks system behaviour across a bounded
+model; Lean's proof terms target properties of the ledger/capability model
+in unbounded arithmetic and do not yet model the full topology/typestate
+layer (I4). Status becomes "verified" only when `lake build` passes with
+zero `sorry` and zero errors, witnessed directly.
 
 The four core security theorems are formally verified using
 **TLA+ (Temporal Logic of Actions)** with the **TLC model checker**.
@@ -178,16 +183,21 @@ Tier 3 — IN PROGRESS (3/5 complete; 2 pending hardware deployment)
     Pending: real YubiHSM or PKCS#11 hardware deployment
 [~] TPM-anchored boot attestation — BootAttestation + TssTpm stub (src/tpm/, tests/tpm.rs)
     Pending: physical TPM chip + TSS stack
-[x] Formal proofs — Lean 4 four-file proof suite (lean/), lake build-verified,
-    zero `sorry`
+[~] Formal proofs — Lean 4 four-file core suite (lean/) is WRITTEN. Mechanical
+    verification via `lake build` has NOT been completed in this session and
+    has not been independently witnessed since. Proof terms are drafted but
+    not machine-checked here.
     LuxSpec.lean: abstract ideal-system specification (I2 + I3)
     LuxCostModel.lean: concrete model of src/metabolism/ledger.rs (7 ledger theorems)
     LuxRefinement.lean: refinement proofs — concreteDeductSpec, delegate_non_amplification
     LuxCapabilityBridge.lean: u32 bitfield ↔ Finset Right isomorphism (bitsContainsIffSubset)
     See docs/FORMAL_COST_MODEL.md and docs/FORMAL_VERIFICATION.md §6 for theorem index.
-    A fifth file, lean/Refinement.lean, scaffolds system-level I1–I4 obligations
-    above this proof tree; 7 of its 9 theorems are proved, 2 (I3-A, I3-B) remain
-    `sorry`. See docs/REFINEMENT_GAPS.md for the per-theorem closure plan.
+    A fifth file, lean/Refinement.lean, layers 9 system-level I1–I4 obligations
+    above this proof tree. Source inspection (not a build) confirms exactly 2
+    literal `sorry` placeholders, both I3 (`accountableResources_soleDeductionPath`,
+    `accountableResources_ceilingBound`). Status becomes "verified" only when
+    `lake build` passes with zero `sorry` and zero errors, witnessed directly.
+    See docs/REFINEMENT_GAPS.md for the per-theorem breakdown and caveats.
 
 AUDIT & VERIFICATION STATUS:
 [x] Internal security review (Lux Project Contributors)
@@ -419,7 +429,12 @@ calibrate their trust accordingly.
       `BootState::run_topology_consensus` by a human reviewer
 - [ ] All call sites of `Policy::check` audited for I1–I4 compliance across
       all feature flag combinations
-- [ ] Lean 4 formal proof mechanical verification (`lake build` in `lean/`)
+- [ ] Lean 4 formal proof mechanical verification (`lake build` in `lean/`) —
+      NOT completed. The proof suite is written but not machine-checked; no
+      `lake build` has been witnessed in this session. Source inspection
+      (grep) confirms 2 literal `sorry` placeholders in `lean/Refinement.lean`
+      (both I3); the four core files contain none. This is a textual fact
+      about the source, not a compilation result.
 
 If you are performing the external audit, start with
 [`docs/SECURITY.md`](docs/SECURITY.md) and

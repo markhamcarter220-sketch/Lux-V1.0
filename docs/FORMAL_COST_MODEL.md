@@ -1,7 +1,11 @@
 # Lux Kernel — Lean 4 Formal Proofs
 
 **Proof assistant:** Lean 4 + Lake build system  
-**Status:** Proofs written; mechanical verification requires Lean 4 toolchain (`lake build` in `lean/`)  
+**Status:** Proofs written; mechanical verification via `lake build` has
+NOT been completed — no Lean 4 toolchain is present in this environment,
+and no end-to-end build has been independently witnessed. Proof terms are
+drafted but not machine-checked. Status becomes "verified" only when
+`lake build` passes with zero `sorry` and zero errors, witnessed directly.  
 **Complements:** TLA+ model in `tla/LuxKernel.tla` (state-machine level)
 
 ## Lean 4 file overview
@@ -213,11 +217,13 @@ elan toolchain install leanprover/lean4:stable
 ```sh
 cd lean
 lake build
-# Expected: Build completed successfully.
 ```
 
-If the proof is correct, `lake build` completes with no errors.  A failed proof
-would produce a `sorry`-containing goal error or a type-mismatch error.
+This command has not been run in this session — no Lean 4 toolchain is
+present here. If the proof is correct, `lake build` completes with no
+errors; a failed proof would produce a `sorry`-containing goal error or a
+type-mismatch error. Until someone runs this and records the actual result,
+treat this file as written but not mechanically verified.
 
 ---
 

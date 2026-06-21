@@ -232,6 +232,17 @@ The TLA+ specification (`tla/LuxKernel.tla`) models:
 The `lean/` directory contains a four-file Lean 4 proof suite that closes the
 refinement chain from abstract specification down to the Rust binary encoding.
 
+**Status:** This four-file core suite is WRITTEN. Mechanical verification
+via `lake build` has NOT been completed in this session — no Lean/Lake
+toolchain is present in this environment, and no end-to-end build has been
+independently witnessed. Proof terms are drafted but not machine-checked
+here. A fifth file, `lean/Refinement.lean`, layers system-level I1–I4
+obligations on top of this suite; source inspection (grep, not a build)
+confirms 2 of its 9 theorems contain literal `sorry` placeholders (see
+`docs/REFINEMENT_GAPS.md` for the full breakdown). Status becomes "verified"
+only when `lake build` passes with zero `sorry` and zero errors, witnessed
+directly.
+
 ### Architecture
 
 ```
@@ -295,8 +306,11 @@ proved in TLA+ and the `Finset Right` refinement proofs remain sound.
 ```sh
 cd lean
 lake build   # requires Lean 4 + Lake
-# Expected: Build completed successfully.
 ```
+
+This command has not been run in this session. The status above ("written,
+not mechanically verified") holds until someone with the Lean 4 toolchain
+runs this and records the actual result.
 
 Install Lean 4: `curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh`
 
