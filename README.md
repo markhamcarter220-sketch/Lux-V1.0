@@ -259,8 +259,11 @@ a racial proxy not labelled as a protected attribute.
 `prior_drug_convictions` by name as a known racial proxy, in addition to
 `race`, `gender`, `ethnicity`, `national_origin`, and `disability`.  On
 150 synthetic defendants, race (p = 0.916) and gender (p = 0.617) are
-statistically independent of risk assessments.  RISK_HIGH rate by race:
-Black 62.0%, White 60.6% (1.4-point gap vs. COMPAS 17-point gap).
+statistically independent of risk assessments.  RISK_HIGH classification
+rate by race: Black 62.0%, White 60.6% — a 1.4-point gap, versus COMPAS's
+own RISK_HIGH classification-rate gap of 17 points (Black 51.4%, White
+34.0%; a different metric from the 44.9%/23.5% false-positive rates cited
+above).
 
 **Regulatory context:** 14th Amendment Equal Protection Clause;
 *Washington v. Davis*, 426 U.S. 229 (1976); *State v. Loomis*, 881 N.W.2d
@@ -308,24 +311,27 @@ java -XX:+UseParallelGC -jar tla2tools.jar MC.tla -config MC.cfg -workers 4
 
 ### Full CI Gate (mirrors the pipeline)
 
-**Status: not yet implemented.** `scripts/ci_full.sh` and the rest of
-`scripts/` do not exist in this repository, and there is no GitHub Actions
-workflow under `.github/workflows/`. The intended pipeline below is a
-specification of what CI should run, not a description of what currently
-runs. Run each step manually until the orchestrator script and CI workflow
-are added:
+`scripts/ci_full.sh` exists and orchestrates the full local CI gate in order
+(format & lint, supply-chain audit, unit & integration tests, security path
+tests, coverage threshold, Lean build, reproducible build & binary
+attestation). There is no GitHub Actions workflow under `.github/workflows/`
+yet — this script is the CI gate, run locally/manually until it is wired
+into a hosted workflow:
 
 ```sh
-cargo fmt --check
-cargo clippy --all-features -- -D warnings
-cargo deny check
-cargo audit
-cargo test --all-features
-cargo test --test security -- --nocapture
+./scripts/ci_full.sh
 ```
 
-LLVM coverage (`cargo-llvm-cov`) is listed as a prerequisite above but has no
-script or enforced threshold in this repo yet.
+Individual phases can also be run standalone:
+
+```sh
+./scripts/lint.sh        # cargo fmt --check + cargo clippy -D warnings
+./scripts/audit.sh       # cargo deny check + cargo audit
+cargo test --all-features
+cargo test --test security -- --nocapture
+./scripts/coverage.sh    # cargo-llvm-cov threshold check
+./scripts/attest.sh      # reproducible build + binary attestation
+```
 
 ### As a Dependency
 
@@ -376,7 +382,10 @@ lux-v1.0/
 │   ├── LuxCostModel.lean       # Concrete model of ledger.rs — 7 ledger invariants (I3)
 │   ├── LuxRefinement.lean      # Refinement proofs (spec ← concrete model)
 │   ├── LuxCapabilityBridge.lean# u32 bitfield ↔ Finset Right isomorphism (I2 bridge)
-│   └── lakefile.lean           # Lake build file (lake build to verify all four modules)
+│   ├── Refinement.lean         # I1–I4 system-level invariant obligations (2 of 9 theorems have `sorry`)
+│   ├── FunctionSpecs.lean      # Entry point for the FunctionSpecs/ tree (signature + pre/post only, no proofs)
+│   ├── FunctionSpecs/          # Per-module function specs for all 247 production functions in src/
+│   └── lakefile.lean           # Lake build file (6 lean_lib targets — see lean/lakefile.lean)
 ├── docs/
 │   ├── ARCHITECTURE.md         # Conceptual model → implementation bridge
 │   ├── ADVERSARIAL_TESTING.md  # 66-attack test methodology
@@ -385,14 +394,21 @@ lux-v1.0/
 │   ├── SECURITY.md             # Threat model and audit findings
 │   └── adr/                    # Architecture Decision Records (0001–0005)
 ├── benches/                # Criterion throughput benchmarks
+├── scripts/
+│   ├── lint.sh             # cargo fmt --check + clippy -D warnings + cargo deny
+│   ├── audit.sh            # cargo audit + cargo deny (advisories/licenses/bans)
+│   ├── coverage.sh         # cargo-llvm-cov + 100% security-path threshold check
+│   ├── attest.sh           # auditable build + SPDX SBOM + binary/lockfile hashes
+│   └── ci_full.sh          # orchestrates all of the above, in order
 ├── Cargo.toml
 ├── deny.toml               # cargo-deny policy
 ├── rustfmt.toml
 └── clippy.toml
 ```
 
-Note: `scripts/` (a CI gate orchestrator) does not exist yet in this
-repository — see [Full CI Gate](#full-ci-gate-mirrors-the-pipeline) above.
+Note: there is no GitHub Actions workflow under `.github/workflows/` yet —
+`scripts/ci_full.sh` is the CI gate today; see
+[Full CI Gate](#full-ci-gate-mirrors-the-pipeline) above.
 
 ---
 
