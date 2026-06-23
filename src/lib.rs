@@ -41,6 +41,8 @@ pub mod boot;
 pub mod consensus;
 pub mod error;
 pub mod hsm;
+#[cfg(feature = "ipc")]
+pub mod ipc;
 pub mod metabolism;
 #[cfg(feature = "python")]
 pub mod python;

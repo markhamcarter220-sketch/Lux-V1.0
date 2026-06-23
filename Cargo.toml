@@ -62,6 +62,9 @@ wasm        = ["dep:wasmtime", "std"]
 # Enabling this feature switches the crate from no_std to std (PyO3 requires std).
 # Build with: maturin develop --features python
 python      = ["dep:pyo3"]
+# Fork-only: Capability-Signed Message IPC protocol (see /FORK_CONTEXT.md).
+# no_std-compatible; does not require std.
+ipc         = []
 
 [profile.release]
 opt-level   = 3
