@@ -7,3 +7,5 @@
 coverage/
 lcov.info
 .venv/
+/fuzz/corpus/
+/fuzz/artifacts/
