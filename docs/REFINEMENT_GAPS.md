@@ -533,3 +533,29 @@ verify against, formally or adversarially, until that FFI work happens.
 outside the current formally specified boundary.** Only the software-backed
 key store has any spec-layer coverage at all, and that coverage is itself
 unproved (see the toolchain-status disclosure in `docs/FUNCTION_SPECS.md`).
+
+---
+
+## IPC-SPEC.md gaps (ID-tagged register)
+
+The two entries below use an explicit ID scheme (`<CATEGORY>-IPC-<NNN>`) not
+used elsewhere in this document, added on request to track open items
+specific to the Capability-Signed Message IPC protocol
+(`docs/ipc/IPC-SPEC.md`). They are additive to, not a replacement for, the
+per-invariant gap sections above.
+
+**ID:** REFINEMENT_GAP-IPC-001
+**Location:** `docs/ipc/IPC-SPEC.md`, Protocol Primitives subsection (lines 264–275, "Authentication of revocation signals")
+**Description:** Checkpoint authentication — revocation signals must be signed by the issuing Lux instance, but the verification mechanism is not yet specified.
+**Status:** REFINEMENT_GAP
+**Blocking:** Phase 3 EXECUTE implementation; any production-use claim.
+**Dependencies:** Requires a decision on signing scheme (Ed25519 is consistent with the kernel's existing crypto — `src/hsm/mock.rs`, `src/boot/decode.rs` both already use Ed25519/`ed25519-dalek` for manifest signatures), a key distribution model, and a verification path wired into the live revocation channel.
+**Added:** 2026-06-23
+
+**ID:** LEAN-IPC-001
+**Location:** `lean/IpcReservation.lean`, lines 443–502 (`haltSequence_strictOrder`, `rollback_is_operation_property`, `auditWrite_mandatory_across_all_triggers`)
+**Description:** Halt-sequence ordering statements — `haltSequence_strictOrder`, `rollback_is_operation_property`, `auditWrite_mandatory_across_all_triggers`.
+**Status:** specified-but-not-yet-proven, EXECUTE-loop model not yet built
+**Blocking:** Mechanical verification of halt semantics.
+**Dependencies:** An EXECUTE-loop model (Lean); a Phase 3 Rust implementation to model in the first place — neither exists yet, so neither `sorry` can be meaningfully closed before they do.
+**Added:** 2026-06-23
