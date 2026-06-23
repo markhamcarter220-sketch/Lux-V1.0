@@ -24,6 +24,20 @@ pub const NONCE_WINDOW: usize = 256;
 /// Must be a power of two (heapless `FnvIndexSet` requirement).
 pub const MAX_REVOCATIONS: usize = 256;
 
+/// Maximum simultaneously-outstanding reservations per node.
+///
+/// For the Capability-Signed Message IPC protocol's RESERVE phase.
+/// Specified in `docs/ipc/IPC-SPEC.md` (Phase 2); not yet wired into
+/// `Policy` — see `src/auth/reservation.rs`.
+pub const MAX_RESERVATIONS: usize = 256;
+
+/// Maximum TTL, in caller-supplied logical ticks, a reservation may request.
+///
+/// Applies to the IPC protocol's RESERVE phase (`docs/ipc/IPC-SPEC.md`
+/// Phase 2). Bounds how long an authorization may remain outstanding
+/// without being consumed, expired, or revoked.
+pub const MAX_RESERVATION_TTL: u64 = 4096;
+
 /// Maximum events retained in the in-memory audit log.
 pub const MAX_AUDIT_EVENTS: usize = 512;
 

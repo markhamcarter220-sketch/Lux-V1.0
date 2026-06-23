@@ -3,7 +3,7 @@ open Lake DSL
 
 -- Lux Kernel — formal verification package.
 --
--- Six modules, in dependency order:
+-- Seven modules, in dependency order:
 --
 --   LuxSpec              — abstract ideal-system specification (no imports)
 --   LuxCostModel         — concrete Lean model of src/metabolism/ledger.rs
@@ -13,6 +13,11 @@ open Lake DSL
 --   FunctionSpecs        — full-coverage spec layer for all of src/ (no proofs
 --                           attempted; signature + pre/post only — see
 --                           docs/FUNCTION_SPECS.md)
+--   IpcReservation        — RESERVE-phase model for the not-yet-implemented
+--                           Capability-Signed Message IPC protocol; covers
+--                           Claims Discipline items 1-5 from
+--                           docs/ipc/IPC-SPEC.md (no imports; independent of
+--                           the six modules above)
 --
 -- To verify all proofs:
 --   cd lean
@@ -53,3 +58,9 @@ lean_lib «Refinement»
 -- Full-coverage function spec layer for all of src/ (signature + pre/post
 -- only, no proofs attempted). See docs/FUNCTION_SPECS.md.
 lean_lib «FunctionSpecs»
+
+-- RESERVE-phase model for the Capability-Signed Message IPC protocol
+-- (docs/ipc/IPC-SPEC.md, Claims Discipline items 1-5). Protocol is
+-- specification-only — no Rust implementation is wired into Policy::check
+-- yet. No imports; independent of the six modules above.
+lean_lib «IpcReservation»

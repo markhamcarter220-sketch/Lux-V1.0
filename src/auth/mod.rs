@@ -15,8 +15,13 @@
 
 pub mod capability;
 pub mod policy;
+pub mod reservation;
 pub mod revocation;
 
 pub use capability::{Capability, CapabilitySet};
 pub use policy::Policy;
+pub use reservation::{
+    ExecutionGrant, Reservation, ReservationId, ReservationLedger, ReservationStatus,
+    ReservationTtl,
+};
 pub use revocation::RevocationLedger;

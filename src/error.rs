@@ -120,6 +120,19 @@ pub enum Error {
     /// drain the log to reclaim capacity.
     #[error("audit log full: operation denied (fail-closed)")]
     AuditFull,
+
+    /// A RESERVE-phase reservation request was rejected: TTL out of bounds,
+    /// reservation capacity exhausted, or the targeted reservation is not
+    /// in an `Active` state (not found, already consumed, expired, or
+    /// revoked). See `docs/ipc/IPC-SPEC.md` Phase 2.
+    ///
+    /// Maps to [`DenialClass::Halt`] — no reservation state is created or
+    /// mutated on this path.
+    #[error("reservation denied: {reason}")]
+    ReservationDenied {
+        /// Specific rejection reason.
+        reason: &'static str,
+    },
 }
 
 impl Error {
@@ -132,7 +145,7 @@ impl Error {
     #[must_use]
     pub const fn denial_reason_str(&self) -> &'static str {
         match self {
-            Self::CapabilityDenied { reason } => reason,
+            Self::CapabilityDenied { reason } | Self::ReservationDenied { reason } => reason,
             Self::QuotaExceeded { resource } => resource,
             Self::TopologyViolation { .. } => "edge not in boot manifest",
             Self::ManifestInvalid { detail }
@@ -165,12 +178,16 @@ impl Error {
             //   sub-system rather than proceeding in an unknown state.
             // AuditFull: stopped before execution because the audit record
             // cannot be maintained.  No kernel state is modified.
+            // ReservationDenied: a RESERVE-phase request was rejected before
+            // any reservation state was created or mutated (IPC-SPEC.md
+            // Phase 2).
             Self::CapabilityDenied { .. }
             | Self::TopologyViolation { .. }
             | Self::ManifestInvalid { .. }
             | Self::UndefinedState { .. }
             | Self::WasmFault { .. }
-            | Self::AuditFull => DenialClass::Halt,
+            | Self::AuditFull
+            | Self::ReservationDenied { .. } => DenialClass::Halt,
 
             // ── FAILURE: authorization passed, execution failed ───────────────
             //
