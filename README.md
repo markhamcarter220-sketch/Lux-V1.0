@@ -412,6 +412,45 @@ Note: there is no GitHub Actions workflow under `.github/workflows/` yet —
 
 ---
 
+## Roadmap
+
+This section describes direction, not commitments: none of the three items
+below carries a delivery date, and none changes the assessment in
+[Project Maturity](#project-maturity) above — listing a direction here does
+not imply production readiness for it.
+
+**LangChain/LangGraph integration.** The intent is to grow Lux's existing
+in-process PyO3 gate into an authorization layer for LangChain tool calls,
+so that every tool invocation requires presenting a valid, scoped capability
+token rather than running under ambient trust. LangGraph's
+checkpoint-and-resume pattern is the specific use case motivating this:
+a graph that pauses and later resumes execution benefits from continuous
+revocation checked at each resume point, which catches a capability that
+became invalid during the pause in a way a single TTL set at graph-start
+time would not. No PyO3-LangChain integration code exists in this
+repository today; this is a direction, not an in-progress feature.
+
+**IPC formalization.** Work is underway, in this repository, to extend
+Lux's single-process governance model to inter-process and inter-service
+boundaries via a three-phase Capability-Signed Message protocol — CHECK,
+RESERVE, EXECUTE (see [`docs/ipc/IPC-SPEC.md`](docs/ipc/IPC-SPEC.md)). As of
+this writing only the RESERVE phase has a Rust implementation
+(`src/auth/reservation.rs`); CHECK and EXECUTE remain specification-only,
+and an accompanying Lean model (`lean/IpcReservation.lean`) covers a subset
+of the protocol's claims, several of them with named, unproved `sorry`
+placeholders rather than completed proofs.
+
+**Mechanical Lean verification.** The Lean 4 proof tree under `lean/`
+contains theorems with named `sorry` placeholders, catalogued in
+[`docs/REFINEMENT_GAPS.md`](docs/REFINEMENT_GAPS.md). Closing those
+placeholders and obtaining a `lake build` that completes with zero `sorry`
+and zero errors — run and witnessed directly, not merely asserted — is on
+the roadmap. No Lean/Lake toolchain has been available in this development
+environment to date, so this item is a stated direction rather than
+in-progress work with a known timeline.
+
+---
+
 ## Contributing
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full development contract,
