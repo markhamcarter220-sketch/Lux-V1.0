@@ -428,7 +428,14 @@ mod tests {
     fn reserve_then_grant_succeeds_within_ttl() {
         let mut ledger = ReservationLedger::new();
         let id = ledger
-            .reserve(nz(1), CapabilitySet::ALLOC_RESOURCE, Generation(1), 42, ttl(10), 0)
+            .reserve(
+                nz(1),
+                CapabilitySet::ALLOC_RESOURCE,
+                Generation(1),
+                42,
+                ttl(10),
+                0,
+            )
             .expect("reserve must succeed under capacity");
         let grant = ledger.grant(id, 5).expect("grant within ttl must succeed");
         assert_eq!(grant.reservation_id(), id);
@@ -440,7 +447,14 @@ mod tests {
     fn grant_after_ttl_elapsed_is_denied() {
         let mut ledger = ReservationLedger::new();
         let id = ledger
-            .reserve(nz(1), CapabilitySet::ALLOC_RESOURCE, Generation(1), 42, ttl(10), 0)
+            .reserve(
+                nz(1),
+                CapabilitySet::ALLOC_RESOURCE,
+                Generation(1),
+                42,
+                ttl(10),
+                0,
+            )
             .unwrap();
         assert!(matches!(
             ledger.grant(id, 10),
@@ -456,7 +470,14 @@ mod tests {
     fn revoke_then_grant_is_denied() {
         let mut ledger = ReservationLedger::new();
         let id = ledger
-            .reserve(nz(1), CapabilitySet::ALLOC_RESOURCE, Generation(1), 42, ttl(10), 0)
+            .reserve(
+                nz(1),
+                CapabilitySet::ALLOC_RESOURCE,
+                Generation(1),
+                42,
+                ttl(10),
+                0,
+            )
             .unwrap();
         assert!(ledger.revoke(id));
         assert!(!ledger.revoke(id), "re-revoking must be a no-op, not true");
@@ -471,20 +492,47 @@ mod tests {
         let mut ledger = ReservationLedger::new();
         let origin_nonce = 7u64;
         let a = ledger
-            .reserve(nz(1), CapabilitySet::ALLOC_RESOURCE, Generation(1), origin_nonce, ttl(10), 0)
+            .reserve(
+                nz(1),
+                CapabilitySet::ALLOC_RESOURCE,
+                Generation(1),
+                origin_nonce,
+                ttl(10),
+                0,
+            )
             .unwrap();
         let b = ledger
-            .reserve(nz(1), CapabilitySet::SCHEDULE, Generation(1), origin_nonce, ttl(10), 0)
+            .reserve(
+                nz(1),
+                CapabilitySet::SCHEDULE,
+                Generation(1),
+                origin_nonce,
+                ttl(10),
+                0,
+            )
             .unwrap();
         let unrelated = ledger
-            .reserve(nz(2), CapabilitySet::SCHEDULE, Generation(1), 999, ttl(10), 0)
+            .reserve(
+                nz(2),
+                CapabilitySet::SCHEDULE,
+                Generation(1),
+                999,
+                ttl(10),
+                0,
+            )
             .unwrap();
 
         let revoked_count = ledger.revoke_by_origin_nonce(origin_nonce);
         assert_eq!(revoked_count, 2);
 
-        assert!(matches!(ledger.grant(a, 1), Err(Error::ReservationDenied { .. })));
-        assert!(matches!(ledger.grant(b, 1), Err(Error::ReservationDenied { .. })));
+        assert!(matches!(
+            ledger.grant(a, 1),
+            Err(Error::ReservationDenied { .. })
+        ));
+        assert!(matches!(
+            ledger.grant(b, 1),
+            Err(Error::ReservationDenied { .. })
+        ));
         assert!(
             ledger.grant(unrelated, 1).is_ok(),
             "cascade must not touch reservations from a different origin nonce"
@@ -495,7 +543,14 @@ mod tests {
     fn consume_is_one_shot() {
         let mut ledger = ReservationLedger::new();
         let id = ledger
-            .reserve(nz(1), CapabilitySet::ALLOC_RESOURCE, Generation(1), 42, ttl(10), 0)
+            .reserve(
+                nz(1),
+                CapabilitySet::ALLOC_RESOURCE,
+                Generation(1),
+                42,
+                ttl(10),
+                0,
+            )
             .unwrap();
         ledger.consume(id, 1).expect("first consume must succeed");
         assert!(
@@ -513,11 +568,25 @@ mod tests {
         let mut ledger = ReservationLedger::new();
         for i in 0..MAX_RESERVATIONS {
             ledger
-                .reserve(nz(1), CapabilitySet::SCHEDULE, Generation(1), i as u64, ttl(10), 0)
+                .reserve(
+                    nz(1),
+                    CapabilitySet::SCHEDULE,
+                    Generation(1),
+                    i as u64,
+                    ttl(10),
+                    0,
+                )
                 .expect("must succeed under capacity");
         }
         assert!(matches!(
-            ledger.reserve(nz(1), CapabilitySet::SCHEDULE, Generation(1), 9999, ttl(10), 0),
+            ledger.reserve(
+                nz(1),
+                CapabilitySet::SCHEDULE,
+                Generation(1),
+                9999,
+                ttl(10),
+                0
+            ),
             Err(Error::ReservationDenied { .. })
         ));
         assert_eq!(ledger.len(), MAX_RESERVATIONS);
