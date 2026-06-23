@@ -4,13 +4,15 @@ use lux_kernel::metabolism::ledger::Ledger;
 use lux_kernel::types::Quota;
 use std::num::NonZeroU32;
 
-fuzz_target!(|data: &[u8; 16]| {
+fuzz_target!(|data: [u8; 16]| {
     let ceiling = u64::from_le_bytes(data[0..8].try_into().unwrap());
     let deduction = u64::from_le_bytes(data[8..16].try_into().unwrap());
 
     let node = NonZeroU32::new(1).unwrap();
     let mut ledger = Ledger::new();
-    ledger.seed(node, Quota::new(ceiling));
+    ledger
+        .seed(node, Quota::new(ceiling))
+        .expect("seed on a fresh ledger always succeeds");
 
     match ledger.deduct(node, deduction) {
         Some(new_balance) => {
