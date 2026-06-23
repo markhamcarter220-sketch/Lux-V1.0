@@ -324,6 +324,201 @@ theorem checkpoint_ordering_nontrivial :
     ∃ t : CheckpointTrace, RespectsCheckpointOrdering t ∧ t.revokedAt ≠ none := by
   sorry
 
+-- ── Halt-sequence ordering (additive — docs/ipc/IPC-SPEC.md lines 301–413) ──
+
+/-!
+## Halt-sequence ordering
+
+Models the three-step ordered halt sequence added to `docs/ipc/IPC-SPEC.md`
+("Revocation during EXECUTE → HALT", lines 301–366) and the Protocol
+Primitives subsection it composes with (lines 231–299). **This is not one
+of Claims Discipline items 1–7** — that table was deliberately left
+unmodified when the halt sequence was specified ("no new verification
+claims", per the prompt that produced commit `34bf940`). The statements
+below are therefore additive specification coverage, not a new row in an
+existing obligation table.
+
+**Claims discipline, restated for this section specifically:** every
+theorem below is `sorry`-blocked. None is mechanically verified. Each
+`sorry` carries the comment `specified-but-not-yet-proven, EXECUTE-loop
+model not yet built` — the same root cause Claim 5's
+`checkpoint_ordering_nontrivial` (above) already cites: there is no Lean
+model of the EXECUTE loop itself (no Rust implementation exists to model,
+either — see the file header). A `HaltRun` below is a *trace* of one
+hypothetical execution of the sequence, exactly as `CheckpointTrace` is a
+trace and not a generator; nothing here proves that a real EXECUTE
+implementation produces only conforming traces.
+-/
+
+/-- The four halt triggers this claim addresses, mapped **one-to-one** to
+    `docs/ipc/IPC-SPEC.md`'s own canonical enumeration — stated twice in the
+    document, identically ordered both times:
+
+    - line 330: "reservation revoked, capability nonce revoked, channel
+      severed, TTL expired" (the `RevocationLedger`-write paragraph), and
+    - lines 443–444: "(reservation revoked / capability nonce revoked /
+      channel severed / TTL expired)" (the `denial_reason` field under
+      "Outputs").
+
+    Line-by-line mapping (constructor ← spec trigger, in the document's own
+    order):
+
+    | Constructor | IPC-SPEC.md trigger | Citation |
+    |---|---|---|
+    | `reservationRevoked` | "reservation revoked" | lines 330, 443 |
+    | `capabilityNonceRevoked` | "capability nonce revoked" | lines 330–331, 443–444 |
+    | `channelSevered` | "channel severed" | lines 331, 444 |
+    | `ttlExpired` | "TTL expired" | lines 331, 444 |
+
+    `reservationRevoked` and `capabilityNonceRevoked` are **separate
+    constructors**, not collapsed: the spec's halt-sequence prose
+    acknowledges they are distinguished only by the `denial_reason` string
+    it produces (lines 301–366 do not otherwise distinguish them), but the
+    Outputs-section enumeration (lines 330–331, 443–444) lists them as two
+    items, not one — so this inductive preserves that distinction rather
+    than merging it away.
+
+    `channelSevered` and the task wording's "failed checkpoint" are **the
+    same constructor, not two**: the Protocol Primitives subsection's
+    partition-behavior rule (lines 276–285) states explicitly that a
+    TTL-bounded silence since the last authenticated checkpoint "is
+    additive precision on top of the existing 'Severed revocation channel'
+    rule below... it gives the previously-informal 'severed' condition a
+    measurable trigger... instead of leaving 'severed' undefined" — i.e.
+    "failed checkpoint" is the concrete mechanism that *realizes* a
+    `channelSevered` classification (see also lines 292–299: a failed
+    checkpoint "triggers the same halt sequence" via that same
+    classification), not a fifth, distinct trigger standing alongside it.
+    Collapsing it here keeps this inductive at exactly four constructors,
+    matching the spec's own four-item enumeration exactly. -/
+inductive HaltTrigger where
+  | reservationRevoked
+  | capabilityNonceRevoked
+  | channelSevered
+  | ttlExpired
+  deriving DecidableEq, Repr
+
+/-- A trace of one halt-sequence execution for a single `HaltTrigger`
+    (IPC-SPEC.md lines 312–353). `hookAttemptedAt` may legitimately be
+    `none` when the gated operation exposes no rollback hook (lines
+    312–321: "this step is a no-op by definition, not a failure");
+    `hookSucceeded` is meaningful only when `hookAttemptedAt` is `some _`.
+    `auditWrittenAt` and `returnedAt` model the halt mechanism's two
+    mandatory steps — see `RespectsHaltOrdering`, below, for why a
+    conforming run never leaves them `none`. -/
+structure HaltRun where
+  trigger          : HaltTrigger
+  hookAttemptedAt  : Option Nat
+  hookSucceeded    : Bool
+  auditWrittenAt   : Option Nat
+  returnedAt       : Option Nat
+
+/-- The strict-ordering property a conforming halt run must satisfy
+    (IPC-SPEC.md lines 322–366):
+    1. the audit-log + `RevocationLedger` write (step 2) always occurs —
+       it is never skippable, regardless of whether rollback was
+       attempted or what its outcome was (lines 322–328: "regardless of
+       rollback outcome");
+    2. the fail-closed return (step 3) always occurs and never precedes
+       step 2 (line 357: "the halt is always recorded before the
+       fail-closed return");
+    3. if rollback was attempted (step 1), it does not occur after step 2
+       (lines 355–357: "rollback, if attempted, happens before the halt
+       is recorded"). -/
+def RespectsHaltOrdering (run : HaltRun) : Prop :=
+  (∃ t2, run.auditWrittenAt = some t2) ∧
+  (∃ t2 t3, run.auditWrittenAt = some t2 ∧ run.returnedAt = some t3 ∧ t2 ≤ t3) ∧
+  (∀ t1, run.hookAttemptedAt = some t1 →
+    ∀ t2, run.auditWrittenAt = some t2 → t1 ≤ t2)
+
+/-!
+### Statement 1: halt ordering is strict
+
+**Source:** IPC-SPEC.md lines 312–366 ("Ordering is strict and is part of
+the specification, not an implementation detail").
+
+**Why sorry:** `specified-but-not-yet-proven, EXECUTE-loop model not yet
+built` — see section header above.
+-/
+theorem haltSequence_strictOrder
+    (run : HaltRun) (h : RespectsHaltOrdering run) :
+    (∃ t2 t3, run.auditWrittenAt = some t2 ∧ run.returnedAt = some t3 ∧ t2 ≤ t3) ∧
+    (∀ t1, run.hookAttemptedAt = some t1 →
+      ∀ t2, run.auditWrittenAt = some t2 → t1 ≤ t2) := by
+  -- specified-but-not-yet-proven, EXECUTE-loop model not yet built
+  sorry
+
+/-- Whether state survives a halt — i.e. whether an already-committed
+    sub-step's effect is undone — as a function of rollback-hook
+    availability and outcome only (IPC-SPEC.md lines 312–321, 397–402:
+    "If step 1's rollback hook reports success, `partial` remains
+    `true`..." — the audit record does not change even on a successful
+    rollback, which is the other half of the separation `Statement 2`,
+    below, formalizes). -/
+def stateSurvives (run : HaltRun) : Bool :=
+  match run.hookAttemptedAt with
+  | none => false
+  | some _ => run.hookSucceeded
+
+/-!
+### Statement 2: rollback is a property of the operation, not the halt
+mechanism
+
+**Source:** IPC-SPEC.md lines 312–321, 397–402 (rollback-hook availability
+is action-specific and optional; the halt mechanism's mandatory steps are
+unconditional and do not consult `stateSurvives`).
+
+**Why sorry:** `specified-but-not-yet-proven, EXECUTE-loop model not yet
+built` — see section header above.
+-/
+theorem rollback_is_operation_property
+    (run : HaltRun) (h : RespectsHaltOrdering run) :
+    -- The halt mechanism's mandatory steps occur regardless of whether
+    -- `stateSurvives run` — i.e. regardless of rollback-hook availability
+    -- or outcome.
+    (∃ t2 t3, run.auditWrittenAt = some t2 ∧ run.returnedAt = some t3) ∧
+    -- Changing only the hook's outcome — never its presence, which is a
+    -- property of the operation this model does not let the halt
+    -- mechanism rewrite — leaves the halt mechanism's ordering intact.
+    (∀ b : Bool, RespectsHaltOrdering { run with hookSucceeded := b }) := by
+  -- specified-but-not-yet-proven, EXECUTE-loop model not yet built
+  sorry
+
+/-!
+### Statement 3: audit log write is mandatory
+
+**Source:** IPC-SPEC.md lines 322–347 ("The `RevocationLedger` write
+applies uniformly across all four halt triggers"); the four-trigger
+enumeration is `HaltTrigger`, above.
+
+**Why sorry:** `specified-but-not-yet-proven, EXECUTE-loop model not yet
+built` — see section header above.
+-/
+theorem auditWrite_mandatory_across_all_triggers
+    (trigger : HaltTrigger) (run : HaltRun) (htrig : run.trigger = trigger)
+    (h : RespectsHaltOrdering run) :
+    ∃ t2, run.auditWrittenAt = some t2 := by
+  -- specified-but-not-yet-proven, EXECUTE-loop model not yet built
+  sorry
+
+/-!
+#### Halt-sequence ordering — obligation inventory (additive; does not
+extend the obligation table above, which covers Claims Discipline items
+1–5 only)
+
+| Theorem | Statement | Status | Estimated closure |
+|---------|-----------|--------|--------------------|
+| `haltSequence_strictOrder` | 1 (ordering is strict) | **sorry** | gated on an EXECUTE-loop model; not yet estimated |
+| `rollback_is_operation_property` | 2 (rollback vs. halt mechanism) | **sorry** | gated on an EXECUTE-loop model; not yet estimated |
+| `auditWrite_mandatory_across_all_triggers` | 3 (audit write mandatory) | **sorry** | gated on an EXECUTE-loop model; not yet estimated |
+
+As with Claim 5's `checkpoint_ordering_nontrivial`, no closure estimate is
+given beyond "gated on Phase 3 having a Rust implementation to model in
+the first place" — none of these three statements can be meaningfully
+closed before that model exists, so any numeric estimate here would be
+speculation dressed as planning.
+-/
+
 -- ── Out of scope (per IPC-SPEC.md Claims Discipline) ─────────────────────────
 
 /-!
