@@ -209,6 +209,41 @@ AUDIT & VERIFICATION STATUS:
 
 ---
 
+## Self-Audit Status (Internal, Not a Substitute for Third-Party Audit)
+
+Last self-audit pass: 2026-06-23, on `claude/lux-kernel-repo-scaffold-fxKWb`.
+Commands run directly in this environment; output not fabricated or
+extrapolated from prior runs.
+
+| Check | Command | Result |
+|---|---|---|
+| Formatting | `cargo fmt --all -- --check` | Clean |
+| Lints | `cargo clippy --all-targets --all-features -- -D warnings -D clippy::pedantic -D clippy::cargo -D clippy::nursery` | Zero warnings |
+| Tests | `cargo test --all-features --workspace` | 326 passed, 0 failed, across 11 test binaries |
+| Supply chain (policy) | `cargo deny check` | advisories ok, bans ok, licenses ok, sources ok |
+| Supply chain (vulnerabilities) | `cargo audit` | 2 known advisories in `pyo3` 0.24.2 (RUSTSEC-2026-0176, RUSTSEC-2026-0177); fix requires a 0.24→0.29 major-version bump, tracked as a separate task, not yet attempted |
+| Panic surface | `grep -rn "unwrap()\|expect(\|todo!(" src/` | All hits confined to `#[cfg(test)]` or `#[cfg(kani)]` modules; none reachable from non-test code |
+| `unsafe_code` | `grep "deny(unsafe_code)" src/lib.rs` | Enforced (`src/lib.rs:34`) |
+| Manifest signature verification | grep across `src/boot/`, `src/hsm/` | `verify_strict` (cofactor-safe) used at the actual crypto boundary (`src/hsm/mock.rs`, `src/hsm/keystore.rs`); wired into the boot path via `boot::decode` → `credentials::verify` → `hsm::verify` |
+
+**Not yet run in this environment:** Lean `lake build` (no Lean/Lake toolchain
+installed here — see [Project Maturity](#project-maturity)); coverage
+threshold check (`cargo-llvm-cov` installed but not yet executed);
+`cargo +nightly fuzz run` against the existing fuzz targets
+(`fuzz/fuzz_targets/ledger_arithmetic.rs`, `fuzz/fuzz_targets/manifest_decode.rs`);
+`scripts/attest.sh` reproducible-build attestation.
+
+**Known discrepancy:** the test count above (326) does not match the 318
+figure quoted in [Quick Start](#quick-start)'s per-binary breakdown; the
+breakdown has not been reconciled against the current binary list in this
+pass.
+
+This table reports what was actually run and its actual output. It is an
+internal self-check, not a third-party audit — see
+[`AUDIT_ROADMAP.md`](AUDIT_ROADMAP.md).
+
+---
+
 ## Compliance Applications
 
 Lux has been applied to three regulated decision-making domains as reference

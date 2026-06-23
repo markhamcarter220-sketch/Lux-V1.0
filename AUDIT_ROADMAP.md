@@ -33,7 +33,7 @@ This document is a public commitment to:
 |-----------|--------|--------|
 | Internal security review complete | Q2 2026 | **Done** |
 | Formal verification complete | Q2 2026 | **Done** |
-| Codebase stabilised (no major API changes) | Q2 2026 | **Done** |
+| Codebase stabilised (no major API changes) | Q2 2026 | **In progress** — 40 commits since the 1.0.0 tag added new public API surface (`auth::reservation` module, `Error::ReservationDenied`, `hsm`/`tpm`/`wasm`/`consensus` subsystems, `python` feature); see `CHANGELOG.md` [Unreleased] |
 | Audit vendor shortlist (3 candidates) | Q3 2026 | In progress |
 | Vendor selected and SOW signed | Q3 2026 | Planned |
 | Audit execution | Q3 2026 | Planned |
