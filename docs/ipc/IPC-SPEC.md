@@ -228,39 +228,183 @@ is a new hardware dependency not present anywhere in `src/` today and must
 be flagged the same way TPM/HSM dependencies are flagged in
 `docs/FUNCTION_SPECS.md`'s `REFINEMENT_GAP` register — not assumed here.
 
+### Protocol Primitives
+
+The two-step check above (`ReservationLedger` status, `RevocationLedger`
+membership) is, as of this writing, a conceptual checkpoint check, not a
+wire primitive — no message crosses a process or node boundary in the
+current single-node architecture (see "Severed revocation channel",
+below). This subsection elevates the channel to a named protocol
+primitive so a future multi-node implementation has a single
+specification to build against, rather than reverse-engineering one from
+single-node behavior. **Specified-but-not-yet-proven:** none of the five
+properties below has a Lean theorem, a TLA+ model, or a Rust
+implementation — they are additive specification, flagged the same way
+the rest of this document flags every other unimplemented requirement.
+
+- **Channel directionality.** The authoritative direction is *push*: the
+  node holding the `RevocationLedger` (the authority) pushes a checkpoint
+  message to the executor whenever a relevant nonce or reservation changes
+  state. Push is primary because it minimizes the window between a
+  revocation taking effect at the authority and the executor learning of
+  it. The executor additionally *polls* the authority at each of its own
+  Phase 3 checkpoints (the same checkpoints described above) as a
+  fallback — polling exists to bound the staleness of the executor's view
+  if a push message is lost, not to replace the push path.
+- **Checkpoint message format.** Each checkpoint message (pushed or
+  polled-for) carries, at the logical level — byte-level encoding remains
+  out of scope for this document (see "Out of scope", below):
+  - the capability nonce the message concerns (the same value carried in
+    the originating `Reservation.origin_nonce`, `src/auth/reservation.rs`),
+  - the generation counter the message is valid for (`Generation`,
+    `src/types.rs`),
+  - a timestamp, in the sender's own logical-tick units (the kernel owns
+    no wall clock; see "Granularity, not wall-clock interval", above),
+  - a signature over the preceding three fields.
+- **Authentication of revocation signals.** A checkpoint message is
+  trusted only if its signature verifies against the issuing Lux
+  instance's key. **REFINEMENT_GAP:** the signature scheme itself (which
+  algorithm, which key material, how keys are provisioned or rotated) is
+  a cryptographic primitive, not a pure predicate, and is explicitly not
+  specified here — same flagging convention as claim 7 in Claims
+  Discipline, below, and as the Ed25519/SHA-256 black boxes in
+  `docs/FUNCTION_SPECS.md`'s `REFINEMENT_GAP` register. An unauthenticated
+  or unverifiable checkpoint message is treated as no message at all (it
+  cannot update the executor's view of `Active`/`Revoked` in either
+  direction), which folds it into the partition-behavior rule below
+  rather than into any new acceptance path.
+- **Partition behavior.** Any gap since the last *authenticated*
+  checkpoint message that exceeds the reservation's own TTL, with no
+  valid checkpoint received in that window, is treated identically to an
+  explicit revocation: same `DenialClass::Halt`, same halt sequence (see
+  "Revocation during EXECUTE → HALT", below), same `partial` flag logic.
+  This is additive precision on top of the existing "Severed revocation
+  channel" rule below ("ambiguity defaults to denial") — it does not
+  relax or replace that rule; it gives the previously-informal "severed"
+  condition a measurable trigger (TTL-bounded silence since the last
+  authenticated checkpoint) instead of leaving "severed" undefined.
+- **Composition with `ReservationLedger`.** Receipt of a valid,
+  authenticated checkpoint message updates the receiver's
+  `ReservationLedger` entry for the named reservation: a revocation signal
+  transitions `status → Revoked` exactly as `ReservationLedger::revoke`
+  already does for a local call (`src/auth/reservation.rs`) — the
+  checkpoint is a remote trigger for the same local state transition, not
+  a new state shape. A *failed* checkpoint (unauthenticated, malformed, or
+  absent past the partition-behavior window above) does not write
+  `Revoked` — it has no positive information to record — and instead
+  triggers the same halt sequence as below, leaving the
+  `ReservationLedger` entry's stored `status` unchanged; only the
+  *effective* outcome for this EXECUTE attempt is a halt, so a transient
+  partition cannot corrupt ledger state that a later, successfully
+  authenticated checkpoint might still need to read accurately.
+
 ### Revocation during EXECUTE → HALT: what halt means
 
-This kernel has **no transactional rollback mechanism anywhere in `src/`
-today** (no undo log, no shadow-write-then-commit pattern outside of
-`Ledger::deduct`'s own all-or-nothing `checked_sub`). This protocol does
-not invent one. Therefore:
+This kernel has **no general-purpose transactional rollback mechanism
+anywhere in `src/` today** (no undo log, no shadow-write-then-commit
+pattern outside of `Ledger::deduct`'s own all-or-nothing `checked_sub`).
+This protocol does not invent one. What it does specify, precisely, is the
+**ordered halt sequence** every conforming EXECUTE implementation must
+follow once revocation — or an equivalent ambiguity, see "Severed
+revocation channel" and "Partition behavior", above — is detected at a
+checkpoint:
+
+1. **Attempt rollback if and only if the operation exposes a rollback
+   hook.** "Rollback hook" means an action-specific, opt-in mechanism the
+   gated operation itself provides (e.g. a scheduler's own dequeue-on-abort
+   path). This protocol does not require any operation to provide one,
+   does not define what one looks like, and does not introduce a
+   general-purpose rollback capability to the kernel — it only specifies
+   where, in the halt sequence, an existing hook (if any) is invoked.
+   Where no hook exists, this step is a no-op by definition, not a
+   failure: skipping an unavailable hook is not the same as a rollback
+   attempt failing.
+2. **Write the halt event to the audit log and to the `RevocationLedger`,
+   regardless of rollback outcome.** This step runs whether step 1 was a
+   no-op, succeeded, or failed — rollback outcome never gates whether the
+   halt is recorded. **If rollback (step 1) fails** — the hook was
+   attempted and itself errored, or could not confirm completion — that
+   failure is logged as part of this same step, not swallowed and not
+   treated as a separate outcome; the halt proceeds regardless. The
+   `RevocationLedger` write applies uniformly across all four halt
+   triggers named under "Outputs" below (reservation revoked, capability
+   nonce revoked, channel severed, TTL expired) — this protocol already
+   treats all four as equivalent to a confirmed revocation (see "Severed
+   revocation channel": "ambiguity defaults to denial"), so recording each
+   into the `RevocationLedger` is a direct application of that existing
+   equivalence, not a new exception carved out for one trigger.
+   Concretely, the write targets the reservation's `origin_nonce`
+   (`src/auth/reservation.rs`) — the capability nonce the reservation was
+   derived from — even when the immediate trigger was TTL expiry or a
+   severed channel rather than an explicit `Policy::revoke_capability`
+   call, so a subsequent attempt using the same capability is denied for
+   the same settled reason rather than re-litigating an already-resolved
+   ambiguity. **New requirement, no existing precedent:** nothing in
+   `RevocationLedger` today (`src/auth/revocation.rs`) is invoked by
+   `ReservationLedger` or by any TTL/channel-severance code path — there
+   is no Rust call site for this write yet, exactly as the cascade rule
+   (Phase 2, above) introduced a requirement with no prior precedent in
+   the codebase.
+3. **Return fail-closed to the caller, unconditionally, with a halt reason
+   code** (the `denial_reason` field named under "Outputs", below). This
+   step is not gated on steps 1 or 2 succeeding — there is no path back to
+   "permitted" once a halt has been triggered, and no path on which the
+   caller receives anything other than a denial once this sequence has
+   started.
+
+**Ordering is strict and is part of the specification, not an
+implementation detail:** rollback, if attempted, happens before the halt
+is recorded, and the halt is always recorded before the fail-closed
+return. An implementation that returns to the caller before completing
+step 2, or that skips step 2 because step 1 failed, does not conform to
+this protocol. **Specified-but-not-yet-proven:** this ordering is asserted
+here as a requirement; no Lean theorem or TLA+ model establishes that a
+future EXECUTE implementation actually honors it. This is additive scope
+on top of Claims Discipline claim 5, below — claim 5 covers checkpoint-
+aligned *commit* ordering; the ordering specified here is a distinct,
+three-step *halt-handling* ordering layered on top of it, not a
+restatement of it.
+
+Restating the rest of this protocol's existing constraints, unchanged by
+the above:
 
 - **Constraint on action design, not a new capability of the kernel:**
   EXECUTE must be checkpoint-aligned such that every sub-step between
   checkpoints is independently atomic and leaves no partially-visible
   effect crossing a checkpoint boundary. A design requiring rollback of an
-  already-committed sub-step is **out of scope** for this protocol until a
-  rollback mechanism is separately specified, proposed, and proven — not
-  assumed to exist here.
+  already-committed sub-step beyond what an action's own optional rollback
+  hook (step 1, above) can provide is **out of scope** for this protocol
+  until a general-purpose rollback mechanism is separately specified,
+  proposed, and proven — not assumed to exist here.
 - **Halt semantics, concretely:**
   - If revocation is detected **before** any sub-step has committed: the
     action does not execute at all. Equivalent to today's `DenialClass::Halt`
-    — no kernel state modified.
+    — no kernel state modified beyond the halt sequence's own step 2 write.
   - If revocation is detected **between** sub-steps (some already
     committed, e.g. 3 of 5 work items already scheduled): the action stops
-    immediately at the next checkpoint. The already-committed sub-steps
-    are **not** rolled back (no mechanism exists to do so) — this is
-    honestly a **partial-execution** outcome, not a clean halt, and must be
-    labeled as such.
+    immediately at the next checkpoint, running the halt sequence above.
+    Step 1's rollback hook, if present, is the only mechanism that can
+    undo an already-committed sub-step; absent one, already-committed
+    sub-steps are **not** rolled back — this is honestly a
+    **partial-execution** outcome, not a clean halt, and must be labeled
+    as such.
   - **Partial-execution flag:** the resulting event carries
     `partial: bool`, `true` iff at least one sub-step committed before the
-    halt was detected. This flag must never be silently dropped — a
-    `partial: true` halt is a materially different outcome from a clean
-    halt and downstream auditing must be able to distinguish them.
+    halt sequence's step 1 began. This flag must never be silently
+    dropped — a `partial: true` halt is a materially different outcome
+    from a clean halt and downstream auditing must be able to distinguish
+    them.
+  - **`partial` is not cleared by a successful rollback.** If step 1's
+    rollback hook reports success, `partial` remains `true` rather than
+    being reset to `false`: rollback-hook correctness is not itself a
+    proof obligation in Claims Discipline below, so the audit record must
+    continue to show that a commit occurred and a halt followed, not
+    silently imply nothing happened.
   - **Audit event:** every EXECUTE outcome — completion or halt, partial
-    or clean — is appended to the audit log unconditionally, following the
-    existing rule that an audit event is always emitted regardless of
-    outcome (`src/auth/policy.rs:79`, comment). Proposed: reuse the
+    or clean — is appended to the audit log unconditionally: for the halt
+    case, per step 2 of the halt sequence above; for the completion case,
+    per the existing rule that an audit event is always emitted regardless
+    of outcome (`src/auth/policy.rs:79`, comment). Proposed: reuse the
     existing two-axis `EventKind` × `Outcome` schema
     (`src/audit/event.rs:8-33`) rather than inventing a parallel "halted"
     taxonomy — add one new variant, `EventKind::IpcExecute`, and represent
