@@ -342,3 +342,29 @@ fn attack_3_12_full_ledger_capacity_all_nodes_independent() {
         assert_eq!(ledger.balance(n), Some(50));
     }
 }
+
+// ── Attack 3.13 ───────────────────────────────────────────────────────────────
+// Seeding one node beyond MAX_NODES capacity is hard-rejected, not silently
+// dropped or wrapped onto an existing node.
+
+#[test]
+fn attack_3_13_seed_beyond_max_nodes_capacity_is_rejected() {
+    let mut ledger = Ledger::new();
+
+    for i in 1u32..=u32::try_from(MAX_NODES).expect("constant fits in u32") {
+        ledger
+            .seed(nz(i), Quota::new(100))
+            .expect("test node count within MAX_NODES");
+    }
+
+    let overflow = nz(u32::try_from(MAX_NODES).expect("constant fits in u32") + 1);
+    assert!(
+        ledger.seed(overflow, Quota::new(1)).is_err(),
+        "seeding past MAX_NODES capacity must be rejected"
+    );
+    assert_eq!(
+        ledger.balance(overflow),
+        None,
+        "rejected overflow seed must not register a balance"
+    );
+}

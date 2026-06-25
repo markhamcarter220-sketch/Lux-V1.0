@@ -121,6 +121,41 @@ mod tests {
         assert_eq!(ledger.balance(nz(1)), Some(100));
         assert_eq!(ledger.balance(nz(2)), Some(200));
     }
+
+    #[test]
+    fn deduct_within_balance_succeeds() {
+        let mut ledger = Ledger::default();
+        let node = nz(1);
+        ledger.seed(node, Quota::new(100)).expect("seed");
+        assert_eq!(ledger.deduct(node, 40), Some(60));
+        assert_eq!(ledger.balance(node), Some(60));
+    }
+
+    #[test]
+    fn seed_beyond_max_nodes_is_rejected() {
+        let mut ledger = Ledger::new();
+        let max_nodes = u32::try_from(MAX_NODES).expect("constant fits in u32");
+        for n in 1..=max_nodes {
+            ledger
+                .seed(nz(n), Quota::new(u64::from(n)))
+                .expect("node count within MAX_NODES must fit");
+        }
+        let overflow_node = nz(max_nodes + 1);
+        assert!(
+            matches!(
+                ledger.seed(overflow_node, Quota::new(1)),
+                Err(Error::ManifestInvalid {
+                    detail: "ledger node capacity exceeded (MAX_NODES)"
+                })
+            ),
+            "seeding past MAX_NODES capacity must be rejected"
+        );
+        assert_eq!(
+            ledger.balance(overflow_node),
+            None,
+            "rejected overflow seed must not register a balance"
+        );
+    }
 }
 
 // ── Kani proof harnesses ──────────────────────────────────────────────────────
