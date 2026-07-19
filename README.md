@@ -85,11 +85,13 @@ modules (`LuxSpec.lean`, `LuxCostModel.lean`, `LuxRefinement.lean`,
 NOT been completed in this session and has not been independently witnessed
 since. Source inspection (grep, not a build) finds no `sorry` token in those
 four files. A fifth file, `lean/Refinement.lean`, layers system-level I1–I4
-obligations on top of that proof tree; the same inspection finds 4 of its 9
-theorems contain literal `sorry` placeholders: 2 I3 obligations
-(`accountableResources_soleDeductionPath`, `accountableResources_ceilingBound`)
-and 2 I4 obligations (`topologyBounded_traversalSubsetDeclaredEdges`,
-`topologyBounded_sealingIrreversible`) — see
+obligations on top of that proof tree; source inspection finds 2 literal
+`sorry` tokens (both I3: `accountableResources_soleDeductionPath`,
+`accountableResources_ceilingBound`). The I4 theorems have proof terms but
+rely on unproven hypotheses — see `docs/REFINEMENT_GAPS.md` §I4 for details.
+A sixth file, `lean/IpcReservation.lean`, models the IPC protocol and
+contains 5 additional `sorry` tokens (Claim 4, Claim 5, and three halt-sequence
+obligations — none are part of the I1–I4 invariant obligation set) — see
 [Project Maturity](#project-maturity) and `docs/REFINEMENT_GAPS.md`. Neither
 layer subsumes the other: TLA+/TLC checks system behaviour across a bounded
 model; Lean's proof terms target properties of the ledger/capability model
@@ -196,10 +198,12 @@ Tier 3 — IN PROGRESS (3/5 complete; 2 pending hardware deployment)
     LuxCapabilityBridge.lean: u32 bitfield ↔ Finset Right isomorphism (bitsContainsIffSubset)
     See docs/FORMAL_COST_MODEL.md and docs/FORMAL_VERIFICATION.md §6 for theorem index.
     A fifth file, lean/Refinement.lean, layers 9 system-level I1–I4 obligations
-    above this proof tree. Source inspection (not a build) confirms exactly 4
-    literal `sorry` placeholders: 2 I3 (`accountableResources_soleDeductionPath`,
-    `accountableResources_ceilingBound`) and 2 I4
-    (`topologyBounded_traversalSubsetDeclaredEdges`, `topologyBounded_sealingIrreversible`).
+    above this proof tree. Source inspection (not a build) confirms exactly 2
+    literal `sorry` tokens (both I3: `accountableResources_soleDeductionPath`,
+    `accountableResources_ceilingBound`). The I4 theorems have proof terms but
+    with unproven hypotheses; see docs/REFINEMENT_GAPS.md §I4.
+    A sixth file, lean/IpcReservation.lean, models the IPC protocol and carries
+    5 additional `sorry` tokens (IPC claims 4-5 and three halt-sequence theorems).
     Status becomes "verified" only when `lake build` passes with zero `sorry` and
     zero errors, witnessed directly.
     See docs/REFINEMENT_GAPS.md for the per-theorem breakdown and caveats.

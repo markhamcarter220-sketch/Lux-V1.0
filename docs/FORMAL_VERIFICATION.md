@@ -2,6 +2,15 @@
 
 **Verdict: All four security theorems hold. Zero invariant violations across 322,560 distinct states.**
 
+> **Execution status (2026-07-19):** An attempt to re-run TLC in this session
+> found that `tla/tla2tools.jar` is **not present in the repository** and could
+> not be downloaded (GitHub releases return 403 under org egress policy).
+> The TLC results quoted in §2 are from a prior committed run and have not been
+> independently re-executed in this session. Status: **UNVERIFIED-ENVIRONMENT-LIMITED**.
+> To re-run: obtain `tla2tools.jar` (commit it to `tla/` or provide a
+> policy-allowlisted download URL) and run
+> `cd tla && java -jar tla2tools.jar MC.tla -config MC.cfg -workers 4`.
+
 ---
 
 ## 1. Approach
@@ -238,11 +247,13 @@ toolchain is present in this environment, and no end-to-end build has been
 independently witnessed. Proof terms are drafted but not machine-checked
 here. A fifth file, `lean/Refinement.lean`, layers system-level I1–I4
 obligations on top of this suite; source inspection (grep, not a build)
-confirms 4 of its 9 theorems contain literal `sorry` placeholders: 2 I3
-obligations (`accountableResources_soleDeductionPath`, `accountableResources_ceilingBound`)
-and 2 I4 obligations (`topologyBounded_traversalSubsetDeclaredEdges`,
-`topologyBounded_sealingIrreversible`) — see
-`docs/REFINEMENT_GAPS.md` for the full breakdown. Status becomes "verified"
+confirms 2 literal `sorry` tokens in `lean/Refinement.lean` (both I3:
+`accountableResources_soleDeductionPath`, `accountableResources_ceilingBound`).
+The I4 theorems have proof terms but rely on unproven hypotheses — see
+`docs/REFINEMENT_GAPS.md` §I4. A separate file `lean/IpcReservation.lean`
+carries 5 additional `sorry` tokens covering IPC protocol obligations not
+in scope for the I1–I4 invariant set — see `docs/REFINEMENT_GAPS.md`.
+Status becomes "verified"
 only when `lake build` passes with zero `sorry` and zero errors, witnessed
 directly.
 

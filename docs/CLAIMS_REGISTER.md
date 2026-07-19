@@ -137,6 +137,79 @@ external auditor needs surfaced, not buried in a 536-line gap-triage doc.
 | Missing fact | Status | Evidence / how checked | Notes |
 |---|---|---|---|
 | IPC/cross-boundary capability-revocation race condition (a caller revoking a token concurrently with another caller's in-flight `Policy::check` on the same token, across a process/IPC boundary) | **FIXED 2026-07-19** | `docs/SECURITY.md` §1.2 out-of-scope list now explicitly names this as a documented non-claim: "Cross-IPC capability-revocation races … Serialising a token across an IPC or network boundary while a revocation is in flight on the issuing side is not captured by the kernel's revocation ledger. This is a documented non-claim for V1.0." | — |
+| 5 `sorry` tokens in `lean/IpcReservation.lean` not tracked in any doc | **NEW FINDING — 2026-07-19 (execution pass)** | `grep -Pn "^\s+sorry\s*$" lean/IpcReservation.lean` returns 5 hits (lines 271, 325, 449, 485, 502): `cascade_revokes_all_matching`, `checkpoint_ordering_nontrivial`, `haltSequence_strictOrder`, `rollback_is_operation_property`, `auditWrite_mandatory_across_all_triggers`. None of these appear in README, FORMAL_VERIFICATION.md, or TCB.md. They are IPC protocol obligations (not I1–I4 invariant obligations), but their existence should be disclosed. README and FORMAL_VERIFICATION.md now note this file. | Not a kernel security hole — IpcReservation.lean models an IPC protocol not yet implemented in Rust. But an auditor doing a full `lake build` would see these sorry warnings and expect them to be documented. |
+
+---
+
+## 13. Execution-pass findings (2026-07-19)
+
+> This section records the results of a toolchain-execution pass attempted on 2026-07-19.
+> Commands run in the session environment; raw output quoted verbatim.
+
+### 13.1 Lean 4 / lake build
+
+**Status: UNVERIFIED-ENVIRONMENT-LIMITED**
+
+**Command attempted:** `bash /tmp/elan-init.sh -y --no-modify-path`
+
+**Raw output:**
+```
+info: downloading installer
+curl: (22) The requested URL returned error: 403
+elan: command failed: curl -sSfL https://github.com/leanprover/elan/releases/latest/download/elan-x86_64-unknown-linux-gnu.tar.gz
+```
+
+**Reason:** GitHub release binary downloads return HTTP 403 (org egress policy blocks the host). `elan`, `lake`, and therefore `lake build` cannot be run. No alternative installation path was found that bypasses org policy.
+
+**`kani` harnesses:** `kani` binary not in PATH. Harness existence confirmed at `src/metabolism/ledger.rs:134,157` and `src/auth/capability.rs:194,227` by grep. Execution: UNVERIFIED-ENVIRONMENT-LIMITED.
+
+**Sorry count — source inspection only (not a build):**
+
+Command: `grep -Pn "^\s+sorry\s*$" lean/**/*.lean`
+
+Raw output:
+```
+lean/IpcReservation.lean:271:  sorry
+lean/IpcReservation.lean:325:  sorry
+lean/IpcReservation.lean:449:  sorry
+lean/IpcReservation.lean:485:  sorry
+lean/IpcReservation.lean:502:  sorry
+lean/Refinement.lean:189:  sorry
+lean/Refinement.lean:215:  sorry
+```
+
+**Total: 7 literal `sorry` tokens across 2 files.** Breakdown:
+
+| File | Count | Theorems |
+|------|-------|---------|
+| `lean/Refinement.lean` | 2 | `accountableResources_soleDeductionPath` (I3, line 189); `accountableResources_ceilingBound` (I3, line 215) |
+| `lean/IpcReservation.lean` | 5 | `cascade_revokes_all_matching` (l.271); `checkpoint_ordering_nontrivial` (l.325); `haltSequence_strictOrder` (l.449); `rollback_is_operation_property` (l.485); `auditWrite_mandatory_across_all_triggers` (l.502) |
+| All other lean/*.lean files | 0 | LuxSpec, LuxCostModel, LuxRefinement, LuxCapabilityBridge, FunctionSpecs — zero sorry |
+
+**I4 clarification:** `topologyBounded_traversalSubsetDeclaredEdges` and `topologyBounded_sealingIrreversible` do NOT contain literal `sorry` keywords. They have proof terms (`exact` and `trivial` respectively) but rely on stated hypotheses (`hCorrespondence`) that are themselves unproven. This is a gap but not a `sorry` in the Lean sense. REFINEMENT_GAPS.md calls these "§I4 gaps" accurately, but a previous documentation pass (2026-07-19 morning) mis-stated them as literal `sorry` tokens; that error is now corrected.
+
+**Correction to prior register entry:**
+
+| Claim | Status change | Evidence |
+|---|---|---|
+| "README.md:85-86: 2 of its 9 theorems contain literal sorry" | **RESTORED to original claim — the count of 2 was correct** | Direct grep: only 2 sorry in Refinement.lean (both I3). The morning-session change to "4" was wrong; it misread REFINEMENT_GAPS.md's "§I4 gaps" as literal sorry keywords. Now corrected back to 2 with added note about I4 hypothesis gaps. |
+
+### 13.2 TLA+ / TLC model check
+
+**Status: UNVERIFIED-ENVIRONMENT-LIMITED**
+
+**Finding: `tla/tla2tools.jar` does not exist in the repository.**
+
+`ls /home/user/Lux-V1.0/tla/` output:
+```
+CostModel.tla  LuxKernel.tla  MC.cfg  MC.tla
+```
+
+No `tla2tools.jar` present. `docs/FORMAL_VERIFICATION.md` describes it as "Locate `tla/tla2tools.jar` (per docs/FORMAL_VERIFICATION.md's file map)" but the file is absent from the repo. Download attempts from GitHub releases and nightly build hosts all returned 403 (org egress policy).
+
+**Consequence:** The TLA+/TLC claim of "322,560 distinct states, 0 violations, all 4 theorems PASS" remains UNVERIFIED-ENVIRONMENT-LIMITED. It was UNVERIFIED before this pass; it remains UNVERIFIED after this pass. No progress made; no regression either.
+
+**Recommendation:** Check `tla2tools.jar` into the repository (it is a single standalone JAR, ~3 MB), or provide a script that downloads it from a host allowlisted in the org egress policy. Without the JAR or a system TLC installation, TLC cannot be run in CI or in any agent-proxy-controlled sandbox.
 
 ---
 
@@ -146,8 +219,8 @@ external auditor needs surfaced, not buried in a 536-line gap-triage doc.
 |---|---|
 | CONFIRMED / CONFIRMED-EXECUTED | 14 |
 | FIXED 2026-07-19 (resolved contradictions / missing claims) | 9 |
-| UNVERIFIED (toolchain/sandbox limitation) | 5 |
-| MISSING | 0 |
+| UNVERIFIED-ENVIRONMENT-LIMITED (toolchain absent or blocked) | 7 |
+| MISSING / NEW FINDING | 1 (IpcReservation.lean sorry count) |
 
 ### MUST FIX BEFORE AUDIT (prioritized by real risk, not by document order)
 
