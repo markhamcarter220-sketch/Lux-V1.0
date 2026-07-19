@@ -11,10 +11,14 @@
 Lux V1.0 implements revocation via a monotonic `Generation` counter. When a capability is checked, it must satisfy:
 
 ```
-cap.generation >= current_generation
+cap.generation == current_generation
 ```
 
 If the generation advances, all tokens issued before that point expire simultaneously.
+Tokens minted with a future generation are also denied — `==` is intentional and
+more restrictive than `>=` would be. A token with `generation > current_gen` would
+permanently pass a `>=` check and survive any rotation, defeating the kill switch.
+The TLA+ `IsValidCap` predicate (`tla/LuxKernel.tla`) likewise requires `cap.gen = epoch`.
 
 **Limitation:** This is revocation-by-reset. There is no granular per-token revocation. If you need to revoke token T1 without affecting token T2, the current design cannot do it—you must advance the generation, which revokes T2 as well.
 

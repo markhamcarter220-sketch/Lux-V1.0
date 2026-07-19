@@ -136,7 +136,7 @@ is not yet production-integrated.
 |------|--------------|----------------|
 | HSM-backed capability minting | `SoftwareHsm` mock only | Real PKCS#11 or vendor HSM driver |
 | TPM-anchored boot attestation | `SoftwareTpm` / `NullTpm` mocks only | Real TPM 2.0 driver (tpm2-tss or equivalent) |
-| Formal cost model | Manual analysis only | Mechanized proof (Lean/Isabelle) |
+| Formal cost model | Lean 4 proof terms written (`lean/LuxCostModel.lean`, 7 theorems); `lake build` NOT yet run — not mechanically verified | `lake build` confirmed green, zero `sorry`, witnessed directly |
 | WASM execution substrate | `WasmShim` struct defined | Wasmtime/Cranelift integration |
 | Distributed topology consensus | `MockTransport` only | Real network transport (QUIC/TLS) |
 

@@ -238,8 +238,11 @@ toolchain is present in this environment, and no end-to-end build has been
 independently witnessed. Proof terms are drafted but not machine-checked
 here. A fifth file, `lean/Refinement.lean`, layers system-level I1–I4
 obligations on top of this suite; source inspection (grep, not a build)
-confirms 2 of its 9 theorems contain literal `sorry` placeholders (see
-`docs/REFINEMENT_GAPS.md` for the full breakdown). Status becomes "verified"
+confirms 4 of its 9 theorems contain literal `sorry` placeholders: 2 I3
+obligations (`accountableResources_soleDeductionPath`, `accountableResources_ceilingBound`)
+and 2 I4 obligations (`topologyBounded_traversalSubsetDeclaredEdges`,
+`topologyBounded_sealingIrreversible`) — see
+`docs/REFINEMENT_GAPS.md` for the full breakdown. Status becomes "verified"
 only when `lake build` passes with zero `sorry` and zero errors, witnessed
 directly.
 

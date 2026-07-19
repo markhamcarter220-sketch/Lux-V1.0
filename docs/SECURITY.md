@@ -58,6 +58,14 @@ Lux is designed to remain correct under the following adversary assumptions:
 - Side-channel attacks (Spectre, Meltdown) against the host CPU.
 - Compromise of the key material used to sign the boot manifest (mitigated in
   Tier 3 by HSM integration).
+- **Cross-IPC capability-revocation races:** Lux capability tokens are
+  in-process objects (`!Send + !Sync`).  If a token is serialized and
+  transmitted across an IPC or network boundary, a revocation issued on the
+  originating side while an in-flight `Policy::check` runs on the receiving
+  side is not captured by the kernel's revocation ledger.  This is a
+  documented non-claim for V1.0 — see `ARCHITECTURE.md` §7 ("Network
+  transport… requires a separate trust establishment protocol") and
+  `docs/TCB.md` §4.
 
 ### 1.3 Trust Boundaries
 
@@ -90,7 +98,7 @@ or developer discipline.
 |----|---------------------|--------------|------------|------------------------|
 | V-01 | Capability forgery | Caller constructs a `Capability` with arbitrary rights | `Capability` fields are `pub(crate)` — callers cannot construct without the boot path | `src/auth/capability.rs` |
 | V-02 | Privilege amplification via delegation | Caller delegates a superset of held rights | `Capability::delegate` requires `self.rights.contains(subset)` — returns `None` on violation | `src/auth/capability.rs:delegate` |
-| V-03 | Token replay after revocation | Caller reuses a token after generation rotation | `Capability::authorises` requires `self.generation >= current_gen` | `src/auth/capability.rs:authorises` |
+| V-03 | Token replay after revocation | Caller reuses a token after generation rotation | `Capability::authorises` requires `self.generation == current_gen` (equality, not `>=`; tokens from future generations are also denied — see `src/auth/capability.rs:62-67`) | `src/auth/capability.rs:authorises` |
 | V-04 | Ambient authority bypass | Caller invokes operation without presenting a token | Policy check is mandatory at every subsystem entry; there is no unauthenticated path | `src/auth/policy.rs:check` |
 | V-05 | Topology escape / lateral movement | Caller traverses an undeclared edge | `TopologyGraph::traverse` denies any edge absent from the manifest | `src/topology/graph.rs:traverse` |
 | V-06 | Resource over-commit | Caller allocates beyond declared quota | `Ledger::deduct` uses `checked_sub` — returns `None` (→ `QuotaExceeded`) on underflow | `src/metabolism/ledger.rs:deduct` |

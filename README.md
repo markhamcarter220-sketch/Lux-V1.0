@@ -85,8 +85,11 @@ modules (`LuxSpec.lean`, `LuxCostModel.lean`, `LuxRefinement.lean`,
 NOT been completed in this session and has not been independently witnessed
 since. Source inspection (grep, not a build) finds no `sorry` token in those
 four files. A fifth file, `lean/Refinement.lean`, layers system-level I1–I4
-obligations on top of that proof tree; the same inspection finds 2 of its 9
-theorems contain literal `sorry` placeholders (the I3 obligations) — see
+obligations on top of that proof tree; the same inspection finds 4 of its 9
+theorems contain literal `sorry` placeholders: 2 I3 obligations
+(`accountableResources_soleDeductionPath`, `accountableResources_ceilingBound`)
+and 2 I4 obligations (`topologyBounded_traversalSubsetDeclaredEdges`,
+`topologyBounded_sealingIrreversible`) — see
 [Project Maturity](#project-maturity) and `docs/REFINEMENT_GAPS.md`. Neither
 layer subsumes the other: TLA+/TLC checks system behaviour across a bounded
 model; Lean's proof terms target properties of the ledger/capability model
@@ -193,10 +196,12 @@ Tier 3 — IN PROGRESS (3/5 complete; 2 pending hardware deployment)
     LuxCapabilityBridge.lean: u32 bitfield ↔ Finset Right isomorphism (bitsContainsIffSubset)
     See docs/FORMAL_COST_MODEL.md and docs/FORMAL_VERIFICATION.md §6 for theorem index.
     A fifth file, lean/Refinement.lean, layers 9 system-level I1–I4 obligations
-    above this proof tree. Source inspection (not a build) confirms exactly 2
-    literal `sorry` placeholders, both I3 (`accountableResources_soleDeductionPath`,
-    `accountableResources_ceilingBound`). Status becomes "verified" only when
-    `lake build` passes with zero `sorry` and zero errors, witnessed directly.
+    above this proof tree. Source inspection (not a build) confirms exactly 4
+    literal `sorry` placeholders: 2 I3 (`accountableResources_soleDeductionPath`,
+    `accountableResources_ceilingBound`) and 2 I4
+    (`topologyBounded_traversalSubsetDeclaredEdges`, `topologyBounded_sealingIrreversible`).
+    Status becomes "verified" only when `lake build` passes with zero `sorry` and
+    zero errors, witnessed directly.
     See docs/REFINEMENT_GAPS.md for the per-theorem breakdown and caveats.
 
 AUDIT & VERIFICATION STATUS:
@@ -277,7 +282,11 @@ for liability, even in automated systems.
 alias-named proxies.  All five pass chi-squared independence at α = 0.05
 (p-values: 0.877, 0.910, 0.591, 0.331, 0.833).  Gender and disability —
 highest priority under active CFPB enforcement — pass the 4/5ths disparate
-impact rule.  200 decisions logged, chain verified, zero policy violations.
+impact rule.  The same report flags age, race, and marital_status: specific
+bands fall below the 80% threshold (e.g. Asian rate/best = 61.7%, ages 65+
+ratio = 0.702), and the overall 4/5ths verdict recommends an ECOA/FHA
+disparate-impact review.  200 decisions logged, chain verified, zero policy
+violations.
 
 **Regulatory context:** ECOA (15 U.S.C. § 1691), FHA (42 U.S.C. § 3605),
 CFPB supervisory examination criteria.

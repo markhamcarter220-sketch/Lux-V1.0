@@ -203,7 +203,7 @@ The topology graph is derived from the manifest and enforced at traversal time. 
 
 **Self-loops (A → A):** Allowed. The kernel does not forbid a node declaring an edge to itself. The authorization check `I2` (capability-gated) still applies; the operation must be authorized regardless of graph shape.
 
-**Missing nodes:** If the manifest declares an edge A → B but B is not in the quota table, this is caught at manifest parse time in `boot::Manifest::parse_and_verify()`. The manifest is rejected with `ManifestInvalid` before the kernel is initialized. No partial state is created.
+**Missing nodes:** If the manifest declares an edge A → B but B is not in the quota table, this is caught at manifest parse time in `ManifestDecoder::decode` (`src/boot/decode.rs`). The manifest is rejected with `ManifestInvalid` before the kernel is initialized. No partial state is created.
 
 **Cycles (A → B → A):** Allowed. The topology is a general directed graph, not a DAG. Cycles do not violate `I4`. However, cycles combined with unbounded traversal could create livelock; the caller's responsibility is to provide a traversal policy (e.g., maximum hop count).
 
@@ -236,7 +236,7 @@ through the public API.
 
 ```
 1. Caller provides raw manifest bytes to BootState::initialise()
-2. Manifest::parse_and_verify() validates:
+2. ManifestDecoder::decode (src/boot/decode.rs) validates:
    a. Non-empty, well-formed wire format
    b. Declared edge table (no duplicates, valid node IDs)
    c. Quota table (non-zero ceilings, declared nodes only)

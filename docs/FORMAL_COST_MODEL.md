@@ -28,7 +28,14 @@ closes the representational gap between the `Finset Right` model and the Rust
 
 ## What is proved
 
-The file `lean/LuxCostModel.lean` contains formal specifications and proofs of
+> **Note:** The theorems below are *written* proof terms in Lean 4.
+> `lake build` has NOT been run in this environment — no Lean/Lake toolchain
+> is present — so these are drafted but not yet mechanically verified.
+> Status becomes "verified" only when `lake build` passes with zero `sorry`
+> and zero errors, witnessed directly. See the correspondence checklist at
+> the end of this file and `docs/REFINEMENT_GAPS.md`.
+
+The file `lean/LuxCostModel.lean` contains formal specifications and proof terms for
 the seven core correctness properties of the resource ledger
 (`src/metabolism/ledger.rs`).
 

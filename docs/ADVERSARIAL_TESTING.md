@@ -28,7 +28,7 @@ Test file: `tests/adversarial.rs` (driver) → `tests/adversarial/*.rs` (6 modul
 | # | Attack | What Was Tried | What Stopped It | Result |
 |---|---|---|---|---|
 | 1.1 | Empty-rights capability | `CapabilitySet::empty()` against every right | `authorises()` → false (0 bits set) | **DENY** |
-| 1.2 | Stale generation, all rights | cap.gen=0 at policy.gen=3 | Generation check: `0 >= 3` = false | **DENY** |
+| 1.2 | Stale generation, all rights | cap.gen=0 at policy.gen=3 | Generation check: `0 == 3` = false | **DENY** |
 | 1.3 | Full rights, stale generation | `CapabilitySet::all()` with gen=9 at policy gen=10 | Generation check fires before rights check | **DENY** |
 | 1.4 | Corrupt manifest signature | Single-bit flip at 8 different signature byte offsets | Ed25519 `verify_strict` fails on any bit mutation | **DENY** |
 | 1.5 | Temporal expiry (stale gen) | Gen-0 cap used after rotation to gen 1 and gen 2 | Generation rotation invalidates all prior caps | **DENY** |
